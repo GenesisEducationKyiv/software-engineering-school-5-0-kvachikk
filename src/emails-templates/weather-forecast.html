@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Forecast</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        .forecast-container {
+            white-space: nowrap;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .weather-card {
+            display: inline-block;
+            vertical-align: top;
+            width: 160px;
+            max-width: 90vw;
+            margin: 0 10px 20px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: background 0.3s ease, color 0.3s ease;
+            color: #333;
+        }
+
+        .weather-card--clear-day {
+            background: linear-gradient(to bottom, #87CEEB, #FFD700);
+            color: #000;
+        }
+
+        .weather-card--clear-night {
+            background: linear-gradient(to bottom, #0f1e3d, #2c3e50);
+            color: #fff;
+        }
+
+        .weather-card--few-clouds-day {
+            background: linear-gradient(to bottom, #add8e6, #f0e68c);
+            color: #000;
+        }
+
+        .weather-card--few-clouds-night {
+            background: linear-gradient(to bottom, #1c2a48, #34495e);
+            color: #fff;
+        }
+
+        .weather-card--cloudy {
+            background: linear-gradient(to bottom, #bdc3c7, #e0e0e0);
+            color: #2c3e50;
+        }
+
+        .weather-card--overcast {
+            background: linear-gradient(to bottom, #95a5a6, #bdc3c7);
+            color: #2c3e50;
+        }
+
+        .weather-card--rainy {
+            background: linear-gradient(to bottom, #778da9, #a0b2c6);
+            color: #fff;
+        }
+
+        .weather-card--shower-rain {
+            background: linear-gradient(to bottom, #6c7a89, #8d9aa9);
+            color: #fff;
+        }
+
+        .weather-card--thunderstorm {
+            background: linear-gradient(to bottom, #2c3e50, #594a66);
+            color: #fff;
+        }
+
+        .weather-card--snowy {
+            background: linear-gradient(to bottom, #e0ffff, #ffffff);
+            color: #005792;
+        }
+
+        .weather-card--misty {
+            background: linear-gradient(to bottom, #d3d3d3, #e9e9e9);
+            color: #333;
+        }
+
+        .weather-card--default {
+            background: linear-gradient(to bottom, #ffffff, #ffe8cc);
+            color: #333;
+        }
+
+        .weather-card__date {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .weather-card__temp {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        .weather-card__description {
+            margin: 6px 0 12px;
+            font-size: 14px;
+            text-transform: capitalize;
+            min-height: 30px;
+        }
+
+        .weather-card__icon {
+            width: 60px;
+            height: 60px;
+        }
+
+        .unsubscribe-link {
+            margin-top: 30px;
+            color: #777;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .unsubscribe-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="forecast-container">
+    {{#each forecast}}
+    <div class="weather-card {{this.cardClass}}">
+        <div class="weather-card__date">
+            {{this.dt}}
+        </div>
+        <div class="weather-card__temp">
+            {{this.temp.day}}°C
+        </div>
+        <div class="weather-card__description">
+            {{this.weather.[0].description}}
+        </div>
+        <img src="https://openweathermap.org/img/wn/{{this.weather.[0].icon}}@2x.png" alt="icon"
+             class="weather-card__icon">
+    </div>
+    {{/each}}
+</div>
+
+<div style="margin-top: 30px;">
+    <a href="{{unsubscribeUrl}}" class="unsubscribe-link">Unsubscribe</a>
+</div>
+</body>
+</html>

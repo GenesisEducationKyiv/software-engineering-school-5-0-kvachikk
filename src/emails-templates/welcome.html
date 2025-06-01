@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm your subscription</title>
+</head>
+<body style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+<div style="max-width: 700px; margin: 0 auto; background: linear-gradient(to right, #ffffff, #ffecd2); border-radius: 12px; padding: 30px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+    <h1 style="text-align: center; color: #333;">Welcome to weather updates for {{city}}🌤️</h1>
+
+    <p style="font-size: 16px; text-align: center;">Please confirm your subscription to receive weather updates for <strong>{{city}}</strong>.</p>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{confirmUrl}}" style="display: inline-block; background-color: #4caf50; color: #fff; text-decoration: none; padding: 12px 25px; border-radius: 6px; font-size: 16px;">Confirm Subscription</a>
+    </div>
+
+    <p>If the button above doesn't work, copy and paste this URL into your browser:</p>
+    <p style="word-break: break-all; font-size: 14px; color: #666;">{{confirmUrl}}</p>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+    <p style="font-size: 14px;">If you did not request this subscription, you can ignore this email or <a href="{{unsubscribeUrl}}" style="color: #d9534f;">unsubscribe</a>.</p>
+
+</div>
+</body>
+</html>
