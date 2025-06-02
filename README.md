@@ -2,21 +2,18 @@
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D22.0.0-green.svg)
 
-- **Hosted API**: [weatherapi-trt0.onrender.com](https://weatherapi-trt0.onrender.com/)
-- **Swagger**: [weatherapi-trt0.onrender.com/docs](https://weatherapi-trt0.onrender.com/docs)
-- **Example Request**: [weatherapi-trt0.onrender.com/api/weather?city=Rivne](https://weatherapi-trt0.onrender.com/api/weather?city=Rivne)
-
-- **Demo HTML Page**: [vladpohorilets.github.io/WeatherFrontend/](https://vladpohorilets.github.io/WeatherFrontend/)
-- **Demo HTML Page code**: [View on GitHub](https://github.com/vladpohorilets/WeatherFrontend/blob/main/index.html)
+- **Hosted API**: [https://software-engineering-school-5-0-kvachikk.onrender.com](https://software-engineering-school-5-0-kvachikk.onrender.com)
+- **Swagger**: [https://software-engineering-school-5-0-kvachikk.onrender.com/docs](https://software-engineering-school-5-0-kvachikk.onrender.com/docs)
+- **Example Request**: [https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne](https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne)
 
 > **Known Issue**: Gmail's anti-spam system automatically follows all links in emails, which can cause automatic confirmation of subscriptions. The API works perfectly with other email providers like Proton Mail. Changing to POST requests would fix this, but that would require modifying the swagger specification.
 
 ## Running locally:
    ```
-   git clone https://github.com/vladpohorilets/WeatherAPI
+   git clone https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk
    ```
    ```
-   cd WeatherAPI
+   cd software-engineering-school-5-0-kvachikk
    ```
    ```
    npm install
