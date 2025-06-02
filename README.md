@@ -9,8 +9,6 @@
 - **Demo HTML Page**: [vladpohorilets.github.io/WeatherFrontend/](https://vladpohorilets.github.io/WeatherFrontend/)
 - **Demo HTML Page code**: [View on GitHub](https://github.com/vladpohorilets/WeatherFrontend/blob/main/index.html)
 
-> **Note**: The `.env` file with database credentials is intentionally included to allow you to test the database connection (via DataGrip, for example). This project is hosted on a separate GitHub account for security purposes.
-
 > **Known Issue**: Gmail's anti-spam system automatically follows all links in emails, which can cause automatic confirmation of subscriptions. The API works perfectly with other email providers like Proton Mail. Changing to POST requests would fix this, but that would require modifying the swagger specification.
 
 ## Running locally:
