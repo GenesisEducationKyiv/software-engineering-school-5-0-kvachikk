@@ -1,6 +1,6 @@
 const js = require('@eslint/js');
 const globals = require('globals');
-const {defineConfig} = require('eslint/config');
+const { defineConfig } = require('eslint/config');
 
 module.exports = defineConfig({
     files: ['**/*.{js,mjs,cjs}'],
@@ -11,8 +11,7 @@ module.exports = defineConfig({
             ...globals.node,
         },
     },
-    plugins: {js},
-    extends: ['js/recommended', 'eslint:recommended', 'plugin:prettier/recommended'],
+    extends: [js.configs.recommended, 'eslint:recommended', 'plugin:prettier/recommended'],
     rules: {
         'no-undef': 'warn',
         'no-unused-vars': 'warn',
