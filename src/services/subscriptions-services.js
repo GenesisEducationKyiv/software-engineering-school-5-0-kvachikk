@@ -1,17 +1,17 @@
-const crypto = require("crypto");
-const BadRequestError = require("../errors/invalid-request");
-const sequelize = require("../database/sequelize");
-const Frequency = require("../database/models/frequency")(sequelize, require("sequelize").DataTypes);
-const Subscription = require("../database/models/subscription")(sequelize, require("sequelize").DataTypes);
-const {getWeather} = require("./weather-services");
-const {sendTemplateLetter} = require("../email-utils/sender");
+const crypto = require('crypto');
+const BadRequestError = require('../errors/invalid-request');
+const sequelize = require('../database/sequelize');
+const Frequency = require('../database/models/frequency')(sequelize, require('sequelize').DataTypes);
+const Subscription = require('../database/models/subscription')(sequelize, require('sequelize').DataTypes);
+const {getWeather} = require('./weather-services');
+const {sendTemplateLetter} = require('../email-utils/sender');
 
 const baseURL = process.env.URL;
 
 const subscribe = async (email, city, frequency) => {
     try {
         // 1. Validate frequency
-        const frequencyEntity = await Frequency.findOne({ where: { title: frequency } });
+        const frequencyEntity = await Frequency.findOne({where: {title: frequency}});
         if (!frequencyEntity) {
             const error = new Error(`Invalid frequency selected: ${frequency}`);
             error.status = 400;
@@ -27,7 +27,7 @@ const subscribe = async (email, city, frequency) => {
         }
 
         // 3. Check if a subscription with this email already exists
-        const existingSubscription = await Subscription.findOne({ where: { email } });
+        const existingSubscription = await Subscription.findOne({where: {email}});
 
         if (existingSubscription) {
             const error = new Error(`Subscription for email ${email} already exists.`);
@@ -50,7 +50,7 @@ const subscribe = async (email, city, frequency) => {
         await sendTemplateLetter({
             to: email,
             subject: `Welcome to weather updates for ${city}`,
-            templatePath: "welcome.html",
+            templatePath: 'welcome.html',
             templateVars: {
                 city,
                 confirmUrl: `${baseURL}/api/confirm/${token}`,
@@ -81,8 +81,8 @@ const confirmSubscription = async (token) => {
 
         await sendTemplateLetter({
             to: subscription.email,
-            subject: `You have successfully confirmed your email!`,
-            templatePath: "confirmed.html",
+            subject: 'You have successfully confirmed your email!',
+            templatePath: 'confirmed.html',
             templateVars: {
                 city: subscription.city,
                 unsubscribeUrl: `${baseURL}/api/unsubscribe/${token}`
@@ -108,7 +108,7 @@ const unsubscribe = async (token) => {
         await sendTemplateLetter({
             to: subscription.email,
             subject: `You have successfully unsubscribed from ${subscription.city} weather forecast`,
-            templatePath: "unsubscribed.html",
+            templatePath: 'unsubscribed.html',
             templateVars: {
                 city: subscription.city,
                 subscribe: `${baseURL}/api/confirm/${token}`

@@ -22,13 +22,13 @@ const getCoordinatesByCityName = async (city) => {
 
 const fetchForecast = async (city) => {
     try {
-        const { lat, lon } = await getCoordinatesByCityName(city);
+        const {lat, lon} = await getCoordinatesByCityName(city);
         const forecastUrl = `${OPEN_WEATHER_API_URL}/forecast?lat=${lat}&lon=${lon}&cnt=40&appid=${API_KEY}&units=metric`;
 
         const response = await fetch(forecastUrl);
         const data = await response.json();
 
-        if (data.cod !== "200") {
+        if (data.cod !== '200') {
             throw new Error(`Forecast API error: ${data.message}`);
         }
         return data.list;

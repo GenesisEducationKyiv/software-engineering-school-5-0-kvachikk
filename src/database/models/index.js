@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require("../sequelize");
+const sequelize = require('../sequelize');
 
 const models = {
     Frequency: require('./frequency')(sequelize, Sequelize.DataTypes),

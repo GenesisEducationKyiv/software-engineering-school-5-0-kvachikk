@@ -1,7 +1,7 @@
 const {Subscription, Frequency} = require('../database/models');
 const {fetchForecast} = require('./forecast-fetch');
 const {sendTemplateLetter} = require('./sender');
-const {getWeatherCardClass} = require("./get-weather-card");
+const {getWeatherCardClass} = require('./get-weather-card');
 
 const INTERVALS = {
     hourly: 60 * 60 * 1000,

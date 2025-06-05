@@ -7,7 +7,7 @@ const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const swaggerDocument = YAML.load('./swagger.yaml');
 const {testConnection, seedDatabase, runMigrations} = require('./src/database/database-utils');
-const startScheduler = require("./src/email-utils/scheduler");
+const startScheduler = require('./src/email-utils/scheduler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,10 +21,9 @@ app.use(express.json());
 app.use('/', routes);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     const status = err.status || 500;
     const message = err.message || 'Internal Server Error';
-
     res.status(status).json({ error: message });
 });
 

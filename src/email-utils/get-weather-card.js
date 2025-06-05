@@ -26,4 +26,4 @@ const getWeatherCardClass = (iconCode) => {
     }
 };
 
-module.exports = { getWeatherCardClass };
+module.exports = {getWeatherCardClass};

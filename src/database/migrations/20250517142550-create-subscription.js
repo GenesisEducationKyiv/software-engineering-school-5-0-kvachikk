@@ -1,9 +1,9 @@
 'use strict';
-const { DataTypes } = require('sequelize');
+const {DataTypes} = require('sequelize');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-    async up({ context: queryInterface }) {
+    async up({context: queryInterface}) {
         await queryInterface.createTable('Subscriptions', {
             id: {
                 allowNull: false,
@@ -56,7 +56,7 @@ module.exports = {
         });
     },
 
-    async down({ context: queryInterface }) {
+    async down({context: queryInterface}) {
         await queryInterface.dropTable('Subscriptions');
     }
 };

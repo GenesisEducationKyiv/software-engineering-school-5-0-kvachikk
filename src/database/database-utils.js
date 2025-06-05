@@ -1,6 +1,6 @@
-const {Umzug, SequelizeStorage} = require("umzug");
+const {Umzug, SequelizeStorage} = require('umzug');
 const sequelize = require('../database/sequelize');
-const Frequency = require("./models/frequency")(sequelize, require("sequelize").DataTypes);
+const Frequency = require('./models/frequency')(sequelize, require('sequelize').DataTypes);
 
 const testConnection = async () => {
     try {

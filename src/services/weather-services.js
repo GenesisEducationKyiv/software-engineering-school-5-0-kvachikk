@@ -1,5 +1,5 @@
 const axios = require('axios');
-const NotFoundError = require("../errors/not-found");
+const NotFoundError = require('../errors/not-found');
 
 const getWeather = async (city) => {
     try {
