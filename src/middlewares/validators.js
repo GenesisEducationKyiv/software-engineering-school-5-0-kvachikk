@@ -1,4 +1,4 @@
-const { check, param, query, validationResult } = require('express-validator')
+const { check, param, query, validationResult } = require('express-validator');
 
 const validateSubscription = [
     check('email')
@@ -23,13 +23,13 @@ const validateSubscription = [
         .withMessage('Frequency must be a string'),
 
     (req, res, next) => {
-        const errors = validationResult(req)
+        const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() })
+            return res.status(400).json({ errors: errors.array() });
         }
-        next()
+        next();
     },
-]
+];
 
 const validateToken = [
     param('token')
@@ -39,13 +39,13 @@ const validateToken = [
         .withMessage('Token must be a string'),
 
     (req, res, next) => {
-        const errors = validationResult(req)
+        const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() })
+            return res.status(400).json({ errors: errors.array() });
         }
-        next()
+        next();
     },
-]
+];
 
 const validateWeatherParams = [
     query('city')
@@ -56,13 +56,13 @@ const validateWeatherParams = [
         .withMessage('City name must be at least 2 characters long'),
 
     (req, res, next) => {
-        const errors = validationResult(req)
+        const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() })
+            return res.status(400).json({ errors: errors.array() });
         }
-        next()
+        next();
     },
-]
+];
 
 module.exports = {
     validator: {
@@ -70,4 +70,4 @@ module.exports = {
         validateToken,
         validateWeatherParams,
     },
-}
+};

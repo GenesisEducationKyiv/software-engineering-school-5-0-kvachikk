@@ -1,18 +1,18 @@
-const request = require('supertest')
-const app = require('../../index')
+const request = require('supertest');
+const app = require('../../index');
 
 describe('Weather API Validation', () => {
     it('should return a successful response for a valid city', async () => {
         const response = await request(app)
             .get('/api/weather')
-            .query({ city: 'Lviv' })
-        expect(response.statusCode).toBe(200)
-    })
+            .query({ city: 'Lviv' });
+        expect(response.statusCode).toBe(200);
+    });
 
     it('should fail with status 400 when city parameter is missing', async () => {
-        const response = await request(app).get('/api/weather')
+        const response = await request(app).get('/api/weather');
 
-        expect(response.statusCode).toBe(400)
+        expect(response.statusCode).toBe(400);
         expect(response.body.errors).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
@@ -21,15 +21,15 @@ describe('Weather API Validation', () => {
                     location: 'query',
                 }),
             ])
-        )
-    })
+        );
+    });
 
     it('should fail with status 400 when city parameter is an empty string', async () => {
         const response = await request(app)
             .get('/api/weather')
-            .query({ city: '' })
+            .query({ city: '' });
 
-        expect(response.statusCode).toBe(400)
+        expect(response.statusCode).toBe(400);
         expect(response.body.errors).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
@@ -41,15 +41,15 @@ describe('Weather API Validation', () => {
                     msg: 'City name must be at least 2 characters long',
                 }),
             ])
-        )
-    })
+        );
+    });
 
     it('should fail with status 400 when city name is too short', async () => {
         const response = await request(app)
             .get('/api/weather')
-            .query({ city: 'A' })
+            .query({ city: 'A' });
 
-        expect(response.statusCode).toBe(400)
+        expect(response.statusCode).toBe(400);
         expect(response.body.errors).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
@@ -57,6 +57,6 @@ describe('Weather API Validation', () => {
                     msg: 'City name must be at least 2 characters long',
                 }),
             ])
-        )
-    })
-})
+        );
+    });
+});

@@ -1,5 +1,5 @@
-'use strict'
-const { DataTypes } = require('sequelize')
+'use strict';
+const { DataTypes } = require('sequelize');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -22,9 +22,9 @@ module.exports = {
                 allowNull: false,
                 type: DataTypes.DATE,
             },
-        })
+        });
     },
     async down({ context: queryInterface }) {
-        await queryInterface.dropTable('Frequencies')
+        await queryInterface.dropTable('Frequencies');
     },
-}
+};

@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 
 module.exports = {
     test: {
@@ -54,4 +54,4 @@ module.exports = {
             },
         },
     },
-}
+};

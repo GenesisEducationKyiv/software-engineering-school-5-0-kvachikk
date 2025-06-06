@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 
 const common = {
     dialect: 'postgres',
@@ -8,7 +8,7 @@ const common = {
             rejectUnauthorized: false,
         },
     },
-}
+};
 
 module.exports = {
     development: {
@@ -23,4 +23,4 @@ module.exports = {
         url: process.env.DB_URL,
         ...common,
     },
-}
+};
