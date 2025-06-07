@@ -50,7 +50,7 @@ Bandwidth
 - External API: 50 Mbps
 
 ## 3. High-Level Architecture
-_(To be detailed: components, data flow, services, infrastructure diagram)_
+![High-Level Architecture](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-2-system-design/docs/High-level-architech.png?raw=true)
 
 ## 4. Detailed Component Design
 
@@ -68,11 +68,8 @@ _(To be detailed: components, data flow, services, infrastructure diagram)_
 - GET /api/unsubscribe/{token} - Allows users to unsubscribe from weather updates using a token included in each weather update email
 - GET /docs - full API Documentation
 
-````
-
 **Scaling:**
 - Horizontal scaling via container orchestration
-
 
 ### 4.4 Weather API Integration
 
