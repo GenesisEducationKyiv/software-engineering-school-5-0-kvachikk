@@ -13,8 +13,8 @@ const getCoordinatesByCityName = async (city) => {
             throw new Error('City not found');
         }
 
-        const {lat, lon} = data[0];
-        return {lat, lon};
+        const { lat, lon } = data[0];
+        return { lat, lon };
     } catch (error) {
         console.error('Error fetching coordinates:', error.message);
     }
@@ -28,7 +28,7 @@ const fetchForecast = async (city) => {
         const response = await fetch(forecastUrl);
         const data = await response.json();
 
-        if (data.cod !== "200") {
+        if (data.cod !== '200') {
             throw new Error(`Forecast API error: ${data.message}`);
         }
         return data.list;
@@ -38,5 +38,5 @@ const fetchForecast = async (city) => {
 };
 
 module.exports = {
-    fetchForecast
+    fetchForecast,
 };

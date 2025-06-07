@@ -2,11 +2,11 @@ const isValidEmail = async (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
-const isValidLetter = async ({from, to, subject, html, text}) => {
-    if (!from || !await isValidEmail(from)) {
+const isValidLetter = async ({ from, to, subject, html, text }) => {
+    if (!from || !(await isValidEmail(from))) {
         throw new Error(`Invalid sender email address: "${from}"`);
     }
-    if (!to || !await isValidEmail(to)) {
+    if (!to || !(await isValidEmail(to))) {
         throw new Error(`Invalid recipient email address: "${to}"`);
     }
     if (!subject || typeof subject !== 'string') {
@@ -16,7 +16,9 @@ const isValidLetter = async ({from, to, subject, html, text}) => {
         throw new Error('HTML content is required and must be a string');
     }
     if (text && typeof text !== 'string') {
-        throw new Error('Text content is optional, but if provided, it must be a string');
+        throw new Error(
+            'Text content is optional, but if provided, it must be a string'
+        );
     }
     return true;
 };

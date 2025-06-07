@@ -1,6 +1,9 @@
-const {Umzug, SequelizeStorage} = require("umzug");
+const { Umzug, SequelizeStorage } = require('umzug');
 const sequelize = require('../database/sequelize');
-const Frequency = require("./models/frequency")(sequelize, require("sequelize").DataTypes);
+const Frequency = require('./models/frequency')(
+    sequelize,
+    require('sequelize').DataTypes
+);
 
 const testConnection = async () => {
     try {
@@ -17,15 +20,13 @@ const seedDatabase = async () => {
     try {
         const count = await Frequency.count();
         if (count > 0) {
-            console.log('Seeding has been skipped because data already exists. \n');
+            console.log(
+                'Seeding has been skipped because data already exists. \n'
+            );
             return;
         }
 
-        await Frequency.bulkCreate([
-            {title: 'hourly'},
-            {title: 'daily'},
-        ]);
-
+        await Frequency.bulkCreate([{ title: 'hourly' }, { title: 'daily' }]);
     } catch (err) {
         console.error('Failed to seed database:', err);
     }
@@ -37,7 +38,7 @@ const runMigrations = async () => {
             glob: 'src/database/migrations/*.js',
         },
         context: sequelize.getQueryInterface(),
-        storage: new SequelizeStorage({sequelize}),
+        storage: new SequelizeStorage({ sequelize }),
         logger: console,
     });
 
@@ -49,5 +50,5 @@ module.exports = {
     sequelize,
     testConnection,
     runMigrations,
-    seedDatabase
+    seedDatabase,
 };

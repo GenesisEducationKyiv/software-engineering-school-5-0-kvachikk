@@ -9,22 +9,22 @@ module.exports = {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
-                type: DataTypes.INTEGER
+                type: DataTypes.INTEGER,
             },
             title: {
-                type: DataTypes.STRING
+                type: DataTypes.STRING,
             },
             createdAt: {
                 allowNull: false,
-                type: DataTypes.DATE
+                type: DataTypes.DATE,
             },
             updatedAt: {
                 allowNull: false,
-                type: DataTypes.DATE
-            }
+                type: DataTypes.DATE,
+            },
         });
     },
     async down({ context: queryInterface }) {
         await queryInterface.dropTable('Frequencies');
-    }
+    },
 };

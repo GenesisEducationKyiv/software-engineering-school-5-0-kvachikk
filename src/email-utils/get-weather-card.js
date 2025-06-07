@@ -4,9 +4,13 @@ const getWeatherCardClass = (iconCode) => {
 
     switch (code) {
         case '01':
-            return dayOrNight === 'd' ? 'weather-card--clear-day' : 'weather-card--clear-night';
+            return dayOrNight === 'd'
+                ? 'weather-card--clear-day'
+                : 'weather-card--clear-night';
         case '02':
-            return dayOrNight === 'd' ? 'weather-card--few-clouds-day' : 'weather-card--few-clouds-night';
+            return dayOrNight === 'd'
+                ? 'weather-card--few-clouds-day'
+                : 'weather-card--few-clouds-night';
         case '03':
             return 'weather-card--cloudy';
         case '04':

@@ -8,7 +8,7 @@ const sequelize = new Sequelize(dbConfig.url, {
     dialect: dbConfig.dialect,
     logging: dbConfig.logging,
     pool: dbConfig.pool,
-    dialectOptions: dbConfig.dialectOptions
+    dialectOptions: dbConfig.dialectOptions,
 });
 
 module.exports = sequelize;

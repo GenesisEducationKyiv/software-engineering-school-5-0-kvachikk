@@ -18,45 +18,45 @@ module.exports = {
             },
             city: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
             },
             isActive: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: true
+                defaultValue: true,
             },
             isVerified: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
             },
             verificationToken: {
                 type: DataTypes.STRING,
-                allowNull: true
+                allowNull: true,
             },
             frequencyId: {
                 type: DataTypes.INTEGER,
                 references: {
                     model: 'Frequencies',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'SET NULL'
+                onDelete: 'SET NULL',
             },
             lastSentAt: {
                 type: DataTypes.DATE,
-                allowNull: true
+                allowNull: true,
             },
             createdAt: {
                 type: DataTypes.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updatedAt: {
                 type: DataTypes.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
     },
 
     async down({ context: queryInterface }) {
         await queryInterface.dropTable('Subscriptions');
-    }
+    },
 };

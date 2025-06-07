@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
     res.json({
         name: 'WeatherAPI',
         version: '1.0.0',
-        description: `Server is running and you can read API on ${process.env.URL}/docs`
+        description: `Server is running and you can read API on ${process.env.URL}/docs`,
     });
 });
 
