@@ -50,7 +50,7 @@ Bandwidth
 - External API: 50 Mbps
 
 ## 3. High-Level Architecture
-_(To be detailed: components, data flow, services, infrastructure diagram)_
+![High-Level Architecture](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-2-system-design/docs/High-level-architech.png?raw=true)
 
 ## 4. Detailed Component Design
 
