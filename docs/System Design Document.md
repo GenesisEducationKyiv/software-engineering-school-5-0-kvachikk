@@ -66,6 +66,12 @@ Bandwidth
 - POST /api/subscribe - Subscribes an email to weather updates for a specific city with selected frequency (daily or hourly)
 - GET /api/confirm/{token} - Confirms email subscription via token sent in the confirmation email
 - GET /api/unsubscribe/{token} - Allows users to unsubscribe from weather updates using a token included in each weather update email
+
+- GET /api/all - Read all subscription 
+- GET /api/get/{id} - Get info about certain subscription 
+- POST /api/create - Add manually a new subscription 
+- PUT /api/update - Update info about certain subscription 
+- DELETE /api/delete/{token} - Completely delete data about subscription 
 - GET /docs - full API Documentation
 
 **Scaling:**
