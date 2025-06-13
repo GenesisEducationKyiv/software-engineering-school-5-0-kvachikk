@@ -72,7 +72,6 @@ Bandwidth
 - CRUD operations for subscriptions
 
 **Endpoints:**
-
 - POST `/api/v1/subscription` - create a subscription
 - GET `/api/v1/subscription/:id` - view one subscription
 - PATCH `/api/v1/subscription/:id` - change (e.g. frequency)
