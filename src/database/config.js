@@ -1,57 +1,15 @@
-require('dotenv').config();
+const config = require('../config/index');
 
 module.exports = {
     test: {
-        url: process.env.DB_URL,
-        dialect: 'postgres',
-        logging: false,
-        pool: {
-            max: 5,
-            min: 0,
-            acquire: 30000,
-            idle: 10000,
-        },
-        dialectOptions: {
-            ssl: {
-                require: true,
-                rejectUnauthorized: false,
-            },
-        },
+        ...config.database.test,
     },
 
     development: {
-        url: process.env.DB_URL,
-        dialect: 'postgres',
-        logging: false,
-        pool: {
-            max: 5,
-            min: 0,
-            acquire: 30000,
-            idle: 10000,
-        },
-        dialectOptions: {
-            ssl: {
-                require: true,
-                rejectUnauthorized: false,
-            },
-        },
+        ...config.database.development,
     },
 
     production: {
-        url: process.env.DB_URL,
-        dialect: 'postgres',
-        logging: false,
-        pool: {
-            max: 5,
-            min: 0,
-            acquire: 30000,
-            idle: 10000,
-        },
-        dialectOptions: {
-            ssl: {
-                require: true,
-                rejectUnauthorized: false,
-            },
-        },
+        ...config.database.production,
     },
 };

@@ -1,8 +1,14 @@
 const express = require('express');
-const router = express.Router();
-const controller = require('../controllers/weather-controller');
-const { validator } = require('../middlewares/validators');
+const weatherController = require('../controllers/weather-controller');
+const validate = require('../middlewares/validation.js');
+const { weatherParamsSchema } = require('../middlewares/validation/schemas');
 
-router.get('/weather', validator.validateWeatherParams, controller.getWeather);
+module.exports = (weatherService) => {
+    const router = express.Router();
+    const controller = weatherController(weatherService);
+    const validateWeatherQuery = validate(weatherParamsSchema, 'query');
 
-module.exports = router;
+    router.get('/', validateWeatherQuery, controller.getWeather);
+
+    return router;
+};

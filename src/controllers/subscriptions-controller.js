@@ -1,37 +1,46 @@
-const services = require('../services/subscriptions-services');
+const response = require('../utils/response-builder');
+const messages = require('../constants/messages/subscription-response-messages');
 
-const subscribe = async (req, res, next) => {
-    try {
-        const { email, city, frequency } = req.body;
-        await services.subscribe(email, city, frequency);
-        res.status(201).json(
-            'Subscription successful. Confirmation email sent.'
-        );
-    } catch (error) {
-        next(error);
-    }
+const subscriptionController = (subscriptionService) => {
+    const controller = {
+        service: subscriptionService,
+
+        async subscribe(req, res, next) {
+            try {
+                const { email, city, frequency } = req.body;
+                await this.service.subscribe(email, city, frequency);
+                response.created(res, messages.SUBSCRIBE_SUCCESS);
+            } catch (error) {
+                next(error);
+            }
+        },
+
+        async confirm(req, res, next) {
+            try {
+                const { token } = req.params;
+                await this.service.confirmSubscription(token);
+                response.success(res, messages.CONFIRM_SUCCESS);
+            } catch (error) {
+                next(error);
+            }
+        },
+
+        async unsubscribe(req, res, next) {
+            try {
+                const { token } = req.params;
+                await this.service.unsubscribe(token);
+                response.success(res, messages.UNSUBSCRIBE_SUCCESS);
+            } catch (error) {
+                next(error);
+            }
+        },
+    };
+
+    controller.subscribe = controller.subscribe.bind(controller);
+    controller.confirm = controller.confirm.bind(controller);
+    controller.unsubscribe = controller.unsubscribe.bind(controller);
+
+    return controller;
 };
 
-const confirmSubscription = async (req, res, next) => {
-    try {
-        await services.confirmSubscription(req.params.token);
-        res.status(200).json('Subscription confirmed successfully!');
-    } catch (error) {
-        next(error);
-    }
-};
-
-const unsubscribe = async (req, res, next) => {
-    try {
-        await services.unsubscribe(req.params.token);
-        res.status(200).json('Successfully unsubscribed from weather updates!');
-    } catch (error) {
-        next(error);
-    }
-};
-
-module.exports = {
-    subscribe,
-    confirmSubscription,
-    unsubscribe,
-};
+module.exports = subscriptionController;

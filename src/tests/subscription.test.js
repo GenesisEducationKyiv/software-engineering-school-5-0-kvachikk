@@ -16,7 +16,7 @@ describe('Subscription API', () => {
         }
     });
 
-    it('should create a subscription with valid data', async () => {
+    it('should create a subscription with valid seed-data', async () => {
         const response = await request(app)
             .post('/api/subscribe')
             .send({

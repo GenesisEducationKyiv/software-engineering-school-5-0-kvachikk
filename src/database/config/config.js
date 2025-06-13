@@ -1,26 +1,7 @@
-require('dotenv').config();
-
-const common = {
-    dialect: 'postgres',
-    dialectOptions: {
-        ssl: {
-            require: true,
-            rejectUnauthorized: false,
-        },
-    },
-};
+const config = require('../../config');
 
 module.exports = {
-    development: {
-        url: process.env.DB_URL,
-        ...common,
-    },
-    test: {
-        url: process.env.DB_URL,
-        ...common,
-    },
-    production: {
-        url: process.env.DB_URL,
-        ...common,
-    },
+    test: config.database.test,
+    development: config.database.development,
+    production: config.database.production,
 };

@@ -1,23 +1,22 @@
 const axios = require('axios');
-const NotFoundError = require('../errors/not-found');
+const config = require('../config/index');
+const NotFoundError = require('../constants/errors/not-found');
+const BadRequestError = require('../constants/errors/not-found');
 
-const getWeather = async (city) => {
+const getWeatherByCity = async (city) => {
     try {
-        const response = await axios.get(
-            `${process.env.OPEN_WEATHER_API_URL}/find`,
-            {
-                params: {
-                    q: city,
-                    appid: process.env.OPEN_WEATHER_API_KEY,
-                    units: 'metric',
-                },
-            }
-        );
+        const response = await axios.get(`${config.weatherApi.baseUrl}/find`, {
+            params: {
+                q: city,
+                appid: config.weatherApi.apiKey,
+                units: 'metric',
+            },
+        });
 
         const data = response.data;
 
         if (!data.list || data.list.length === 0) {
-            throw new NotFoundError(`City "${city}" not found`);
+            throw new NotFoundError(city);
         }
 
         const { main, weather } = data.list[0];
@@ -28,15 +27,19 @@ const getWeather = async (city) => {
             description: weather[0].description,
         };
     } catch (error) {
-        if (error instanceof NotFoundError) throw error;
-
-        if (error.response && error.response.status === 404) {
-            throw new NotFoundError(`City "${city}" not found`);
+        if (!error.status) {
+            if (error.response?.status === 400) {
+                throw new BadRequestError(error);
+            } else if (error.response?.status === 404) {
+                throw new NotFoundError(error);
+            } else {
+                throw new Error(error);
+            }
         }
-        throw new Error(`Failed to fetch weather data: ${error.message}`);
+        throw error;
     }
 };
 
 module.exports = {
-    getWeather,
+    getWeatherByCity,
 };

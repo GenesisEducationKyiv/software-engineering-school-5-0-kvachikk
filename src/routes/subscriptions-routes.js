@@ -1,18 +1,24 @@
 const express = require('express');
-const router = express.Router();
-const controller = require('../controllers/subscriptions-controller');
-const { validator } = require('../middlewares/validators');
+const subscriptionController = require('../controllers/subscriptions-controller');
+const validate = require('../middlewares/validation.js');
+const {
+    subscriptionSchema,
+    verifyEmailSchema,
+} = require('../middlewares/validation/schemas');
 
-router.post('/subscribe', validator.validateSubscription, controller.subscribe);
-router.get(
-    '/confirm/:token',
-    validator.validateToken,
-    controller.confirmSubscription
-);
-router.get(
-    '/unsubscribe/:token',
-    validator.validateToken,
-    controller.unsubscribe
-);
+module.exports = (subscriptionService) => {
+    const router = express.Router();
+    const controller = subscriptionController(subscriptionService);
+    const validateSubscriptionBody = validate(subscriptionSchema, 'body');
+    const validateTokenParams = validate(verifyEmailSchema, 'params');
 
-module.exports = router;
+    router.post('/subscribe', validateSubscriptionBody, controller.subscribe);
+    router.get('/confirm/:token', validateTokenParams, controller.confirm);
+    router.get(
+        '/unsubscribe/:token',
+        validateTokenParams,
+        controller.unsubscribe
+    );
+
+    return router;
+};
