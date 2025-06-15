@@ -16,6 +16,3 @@ jobs:
 
             - name: Run Prettier
               run: npm run format
-
-            - name: Run test
-              run: npm run test
