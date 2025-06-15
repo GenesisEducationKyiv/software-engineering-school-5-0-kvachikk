@@ -1,7 +1,0 @@
-const config = require('../../config');
-
-module.exports = {
-    test: config.database.test,
-    development: config.database.development,
-    production: config.database.production,
-};

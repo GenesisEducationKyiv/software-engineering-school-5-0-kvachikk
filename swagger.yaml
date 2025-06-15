@@ -73,7 +73,7 @@ paths:
                   type: 'string'
                 - name: 'frequency'
                   in: 'formData'
-                  description: 'Frequency of updates (hourly or daily)'
+                  description: 'FrequencyModel of updates (hourly or daily)'
                   required: true
                   type: 'string'
                   enum: ['hourly', 'daily']
@@ -156,7 +156,7 @@ definitions:
                 description: 'City for weather updates'
             frequency:
                 type: 'string'
-                description: 'Frequency of updates'
+                description: 'FrequencyModel of updates'
                 enum: ['hourly', 'daily']
             confirmed:
                 type: 'boolean'
