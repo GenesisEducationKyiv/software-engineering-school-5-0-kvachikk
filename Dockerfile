@@ -1,13 +1,7 @@
-FROM node:22
-
+FROM node:24
 WORKDIR /app
-
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
-
 EXPOSE 3000
-
-CMD ["node", "validation.js"]
+CMD ["node", "index.js"]
