@@ -13,6 +13,7 @@ import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
 import { NotFoundError } from '../src/constants/errors/not-found.error';
 import { BadRequestError } from '../src/constants/errors/bad-request.error';
 import { DatabaseLoader } from '../src/loaders/database.loader';
+import { EmailService } from '../src/services/emails/sender';
 
 // Mock
 const weatherServiceMock: Partial<Record<keyof CurrentWeatherService, any>> = {
@@ -29,6 +30,8 @@ const subscriptionServiceMock: Partial<Record<keyof SubscriptionService, any>> =
    unsubscribe: jest.fn().mockResolvedValue({}),
    getActiveSubscriptions: jest.fn().mockResolvedValue([]),
 };
+
+const emailServiceMock = { sendTemplateLetter: jest.fn(), sendSimpleLetter: jest.fn() } as Partial<EmailService>;
 
 // Helper
 const makeValidSubscriptionPayload = () => ({
@@ -53,6 +56,8 @@ describe('Weather-Forecast API (integration)', () => {
          .useValue({ onModuleInit: jest.fn() })
          .overrideProvider(DatabaseLoader)
          .useValue({ onModuleInit: jest.fn() })
+         .overrideProvider(EmailService)
+         .useValue(emailServiceMock)
          .compile();
 
       app = moduleFixture.createNestApplication();
@@ -62,7 +67,7 @@ describe('Weather-Forecast API (integration)', () => {
    });
 
    afterAll(async () => {
-      await app.close();
+      if (app) await app.close();
    });
 
    //  Weather
