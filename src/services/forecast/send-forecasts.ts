@@ -13,9 +13,7 @@ export async function sendForecasts(
    emailService: EmailService,
 ): Promise<void> {
    for (const subscription of subscriptions) {
-      const forecast = await forecastService.getFormattedForecast(
-         subscription.city,
-      );
+      const forecast = await forecastService.getFormattedForecast(subscription.city);
       if (!forecast) continue;
       await emailService.sendForecastEmail(subscription, forecast);
    }

@@ -1,4 +1,4 @@
-name: CI/CD Pipelines
+name: Linter Pipeline
 
 on: [push, pull_request]
 

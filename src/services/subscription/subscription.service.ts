@@ -20,23 +20,16 @@ export class SubscriptionService {
       return randomBytes(32).toString('hex');
    }
 
-   async subscribe(
-      email: string,
-      city: string,
-      frequency: string,
-   ): Promise<any> {
+   async subscribe(email: string, city: string, frequency: string): Promise<any> {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const frequencyEntity =
-         await this.repository.findFrequencyByTitle(frequency);
+      const frequencyEntity = await this.repository.findFrequencyByTitle(frequency);
 
       await this.weatherService.fetchRawForecast(city);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const existing = await this.repository.findByEmail(email);
       if (existing) {
-         throw new ConflictError(
-            subscriptionResponseMessages.SUBSCRIPTION_ALREADY_EXISTS,
-         );
+         throw new ConflictError(subscriptionResponseMessages.SUBSCRIPTION_ALREADY_EXISTS);
       }
 
       const token = this.generateToken();

@@ -10,14 +10,10 @@ export class EmailValidationService {
 
    isValidLetter({ from, to, subject, html, text }: Letter): boolean {
       if (!from || !this.isValidEmail(from)) {
-         throw new Error(
-            `${validationMessages.LETTER_SENDER_INVALID}"${from}"`,
-         );
+         throw new Error(`${validationMessages.LETTER_SENDER_INVALID}"${from}"`);
       }
       if (!to || !this.isValidEmail(to)) {
-         throw new Error(
-            `${validationMessages.LETTER_RECIPIENT_INVALID}"${to}"`,
-         );
+         throw new Error(`${validationMessages.LETTER_RECIPIENT_INVALID}"${to}"`);
       }
       if (!subject) {
          throw new Error(validationMessages.LETTER_SUBJECT_REQUIRED);

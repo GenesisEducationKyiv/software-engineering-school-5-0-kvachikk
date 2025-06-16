@@ -1,11 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { weatherConfig } from '../../config';
-import {
-   ICoordinates,
-   IGeocodeResponseItem,
-   IForecastItem,
-   IForecastResponse,
-} from '../../interfaces/Forecast';
+import { ICoordinates, IGeocodeResponseItem, IForecastItem, IForecastResponse } from '../../interfaces/Forecast';
 
 @Injectable()
 export class ForecastFetchingService {

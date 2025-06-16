@@ -1,11 +1,4 @@
-import {
-   Table,
-   Column,
-   Model,
-   DataType,
-   BelongsTo,
-   ForeignKey,
-} from 'sequelize-typescript';
+import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { FrequencyModel } from './frequency.model';
 
 @Table({ tableName: 'Subscriptions', modelName: 'SubscriptionModel' })

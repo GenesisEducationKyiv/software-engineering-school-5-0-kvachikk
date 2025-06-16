@@ -30,12 +30,8 @@ export class SubscriptionRepository {
       private readonly frequencyModel: IFrequencyModel,
    ) {}
 
-   private getModel(
-      model: 'subscription' | 'frequency',
-   ): ISubscriptionModel | IFrequencyModel {
-      return model === 'subscription'
-         ? this.subscriptionModel
-         : this.frequencyModel;
+   private getModel(model: 'subscription' | 'frequency'): ISubscriptionModel | IFrequencyModel {
+      return model === 'subscription' ? this.subscriptionModel : this.frequencyModel;
    }
 
    /**
@@ -43,10 +39,7 @@ export class SubscriptionRepository {
     * @param model        Which model to query: "subscription" | "frequency".
     * @param whereClause  Plain object representing the Sequelize "where" clause.
     */
-   async find(
-      model: 'subscription' | 'frequency',
-      whereClause: Record<string, unknown>,
-   ): Promise<any> {
+   async find(model: 'subscription' | 'frequency', whereClause: Record<string, unknown>): Promise<any> {
       const targetModel = this.getModel(model);
       return targetModel.findOne({ where: whereClause });
    }
@@ -71,9 +64,7 @@ export class SubscriptionRepository {
       return subscriptionInstance.save();
    }
 
-   async getActiveSubscriptionsByFrequency(
-      frequencyTitle: string,
-   ): Promise<any[]> {
+   async getActiveSubscriptionsByFrequency(frequencyTitle: string): Promise<any[]> {
       return this.subscriptionModel.findAll({
          where: { isActive: true, isVerified: true },
          include: [

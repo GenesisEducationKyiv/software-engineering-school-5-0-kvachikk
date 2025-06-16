@@ -25,19 +25,11 @@ export class EmailService {
       templateVars = {},
       text = '',
    }: TemplateLetterParams): Promise<void> {
-      let fullPath = path.join(
-         __dirname,
-         '../../constants/templates',
-         templatePath,
-      );
+      let fullPath = path.join(__dirname, '../../constants/templates', templatePath);
 
       if (!fs.existsSync(fullPath)) {
          // Fallback when running from compiled dist without copied assets
-         fullPath = path.join(
-            process.cwd(),
-            'src/constants/templates',
-            templatePath,
-         );
+         fullPath = path.join(process.cwd(), 'src/constants/templates', templatePath);
       }
 
       const template = handlebars.compile(fs.readFileSync(fullPath, 'utf8'));
@@ -63,10 +55,7 @@ export class EmailService {
       }
    }
 
-   async sendForecastEmail(
-      subscription: ISubscription,
-      forecast: ITemplateWeatherItem[] | string,
-   ): Promise<void> {
+   async sendForecastEmail(subscription: ISubscription, forecast: ITemplateWeatherItem[] | string): Promise<void> {
       await this.sendTemplateLetter({
          to: subscription.email,
          subject: `Weather forecast for ${subscription.city}`,

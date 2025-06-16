@@ -34,6 +34,7 @@ export default tslint.config(
       },
       rules: {
          '@typescript-eslint/no-explicit-any': 'off',
+         'max-len': ['off'],
       },
    },
 

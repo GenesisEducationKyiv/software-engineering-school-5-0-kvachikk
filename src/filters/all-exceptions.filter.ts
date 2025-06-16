@@ -1,10 +1,4 @@
-import {
-   ExceptionFilter,
-   Catch,
-   ArgumentsHost,
-   HttpException,
-   HttpStatus,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 
 @Catch()
@@ -15,14 +9,21 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
       // Default values
       let status = HttpStatus.INTERNAL_SERVER_ERROR;
-      let message = 'Internal server error';
+
+      let responseBody: any = { message: 'Internal server error' };
 
       if (exception instanceof HttpException) {
          status = exception.getStatus();
          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
          const res = exception.getResponse() as any;
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-         message = typeof res === 'string' ? res : (res.message ?? message);
+
+         if (typeof res === 'string') {
+            responseBody = { message: res };
+         } else {
+            // Preserve full object (e.g., validation errors)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            responseBody = res;
+         }
       } else if (typeof exception === 'object' && exception !== null) {
          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
          const anyEx = exception as any;
@@ -31,17 +32,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
             status = anyEx.status;
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-            message = anyEx.message ?? message;
+            responseBody = { message: anyEx.message ?? responseBody.message };
          }
          // Sequelize unique constraint => 409
          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
          if (anyEx.name === 'SequelizeUniqueConstraintError') {
             status = HttpStatus.CONFLICT;
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-            message = anyEx.message ?? 'Conflict';
+            responseBody = { message: anyEx.message ?? 'Conflict' };
          }
       }
 
-      response.status(status).json({ message });
+      response.status(status).json(responseBody);
    }
 }
