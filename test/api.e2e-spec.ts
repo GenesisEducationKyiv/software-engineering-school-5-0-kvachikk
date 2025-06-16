@@ -12,6 +12,7 @@ import { EmailSchedulerLoader } from '../src/loaders/email-scheduler.loader';
 import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
 import { NotFoundError } from '../src/constants/errors/not-found.error';
 import { BadRequestError } from '../src/constants/errors/bad-request.error';
+import { DatabaseLoader } from '../src/loaders/database.loader';
 
 // Mock
 const weatherServiceMock: Partial<Record<keyof CurrentWeatherService, any>> = {
@@ -49,6 +50,8 @@ describe('Weather-Forecast API (integration)', () => {
          .overrideProvider(SubscriptionService)
          .useValue(subscriptionServiceMock)
          .overrideProvider(EmailSchedulerLoader)
+         .useValue({ onModuleInit: jest.fn() })
+         .overrideProvider(DatabaseLoader)
          .useValue({ onModuleInit: jest.fn() })
          .compile();
 
