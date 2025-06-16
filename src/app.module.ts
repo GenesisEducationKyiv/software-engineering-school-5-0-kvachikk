@@ -9,6 +9,7 @@ import { EmailValidationService } from './services/emails/validation';
 import { NotificationService } from './services/emails/notification';
 import { ForecastFetchingService } from './services/forecast/fetching';
 import { ForecastHandlingService } from './services/forecast/handling';
+import { ForecastService } from './services/forecast/forecast.service';
 import { SubscriptionService } from './services/subscription/subscription.service';
 import { CurrentWeatherService } from './services/weather/current';
 import { SchedulerService } from './services/emails/scheduler';
@@ -30,6 +31,7 @@ import { EmailSchedulerLoader } from './loaders/email-scheduler.loader';
       NotificationService,
       ForecastFetchingService,
       ForecastHandlingService,
+      ForecastService,
       CurrentWeatherService,
       SchedulerService,
       DatabaseLoader,
