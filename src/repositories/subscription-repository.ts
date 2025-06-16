@@ -30,18 +30,37 @@ export class SubscriptionRepository {
       private readonly frequencyModel: IFrequencyModel,
    ) {}
 
+   private getModel(
+      model: 'subscription' | 'frequency',
+   ): ISubscriptionModel | IFrequencyModel {
+      return model === 'subscription'
+         ? this.subscriptionModel
+         : this.frequencyModel;
+   }
+
+   /**
+    * Generic finder that can be reused by any service to fetch a single record.
+    * @param model        Which model to query: "subscription" | "frequency".
+    * @param whereClause  Plain object representing the Sequelize "where" clause.
+    */
+   async find(
+      model: 'subscription' | 'frequency',
+      whereClause: Record<string, unknown>,
+   ): Promise<any> {
+      const targetModel = this.getModel(model);
+      return targetModel.findOne({ where: whereClause });
+   }
+
    async findByEmail(email: string): Promise<any> {
-      return this.subscriptionModel.findOne({ where: { email } });
+      return this.find('subscription', { email });
    }
 
    async findByToken(verificationToken: string): Promise<any> {
-      return this.subscriptionModel.findOne({ where: { verificationToken } });
+      return this.find('subscription', { verificationToken });
    }
 
    async findFrequencyByTitle(title: string): Promise<any> {
-      return this.frequencyModel.findOne({
-         where: { title: title.toUpperCase() },
-      });
+      return this.find('frequency', { title: title.toUpperCase() });
    }
 
    async create(subscriptionData: ISubscriptionData): Promise<any> {

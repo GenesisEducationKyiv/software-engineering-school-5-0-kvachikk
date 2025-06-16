@@ -1,4 +1,13 @@
-import { Controller, Get, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import {
+   Controller,
+   Get,
+   HttpCode,
+   HttpStatus,
+   Query,
+   UsePipes,
+} from '@nestjs/common';
+import { JoiValidationPipe } from '../validation';
+import { weatherParamsSchema } from '../validation/weather.validation';
 
 import { CurrentWeatherService } from '../services/weather/current';
 import { weatherResponseMessages as messages } from '../constants/message/weather-responses';
@@ -9,9 +18,11 @@ export class WeatherController {
 
    @Get()
    @HttpCode(HttpStatus.OK)
+   @UsePipes(new JoiValidationPipe(weatherParamsSchema))
    async getWeather(
-      @Query('city') city: string,
+      @Query() query: { city: string },
    ): Promise<{ message: string; data: any }> {
+      const { city } = query;
       const data = await this.weatherService.getWeatherByCity(city);
       return { message: messages.WEATHER_DATA_FETCHED, data };
    }

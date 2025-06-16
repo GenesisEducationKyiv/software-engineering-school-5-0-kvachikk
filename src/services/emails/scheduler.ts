@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { INTERVALS } from '../../constants/intervals';
 import { FREQUENCIES } from '../../constants/frequencies';
 import { EmailService } from './sender';
+import { ForecastService } from '../forecast/forecast.service';
+import { sendForecasts } from '../forecast/send-forecasts';
 
 interface ISubscriptionService {
    getActiveSubscriptions(frequency: string): Promise<any[]>;
@@ -18,19 +20,20 @@ export class SchedulerService {
          const subscriptions = await subscriptionService.getActiveSubscriptions(
             FREQUENCIES.HOURLY,
          );
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         await this.emailService.sendForecasts(subscriptions);
+         await sendForecasts(subscriptions, this.forecastService, this.emailService);
       },
       DAILY: async (subscriptionService: ISubscriptionService) => {
          const subscriptions = await subscriptionService.getActiveSubscriptions(
             FREQUENCIES.DAILY,
          );
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         await this.emailService.sendForecasts(subscriptions);
+         await sendForecasts(subscriptions, this.forecastService, this.emailService);
       },
    };
 
-   constructor(private readonly emailService: EmailService) {}
+   constructor(
+      private readonly forecastService: ForecastService,
+      private readonly emailService: EmailService,
+   ) {}
 
    private async createScheduler(
       handler: FrequencyHandler,

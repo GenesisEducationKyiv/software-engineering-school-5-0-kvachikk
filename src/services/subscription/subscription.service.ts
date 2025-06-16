@@ -3,8 +3,10 @@ import { randomBytes } from 'node:crypto';
 
 import { SubscriptionRepository } from '../../repositories/subscription-repository';
 import { NotFoundError } from '../../constants/errors/not-found.error';
+import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotificationService } from '../emails/notification';
 import { ForecastFetchingService } from '../forecast/fetching';
+import { subscriptionResponseMessages } from '../../constants/message/subscription-responses';
 
 @Injectable()
 export class SubscriptionService {
@@ -29,7 +31,13 @@ export class SubscriptionService {
 
       await this.weatherService.fetchRawForecast(city);
 
-      await this.repository.findByEmail(email);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const existing = await this.repository.findByEmail(email);
+      if (existing) {
+         throw new ConflictError(
+            subscriptionResponseMessages.SUBSCRIPTION_ALREADY_EXISTS,
+         );
+      }
 
       const token = this.generateToken();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
