@@ -3,7 +3,7 @@ info:
     description: 'Weather API application that allows users to subscribe to weather updates for their city.'
     version: '1.0.0'
     title: 'Weather Forecast API'
-host: 'software-engineering-school-5-0-kvachikk.onrender.com'
+host: 'localhost:3000'
 basePath: '/api'
 tags:
     - name: 'weather'
@@ -73,7 +73,7 @@ paths:
                   type: 'string'
                 - name: 'frequency'
                   in: 'formData'
-                  description: 'Frequency of updates (hourly or daily)'
+                  description: 'FrequencyModel of updates (hourly or daily)'
                   required: true
                   type: 'string'
                   enum: ['hourly', 'daily']
@@ -156,7 +156,7 @@ definitions:
                 description: 'City for weather updates'
             frequency:
                 type: 'string'
-                description: 'Frequency of updates'
+                description: 'FrequencyModel of updates'
                 enum: ['hourly', 'daily']
             confirmed:
                 type: 'boolean'
