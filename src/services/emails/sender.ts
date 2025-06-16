@@ -14,9 +14,7 @@ import { ITemplateWeatherItem } from '../../interfaces/Forecast';
 export class EmailService {
    private readonly resend: Resend;
 
-   constructor(
-      private readonly emailValidation: EmailValidationService,
-   ) {
+   constructor(private readonly emailValidation: EmailValidationService) {
       this.resend = new Resend(mailConfig.apiKey);
    }
 

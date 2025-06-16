@@ -20,13 +20,23 @@ export class SchedulerService {
          const subscriptions = await subscriptionService.getActiveSubscriptions(
             FREQUENCIES.HOURLY,
          );
-         await sendForecasts(subscriptions, this.forecastService, this.emailService);
+         await sendForecasts(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            subscriptions,
+            this.forecastService,
+            this.emailService,
+         );
       },
       DAILY: async (subscriptionService: ISubscriptionService) => {
          const subscriptions = await subscriptionService.getActiveSubscriptions(
             FREQUENCIES.DAILY,
          );
-         await sendForecasts(subscriptions, this.forecastService, this.emailService);
+         await sendForecasts(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            subscriptions,
+            this.forecastService,
+            this.emailService,
+         );
       },
    };
 
