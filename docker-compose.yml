@@ -23,6 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+
     environment:
       POSTGRES_URL: postgresql://app:example@pg:5432/app
       PORT: 3000
