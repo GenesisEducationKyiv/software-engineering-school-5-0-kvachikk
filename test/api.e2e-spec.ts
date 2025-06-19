@@ -3,9 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AppModule } from '../src/app.module';
-import { CurrentWeatherService } from '../src/services/weather/current';
+import { WeatherServices } from '../src/services/weather/weather.services';
 import { SubscriptionService } from '../src/services/subscription/subscription.service';
-import { weatherResponseMessages as weatherMsgs } from '../src/constants/message/weather-responses';
 import { subscriptionResponseMessages as subMsgs } from '../src/constants/message/subscription-responses';
 import { ConflictError } from '../src/constants/errors/conflict.error';
 import { EmailSchedulerLoader } from '../src/loaders/email-scheduler.loader';
@@ -16,12 +15,14 @@ import { DatabaseLoader } from '../src/loaders/database.loader';
 import { EmailService } from '../src/services/emails/sender';
 
 // Mock
-const weatherServiceMock: Partial<Record<keyof CurrentWeatherService, any>> = {
-   getWeatherByCity: jest.fn().mockResolvedValue({
-      temperature: 12,
-      humidity: 67,
-      description: 'Clear sky',
-   }),
+const weatherServiceMock: Partial<Record<keyof WeatherServices, any>> = {
+   getWeatherForecast: jest.fn().mockResolvedValue([
+      {
+         temperature: 12,
+         humidity: 67,
+         description: 'Clear sky',
+      },
+   ]),
 };
 
 const subscriptionServiceMock: Partial<Record<keyof SubscriptionService, any>> = {
@@ -48,7 +49,7 @@ describe('Weather-Forecast API (integration)', () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
          imports: [AppModule],
       })
-         .overrideProvider(CurrentWeatherService)
+         .overrideProvider(WeatherServices)
          .useValue(weatherServiceMock)
          .overrideProvider(SubscriptionService)
          .useValue(subscriptionServiceMock)
@@ -78,11 +79,9 @@ describe('Weather-Forecast API (integration)', () => {
          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
          const res = await request(app.getHttpServer()).get('/api/weather').query({ city }).expect(200);
 
-         expect(weatherServiceMock.getWeatherByCity).toHaveBeenCalledWith(city);
-         expect(res.body).toEqual({
-            message: weatherMsgs.WEATHER_DATA_FETCHED,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            data: expect.objectContaining({
+         expect(weatherServiceMock.getWeatherForecast).toHaveBeenCalledWith(city);
+         expect(res.body).toEqual(
+            expect.objectContaining({
                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                temperature: expect.any(Number),
                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -90,7 +89,7 @@ describe('Weather-Forecast API (integration)', () => {
                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                description: expect.any(String),
             }),
-         });
+         );
       });
 
       it('returns 400 when city parameter is missing', async () => {
@@ -122,7 +121,7 @@ describe('Weather-Forecast API (integration)', () => {
       });
 
       it('returns 404 when city is not found', async () => {
-         (weatherServiceMock.getWeatherByCity as jest.Mock).mockImplementationOnce(() => {
+         (weatherServiceMock.getWeatherForecast as jest.Mock).mockImplementationOnce(() => {
             throw new NotFoundError('City not found');
          });
 
@@ -131,7 +130,7 @@ describe('Weather-Forecast API (integration)', () => {
       });
 
       it('returns 400 when weather service reports bad request', async () => {
-         (weatherServiceMock.getWeatherByCity as jest.Mock).mockImplementationOnce(() => {
+         (weatherServiceMock.getWeatherForecast as jest.Mock).mockImplementationOnce(() => {
             throw new BadRequestError('Invalid city');
          });
 

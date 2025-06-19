@@ -2,19 +2,17 @@ import { Controller, Get, HttpCode, HttpStatus, Query, UsePipes } from '@nestjs/
 import { JoiValidationPipe } from '../validation';
 import { weatherParamsSchema } from '../validation/weather.validation';
 
-import { CurrentWeatherService } from '../services/weather/current';
-import { weatherResponseMessages as messages } from '../constants/message/weather-responses';
+import { WeatherServices } from '../services/weather/weather.services';
+import { Weather } from '../providers/weather.handler';
 
 @Controller('weather')
 export class WeatherController {
-   constructor(private readonly weatherService: CurrentWeatherService) {}
+   constructor(private readonly weatherService: WeatherServices) {}
 
    @Get()
    @HttpCode(HttpStatus.OK)
    @UsePipes(new JoiValidationPipe(weatherParamsSchema))
-   async getWeather(@Query() query: { city: string }): Promise<{ message: string; data: any }> {
-      const { city } = query;
-      const data = await this.weatherService.getWeatherByCity(city);
-      return { message: messages.WEATHER_DATA_FETCHED, data };
+   async getWeather(@Query() query: { city: string }): Promise<Weather> {
+      return (await this.weatherService.getWeatherForecast(query.city))[0];
    }
 }

@@ -5,17 +5,22 @@ import { Resend } from 'resend';
 import { Injectable } from '@nestjs/common';
 import { EmailValidationService } from './validation';
 import { TemplateLetterParams } from '../../interfaces/TemplateLetterParams';
-import { ISubscription } from '../../interfaces/Subscription';
+import { Subscription } from '../../interfaces/Subscription';
 import { appConfig } from '../../config';
 import { mailConfig } from '../../config';
-import { ITemplateWeatherItem } from '../../interfaces/Forecast';
+import { WeatherServices } from '../weather/weather.services';
 
 @Injectable()
 export class EmailService {
    private readonly resend: Resend;
+   private readonly emailService: EmailService;
 
-   constructor(private readonly emailValidation: EmailValidationService) {
+   constructor(
+      private readonly emailValidation: EmailValidationService,
+      private readonly weatherServices: WeatherServices,
+   ) {
       this.resend = new Resend(mailConfig.apiKey);
+      this.weatherServices = new WeatherServices();
    }
 
    async sendTemplateLetter({
@@ -55,14 +60,14 @@ export class EmailService {
       }
    }
 
-   async sendForecastEmail(subscription: ISubscription, forecast: ITemplateWeatherItem[] | string): Promise<void> {
+   async sendForecastEmail(subscription: Subscription): Promise<void> {
       await this.sendTemplateLetter({
          to: subscription.email,
          subject: `Weather forecast for ${subscription.city}`,
          templatePath: 'weather-forecast.html',
          templateVars: {
             city: subscription.city,
-            forecast,
+            forecast: await this.weatherServices.getWeatherForecast(subscription.city),
             unsubscribeUrl: `${appConfig.baseUrl}/api/unsubscribe/${subscription.verificationToken}`,
          },
       });

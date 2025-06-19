@@ -5,15 +5,15 @@ import { SubscriptionRepository } from '../../repositories/subscription-reposito
 import { NotFoundError } from '../../constants/errors/not-found.error';
 import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotificationService } from '../emails/notification';
-import { ForecastFetchingService } from '../forecast/fetching';
 import { subscriptionResponseMessages } from '../../constants/message/subscription-responses';
+import { WeatherServices } from '../weather/weather.services';
 
 @Injectable()
 export class SubscriptionService {
    constructor(
       private readonly repository: SubscriptionRepository,
       private readonly notifier: NotificationService,
-      private readonly weatherService: ForecastFetchingService,
+      private readonly weatherServices: WeatherServices,
    ) {}
 
    private generateToken(): string {
@@ -21,14 +21,12 @@ export class SubscriptionService {
    }
 
    async subscribe(email: string, city: string, frequency: string): Promise<any> {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const frequencyEntity = await this.repository.findFrequencyByTitle(frequency);
 
-      await this.weatherService.fetchRawForecast(city);
+      await this.weatherServices.getWeatherForecast(city);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const existing = await this.repository.findByEmail(email);
-      if (existing) {
+      const subscription = await this.repository.findByEmail(email);
+      if (subscription) {
          throw new ConflictError(subscriptionResponseMessages.SUBSCRIPTION_ALREADY_EXISTS);
       }
 
@@ -37,7 +35,7 @@ export class SubscriptionService {
       const newSubscription = await this.repository.create({
          email,
          city,
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
          frequencyId: frequencyEntity.id,
          verificationToken: token,
          isVerified: false,

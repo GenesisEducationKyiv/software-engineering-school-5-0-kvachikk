@@ -7,11 +7,8 @@ import { WeatherController } from './controllers/weather.controller';
 import { EmailService } from './services/emails/sender';
 import { EmailValidationService } from './services/emails/validation';
 import { NotificationService } from './services/emails/notification';
-import { ForecastFetchingService } from './services/forecast/fetching';
-import { ForecastHandlingService } from './services/forecast/handling';
-import { ForecastService } from './services/forecast/forecast.service';
 import { SubscriptionService } from './services/subscription/subscription.service';
-import { CurrentWeatherService } from './services/weather/current';
+import { WeatherServices } from './services/weather/weather.services';
 import { SchedulerService } from './services/emails/scheduler';
 
 import { SubscriptionRepository } from './repositories/subscription-repository';
@@ -29,10 +26,7 @@ import { EmailSchedulerLoader } from './loaders/email-scheduler.loader';
       EmailService,
       EmailValidationService,
       NotificationService,
-      ForecastFetchingService,
-      ForecastHandlingService,
-      ForecastService,
-      CurrentWeatherService,
+      WeatherServices,
       SchedulerService,
       DatabaseLoader,
       EmailSchedulerLoader,

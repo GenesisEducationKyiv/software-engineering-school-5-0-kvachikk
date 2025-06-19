@@ -16,12 +16,6 @@ export interface DatabaseConfig {
    };
 }
 
-export interface WeatherConfig {
-   baseUrl: string;
-   coordinatesUrl: string;
-   apiKey: string;
-}
-
 export interface MailConfig {
    apiKey: string;
    senderEmail: string;

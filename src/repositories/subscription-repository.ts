@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { Subscription } from '../interfaces/Subscription';
+import { FrequencyModel } from '../database/models/frequency.model';
 
 interface ISubscriptionModel {
    findOne(options: any): Promise<any>;
@@ -34,17 +36,13 @@ export class SubscriptionRepository {
       return model === 'subscription' ? this.subscriptionModel : this.frequencyModel;
    }
 
-   /**
-    * Generic finder that can be reused by any service to fetch a single record.
-    * @param model        Which model to query: "subscription" | "frequency".
-    * @param whereClause  Plain object representing the Sequelize "where" clause.
-    */
    async find(model: 'subscription' | 'frequency', whereClause: Record<string, unknown>): Promise<any> {
       const targetModel = this.getModel(model);
       return targetModel.findOne({ where: whereClause });
    }
 
-   async findByEmail(email: string): Promise<any> {
+   async findByEmail(email: string): Promise<Subscription> {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return this.find('subscription', { email });
    }
 
@@ -52,7 +50,8 @@ export class SubscriptionRepository {
       return this.find('subscription', { verificationToken });
    }
 
-   async findFrequencyByTitle(title: string): Promise<any> {
+   async findFrequencyByTitle(title: string): Promise<FrequencyModel> {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return this.find('frequency', { title: title.toUpperCase() });
    }
 

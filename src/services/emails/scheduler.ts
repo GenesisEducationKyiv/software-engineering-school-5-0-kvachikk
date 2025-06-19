@@ -2,42 +2,43 @@ import { Injectable } from '@nestjs/common';
 import { INTERVALS } from '../../constants/intervals';
 import { FREQUENCIES } from '../../constants/frequencies';
 import { EmailService } from './sender';
-import { ForecastService } from '../forecast/forecast.service';
-import { sendForecasts } from '../forecast/send-forecasts';
+import { Subscription } from '../../interfaces/Subscription';
 
 interface ISubscriptionService {
-   getActiveSubscriptions(frequency: string): Promise<any[]>;
+   getActiveSubscriptions(frequency: string): Promise<Subscription[]>;
 }
 
 type FrequencyHandler = (subscriptionService: ISubscriptionService) => Promise<void>;
 
 @Injectable()
 export class SchedulerService {
+   constructor(private readonly emailService: EmailService) {}
+
+   private async processSubscriptions(subscriptions: Subscription[]): Promise<void> {
+      if (subscriptions.length === 0) {
+         return;
+      }
+      const sendPromises = subscriptions.map((subscription) => this.emailService.sendForecastEmail(subscription));
+      const results = await Promise.allSettled(sendPromises);
+
+      results.forEach((result, index) => {
+         if (result.status === 'rejected') {
+            const failedSubscription = subscriptions[index];
+            console.error(`Failed to send forecast to ${failedSubscription.email}:`, result.reason);
+         }
+      });
+   }
+
    private readonly FREQUENCY_HANDLERS: Record<string, FrequencyHandler> = {
       HOURLY: async (subscriptionService: ISubscriptionService) => {
          const subscriptions = await subscriptionService.getActiveSubscriptions(FREQUENCIES.HOURLY);
-         await sendForecasts(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            subscriptions,
-            this.forecastService,
-            this.emailService,
-         );
+         await this.processSubscriptions(subscriptions);
       },
       DAILY: async (subscriptionService: ISubscriptionService) => {
          const subscriptions = await subscriptionService.getActiveSubscriptions(FREQUENCIES.DAILY);
-         await sendForecasts(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            subscriptions,
-            this.forecastService,
-            this.emailService,
-         );
+         await this.processSubscriptions(subscriptions);
       },
    };
-
-   constructor(
-      private readonly forecastService: ForecastService,
-      private readonly emailService: EmailService,
-   ) {}
 
    private async createScheduler(
       handler: FrequencyHandler,
@@ -48,7 +49,7 @@ export class SchedulerService {
          try {
             await handler(subscriptionService);
          } catch (error) {
-            console.error(error);
+            console.error('Error during scheduled task execution:', error);
          } finally {
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
             setTimeout(run, interval);
@@ -58,13 +59,9 @@ export class SchedulerService {
    }
 
    async startScheduler(subscriptionService: ISubscriptionService): Promise<void> {
-      for (const handler of Object.keys(this.FREQUENCY_HANDLERS)) {
-         await this.createScheduler(
-            this.FREQUENCY_HANDLERS[handler],
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            INTERVALS[handler],
-            subscriptionService,
-         );
+      for (const handlerKey of Object.keys(this.FREQUENCY_HANDLERS)) {
+         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+         await this.createScheduler(this.FREQUENCY_HANDLERS[handlerKey], INTERVALS[handlerKey], subscriptionService);
       }
    }
 }
