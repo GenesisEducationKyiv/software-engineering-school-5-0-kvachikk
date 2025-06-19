@@ -9,17 +9,13 @@ interface ISubscriptionService {
    getActiveSubscriptions(frequency: string): Promise<any[]>;
 }
 
-type FrequencyHandler = (
-   subscriptionService: ISubscriptionService,
-) => Promise<void>;
+type FrequencyHandler = (subscriptionService: ISubscriptionService) => Promise<void>;
 
 @Injectable()
 export class SchedulerService {
    private readonly FREQUENCY_HANDLERS: Record<string, FrequencyHandler> = {
       HOURLY: async (subscriptionService: ISubscriptionService) => {
-         const subscriptions = await subscriptionService.getActiveSubscriptions(
-            FREQUENCIES.HOURLY,
-         );
+         const subscriptions = await subscriptionService.getActiveSubscriptions(FREQUENCIES.HOURLY);
          await sendForecasts(
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             subscriptions,
@@ -28,9 +24,7 @@ export class SchedulerService {
          );
       },
       DAILY: async (subscriptionService: ISubscriptionService) => {
-         const subscriptions = await subscriptionService.getActiveSubscriptions(
-            FREQUENCIES.DAILY,
-         );
+         const subscriptions = await subscriptionService.getActiveSubscriptions(FREQUENCIES.DAILY);
          await sendForecasts(
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             subscriptions,
@@ -63,9 +57,7 @@ export class SchedulerService {
       await run();
    }
 
-   async startScheduler(
-      subscriptionService: ISubscriptionService,
-   ): Promise<void> {
+   async startScheduler(subscriptionService: ISubscriptionService): Promise<void> {
       for (const handler of Object.keys(this.FREQUENCY_HANDLERS)) {
          await this.createScheduler(
             this.FREQUENCY_HANDLERS[handler],

@@ -10,9 +10,7 @@ export class ForecastService {
       private readonly handler: ForecastHandlingService,
    ) {}
 
-   async getFormattedForecast(
-      city: string,
-   ): Promise<ITemplateWeatherItem[] | null> {
+   async getFormattedForecast(city: string): Promise<ITemplateWeatherItem[] | null> {
       const raw = await this.fetcher.fetchRawForecast(city);
       if (!raw) return null;
       const grouped = this.handler.groupForecastByDate(raw);

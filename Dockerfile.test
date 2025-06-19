@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/playwright:v1.53.0-jammy
+
+WORKDIR /home/node/app
+
+COPY package*.json ./
+
+RUN npm ci
+RUN npx playwright install --with-deps
+
+COPY . .
+
+ENV RUN_ENVIROMENT=test
+
+CMD ["npm", "run", "test:e2e"]

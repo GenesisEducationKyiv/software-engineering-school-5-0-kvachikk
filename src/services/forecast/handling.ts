@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { weatherCardMap } from '../../constants/weather-card-map';
-import {
-   IRawForecastItem,
-   IGroupedForecasts,
-   ITemplateWeatherItem,
-} from '../../interfaces/Forecast';
+import { IRawForecastItem, IGroupedForecasts, ITemplateWeatherItem } from '../../interfaces/Forecast';
 
 @Injectable()
 export class ForecastHandlingService {
@@ -44,22 +40,14 @@ export class ForecastHandlingService {
       return groupedByDate;
    }
 
-   mapForecastToTemplate(
-      groupedForecasts: IGroupedForecasts,
-   ): ITemplateWeatherItem[] {
+   mapForecastToTemplate(groupedForecasts: IGroupedForecasts): ITemplateWeatherItem[] {
       return Object.keys(groupedForecasts)
          .slice(0, 5)
          .map((date) => {
             const dayData = groupedForecasts[date];
-            const noonData =
-               dayData.find((item) => item.dt_txt.includes('12:00:00')) ||
-               dayData[0];
+            const noonData = dayData.find((item) => item.dt_txt.includes('12:00:00')) || dayData[0];
 
-            if (
-               !noonData ||
-               !noonData.weather ||
-               noonData.weather.length === 0
-            ) {
+            if (!noonData || !noonData.weather || noonData.weather.length === 0) {
                return {
                   temp: { day: 'N/A' },
                   weather: [{ description: 'No data', icon: '01d' }],

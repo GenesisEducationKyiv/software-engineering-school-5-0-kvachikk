@@ -1,13 +1,4 @@
-import {
-   Body,
-   Controller,
-   Get,
-   HttpCode,
-   HttpStatus,
-   Param,
-   Post,
-   UsePipes,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UsePipes } from '@nestjs/common';
 import { JoiValidationPipe } from '../validation';
 import { subscriptionSchema } from '../validation/subscription.validation';
 import { verifyEmailSchema } from '../validation/verification.validation';
@@ -36,9 +27,7 @@ export class SubscriptionController {
    @Get('confirm/:token')
    @HttpCode(HttpStatus.OK)
    @UsePipes(new JoiValidationPipe(verifyEmailSchema))
-   async confirm(
-      @Param() params: { token: string },
-   ): Promise<{ message: string }> {
+   async confirm(@Param() params: { token: string }): Promise<{ message: string }> {
       const { token } = params;
       await this.subscriptionService.confirmSubscription(token);
       return { message: messages.CONFIRM_SUCCESS };
@@ -47,9 +36,7 @@ export class SubscriptionController {
    @Get('unsubscribe/:token')
    @HttpCode(HttpStatus.OK)
    @UsePipes(new JoiValidationPipe(verifyEmailSchema))
-   async unsubscribe(
-      @Param() params: { token: string },
-   ): Promise<{ message: string }> {
+   async unsubscribe(@Param() params: { token: string }): Promise<{ message: string }> {
       const { token } = params;
       await this.subscriptionService.unsubscribe(token);
       return { message: messages.UNSUBSCRIBE_SUCCESS };

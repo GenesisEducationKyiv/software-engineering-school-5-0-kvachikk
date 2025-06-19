@@ -18,6 +18,5 @@ export const validationMessages = {
    LETTER_RECIPIENT_INVALID: 'Invalid recipient email address: ',
    LETTER_SUBJECT_REQUIRED: 'Subject is required and must be a string',
    LETTER_HTML_REQUIRED: 'HTML content is required and must be a string',
-   LETTER_TEXT_INVALID:
-      'Text content is optional, but if provided, it must be a string',
+   LETTER_TEXT_INVALID: 'Text content is optional, but if provided, it must be a string',
 } as const;

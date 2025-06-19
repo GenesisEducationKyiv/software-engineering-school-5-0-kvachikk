@@ -6,11 +6,7 @@ import { appConfig } from '../../config';
 export class NotificationService {
    constructor(private readonly emailService: EmailService) {}
 
-   async sendWelcomeEmail(
-      to: string,
-      city: string,
-      token: string,
-   ): Promise<void> {
+   async sendWelcomeEmail(to: string, city: string, token: string): Promise<void> {
       await this.emailService.sendTemplateLetter({
          to,
          subject: `Confirm your subscription to ${city}`,
@@ -23,11 +19,7 @@ export class NotificationService {
       });
    }
 
-   async sendConfirmationEmail(
-      to: string,
-      city: string,
-      token: string,
-   ): Promise<void> {
+   async sendConfirmationEmail(to: string, city: string, token: string): Promise<void> {
       await this.emailService.sendTemplateLetter({
          to,
          subject: `Subscription confirmed for ${city}`,
@@ -39,11 +31,7 @@ export class NotificationService {
       });
    }
 
-   async sendUnsubscribeEmail(
-      to: string,
-      city: string,
-      token: string,
-   ): Promise<void> {
+   async sendUnsubscribeEmail(to: string, city: string, token: string): Promise<void> {
       await this.emailService.sendTemplateLetter({
          to,
          subject: `You have unsubscribed from weather updates for ${city}`,

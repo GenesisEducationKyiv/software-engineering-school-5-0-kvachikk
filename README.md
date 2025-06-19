@@ -9,7 +9,8 @@
 - **Swagger**: [software-engineering-school-5-0-kvachikk.onrender.com/docs](https://software-engineering-school-5-0-kvachikk.onrender.com/docs)
 - **Example Request**: [software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne](https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne)
 
----
+
+## [Testing](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-4-tests/docs/testing.md)
 
 ## Running locally:
 
