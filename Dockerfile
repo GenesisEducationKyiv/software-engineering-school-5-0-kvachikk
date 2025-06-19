@@ -5,7 +5,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
-ENV RUN_ENVIROMENT production
+ENV RUN_ENVIRONMENT production
 RUN npm run build
 
 EXPOSE 3000
