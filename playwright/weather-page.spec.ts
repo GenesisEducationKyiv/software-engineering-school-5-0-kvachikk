@@ -58,4 +58,4 @@ test.describe('Weather Page', () => {
       await expect(msg).toBeVisible();
       await expect(msg).toContainText('Subscription created');
    });
-}); 
+});

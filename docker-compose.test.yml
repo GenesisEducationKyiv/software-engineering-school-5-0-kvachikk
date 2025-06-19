@@ -1,0 +1,72 @@
+version: '3.9'
+
+# ---------------------------------------------------------------------------
+# Reusable settings applied to every test-runner container
+# ---------------------------------------------------------------------------
+x-test-runner: &test-runner
+  build:
+    context: .
+    dockerfile: Dockerfile.test
+  env_file:
+    - .env.test
+  working_dir: /home/node/app
+  volumes:
+    - ./:/home/node/app
+  networks:
+    - test-net
+
+# ---------------------------------------------------------------------------
+# Named resources
+# ---------------------------------------------------------------------------
+volumes:
+  pg-test-data:
+
+networks:
+  test-net:
+    driver: bridge
+
+# ---------------------------------------------------------------------------
+# Service definitions
+# ---------------------------------------------------------------------------
+services:
+  # 1. Database used by integration/API tests
+  postgres-test:
+    container_name: postgres-test
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: app_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5434:5432"
+    volumes:
+      - pg-test-data:/var/lib/postgresql/data
+    networks:
+      - test-net
+
+  # 2. Pure unit tests – run entirely in-memory
+  unit-tests:
+    <<: *test-runner
+    container_name: unit-tests
+    command: npm run test:unit
+
+  # 4. API (integration) tests – require DB
+  api-tests:
+    <<: *test-runner
+    container_name: api-tests
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    command: npm run test:e2e
+
+  # 5. UI / Playwright tests
+  ui-tests:
+    <<: *test-runner
+    container_name: ui-tests
+    command: npm run test:ui
