@@ -4,11 +4,11 @@ import { FREQUENCIES } from '../../constants/frequencies';
 import { EmailService } from './sender';
 import { Subscription } from '../../interfaces/Subscription';
 
-interface ISubscriptionService {
+interface SubscriptionService {
    getActiveSubscriptions(frequency: string): Promise<Subscription[]>;
 }
 
-type FrequencyHandler = (subscriptionService: ISubscriptionService) => Promise<void>;
+type FrequencyHandler = (subscriptionService: SubscriptionService) => Promise<void>;
 
 @Injectable()
 export class SchedulerService {
@@ -30,11 +30,11 @@ export class SchedulerService {
    }
 
    private readonly FREQUENCY_HANDLERS: Record<string, FrequencyHandler> = {
-      HOURLY: async (subscriptionService: ISubscriptionService) => {
+      HOURLY: async (subscriptionService: SubscriptionService) => {
          const subscriptions = await subscriptionService.getActiveSubscriptions(FREQUENCIES.HOURLY);
          await this.processSubscriptions(subscriptions);
       },
-      DAILY: async (subscriptionService: ISubscriptionService) => {
+      DAILY: async (subscriptionService: SubscriptionService) => {
          const subscriptions = await subscriptionService.getActiveSubscriptions(FREQUENCIES.DAILY);
          await this.processSubscriptions(subscriptions);
       },
@@ -43,7 +43,7 @@ export class SchedulerService {
    private async createScheduler(
       handler: FrequencyHandler,
       interval: number,
-      subscriptionService: ISubscriptionService,
+      subscriptionService: SubscriptionService,
    ): Promise<void> {
       const run = async (): Promise<void> => {
          try {
@@ -58,7 +58,7 @@ export class SchedulerService {
       await run();
    }
 
-   async startScheduler(subscriptionService: ISubscriptionService): Promise<void> {
+   async startScheduler(subscriptionService: SubscriptionService): Promise<void> {
       for (const handlerKey of Object.keys(this.FREQUENCY_HANDLERS)) {
          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
          await this.createScheduler(this.FREQUENCY_HANDLERS[handlerKey], INTERVALS[handlerKey], subscriptionService);
