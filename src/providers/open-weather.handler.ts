@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { AbstractWeatherHandler, Weather } from './weather.handler';
 import { Coordinates } from '../interfaces/Coordinates';
 import { NotFoundError } from '../constants/errors/not-found.error';
+import { Logger } from '../logger/logger.service';
+import { Injectable } from '@nestjs/common';
 
 export type OpenWeatherApiResponse = {
    cod: string;
@@ -42,19 +44,24 @@ export type OpenWeatherApiResponse = {
    };
 };
 
+@Injectable()
 export class OpenWeatherHandler extends AbstractWeatherHandler {
+   constructor(private readonly logger: Logger) {
+      super();
+   }
+
    public override async handle(city: string): Promise<Weather[]> {
       try {
          const coordinates = await this.getCoordinates(city);
-         const forecastResponse = await fetch(
+         const response = await fetch(
             `${process.env.OPEN_WEATHER_API_URL}/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&cnt=40&appid=${process.env.OPEN_WEATHER_API_KEY}&units=metric`,
          );
 
-         if (!forecastResponse.ok) {
-            throw new Error(`OpenWeather provider failed: ${forecastResponse.status}`);
+         if (!response.ok) {
+            this.handleAndThrowError(`OpenWeather provider failed: ${response.status}`);
          }
 
-         const forecastData = (await forecastResponse.json()) as OpenWeatherApiResponse;
+         const forecastData = (await response.json()) as OpenWeatherApiResponse;
          const dailyForecasts: Weather[] = [];
 
          for (let i = 3; i < forecastData.list.length; i += 8) {
@@ -67,10 +74,10 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
             if (dailyForecasts.length === 4) break;
          }
 
-         console.log('FROM OPEN WEATHER MAP: ', dailyForecasts);
+         this.logger.response('Fetched forecast from OpenWeather', 'OpenWeather', dailyForecasts);
          return dailyForecasts;
       } catch (error) {
-         console.error(`OpenWeatherHandler encountered an error: ${error}`);
+         this.logger.error(`OpenWeatherHandler encountered an error: ${error}`);
          return super.handle(city);
       }
    }
@@ -80,13 +87,16 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
       const geoResponse = await fetch(geoUrl);
 
       if (!geoResponse.ok) {
-         throw new Error(`Failed to fetch coordinates for city: ${city}. Status: ${geoResponse.status}`);
+         this.handleAndThrowError(`Failed to fetch coordinates for city: ${city}. Status: ${geoResponse.status}`);
       }
 
       const dataArray = (await geoResponse.json()) as any[];
 
       if (!dataArray || dataArray.length === 0) {
-         throw new NotFoundError(`Unable to determine coordinates for city: ${city}`);
+         this.handleAndThrowError(
+            `Unable to determine coordinates for city: ${city}`,
+            new NotFoundError(`Unable to determine coordinates for city: ${city}`),
+         );
       }
 
       const coordinates = dataArray[0] as Coordinates;
@@ -94,5 +104,13 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
          lat: coordinates.lat,
          lon: coordinates.lon,
       };
+   }
+
+   private handleAndThrowError(message: string, error?: Error): never {
+      this.logger.error(message);
+      if (error) {
+         throw error;
+      }
+      throw new Error(message);
    }
 }

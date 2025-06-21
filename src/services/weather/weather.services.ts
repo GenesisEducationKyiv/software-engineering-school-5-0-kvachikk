@@ -7,10 +7,7 @@ import { ApiWeatherHandler } from '../../providers/api-weather.handler';
 export class WeatherServices {
    private handler: WeatherHandler;
 
-   constructor() {
-      const openWeatherHandler = new OpenWeatherHandler();
-      const apiWeatherHandler = new ApiWeatherHandler();
-
+   constructor(openWeatherHandler: OpenWeatherHandler, apiWeatherHandler: ApiWeatherHandler) {
       openWeatherHandler.setNext(apiWeatherHandler);
 
       this.handler = openWeatherHandler;

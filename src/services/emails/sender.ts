@@ -13,14 +13,12 @@ import { WeatherServices } from '../weather/weather.services';
 @Injectable()
 export class EmailService {
    private readonly resend: Resend;
-   private readonly emailService: EmailService;
 
    constructor(
       private readonly emailValidation: EmailValidationService,
       private readonly weatherServices: WeatherServices,
    ) {
       this.resend = new Resend(mailConfig.apiKey);
-      this.weatherServices = new WeatherServices();
    }
 
    async sendTemplateLetter({

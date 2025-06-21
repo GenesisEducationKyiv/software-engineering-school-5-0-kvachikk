@@ -33,6 +33,7 @@
     "dotenv": "^16.5.0",
     "handlebars": "^4.7.8",
     "joi": "^17.13.3",
+    "nest-winston": "^1.10.2",
     "pg": "^8.16.0",
     "pg-hstore": "^2.3.4",
     "reflect-metadata": "^0.2.2",
@@ -42,6 +43,7 @@
     "sequelize-typescript": "^2.1.6",
     "sqlite3": "^5.1.7",
     "umzug": "^3.8.2",
+    "winston": "^3.17.0",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {

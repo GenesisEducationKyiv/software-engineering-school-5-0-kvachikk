@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import { AbstractWeatherHandler, Weather } from './weather.handler';
+import { Logger } from '../logger/logger.service';
+import { Injectable } from '@nestjs/common';
 
 export type WeatherApiResponse = {
    location: {
@@ -34,7 +36,12 @@ export type WeatherApiResponse = {
    };
 };
 
+@Injectable()
 export class ApiWeatherHandler extends AbstractWeatherHandler {
+   constructor(private readonly logger: Logger) {
+      super();
+   }
+
    public async handle(city: string): Promise<Weather[]> {
       try {
          const response = await fetch(
@@ -42,6 +49,7 @@ export class ApiWeatherHandler extends AbstractWeatherHandler {
          );
 
          if (!response.ok) {
+            this.logger.error(`WeatherAPI provider failed: ${response.status}`);
             throw new Error(`WeatherAPI provider failed: ${response.status}`);
          }
 
@@ -59,11 +67,12 @@ export class ApiWeatherHandler extends AbstractWeatherHandler {
             description: day.day.condition.text,
          }));
 
-         console.log('FROM WEATHER API: ', [currentWeather, ...forecastWeathers.slice(1, 4)]);
+         const formattedResponse = [currentWeather, ...forecastWeathers.slice(1, 4)];
+         this.logger.response('Fetched forecast from WeatherAPI', 'WeatherAPI', formattedResponse);
 
-         return [currentWeather, ...forecastWeathers.slice(1, 4)];
+         return formattedResponse;
       } catch (error) {
-         console.error(`ApiWeatherHandler encountered an error: ${error}`);
+         this.logger.error(`ApiWeatherHandler error: ${error}`);
          return super.handle(city);
       }
    }

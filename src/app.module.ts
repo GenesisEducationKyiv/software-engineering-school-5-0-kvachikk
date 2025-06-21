@@ -18,6 +18,10 @@ import { FrequencyModel } from './database/models/frequency.model';
 
 import { DatabaseLoader } from './loaders/database.loader';
 import { EmailSchedulerLoader } from './loaders/email-scheduler.loader';
+import { Logger } from './logger/logger.service';
+
+import { OpenWeatherHandler } from './providers/open-weather.handler';
+import { ApiWeatherHandler } from './providers/api-weather.handler';
 
 @Module({
    imports: [ConfigModule.forRoot({ isGlobal: true })],
@@ -30,15 +34,12 @@ import { EmailSchedulerLoader } from './loaders/email-scheduler.loader';
       SchedulerService,
       DatabaseLoader,
       EmailSchedulerLoader,
+      Logger,
+      OpenWeatherHandler,
+      ApiWeatherHandler,
       {
          provide: SubscriptionRepository,
-         useFactory: () =>
-            new SubscriptionRepository(
-               // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-               SubscriptionModel as any,
-               // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-               FrequencyModel as any,
-            ),
+         useFactory: () => new SubscriptionRepository(SubscriptionModel, FrequencyModel),
       },
       SubscriptionService,
    ],
