@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { Subscription } from '../interfaces/Subscription';
+import { FrequencyModel } from '../database/models/frequency.model';
 
-interface ISubscriptionModel {
+interface SubscriptionModel {
    findOne(options: any): Promise<any>;
    findAll(options: any): Promise<any[]>;
    create(data: any): Promise<any>;
 }
 
-interface IFrequencyModel {
+interface FrequencyInterface {
    findOne(options: any): Promise<any>;
 }
 
-interface ISubscriptionData {
+interface SubscriptionData {
    email: string;
    city: string;
    verificationToken: string;
@@ -19,32 +21,28 @@ interface ISubscriptionData {
    isVerified?: boolean;
 }
 
-interface ISubscriptionInstance {
+interface SubscriptionInstance {
    save(): Promise<any>;
 }
 
 @Injectable()
 export class SubscriptionRepository {
    constructor(
-      private readonly subscriptionModel: ISubscriptionModel,
-      private readonly frequencyModel: IFrequencyModel,
+      private readonly subscriptionModel: SubscriptionModel,
+      private readonly frequencyModel: FrequencyInterface,
    ) {}
 
-   private getModel(model: 'subscription' | 'frequency'): ISubscriptionModel | IFrequencyModel {
+   private getModel(model: 'subscription' | 'frequency'): SubscriptionModel | FrequencyInterface {
       return model === 'subscription' ? this.subscriptionModel : this.frequencyModel;
    }
 
-   /**
-    * Generic finder that can be reused by any service to fetch a single record.
-    * @param model        Which model to query: "subscription" | "frequency".
-    * @param whereClause  Plain object representing the Sequelize "where" clause.
-    */
    async find(model: 'subscription' | 'frequency', whereClause: Record<string, unknown>): Promise<any> {
       const targetModel = this.getModel(model);
       return targetModel.findOne({ where: whereClause });
    }
 
-   async findByEmail(email: string): Promise<any> {
+   async findByEmail(email: string): Promise<Subscription> {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return this.find('subscription', { email });
    }
 
@@ -52,15 +50,16 @@ export class SubscriptionRepository {
       return this.find('subscription', { verificationToken });
    }
 
-   async findFrequencyByTitle(title: string): Promise<any> {
+   async findFrequencyByTitle(title: string): Promise<FrequencyModel> {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return this.find('frequency', { title: title.toUpperCase() });
    }
 
-   async create(subscriptionData: ISubscriptionData): Promise<any> {
+   async create(subscriptionData: SubscriptionData): Promise<any> {
       return this.subscriptionModel.create(subscriptionData);
    }
 
-   async save(subscriptionInstance: ISubscriptionInstance): Promise<any> {
+   async save(subscriptionInstance: SubscriptionInstance): Promise<any> {
       return subscriptionInstance.save();
    }
 

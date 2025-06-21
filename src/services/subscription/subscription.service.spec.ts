@@ -23,7 +23,7 @@ const notifierMock = {
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const weatherServiceMock = {
-   fetchRawForecast: jest.fn(),
+   getWeatherForecast: jest.fn(),
 } as any;
 
 const makeService = () =>
@@ -60,7 +60,7 @@ describe('SubscriptionService', () => {
          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
          expect(repositoryMock.findFrequencyByTitle).toHaveBeenCalledWith(frequency);
          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(weatherServiceMock.fetchRawForecast).toHaveBeenCalledWith(city);
+         expect(weatherServiceMock.getWeatherForecast).toHaveBeenCalledWith(city);
          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
          expect(repositoryMock.findByEmail).toHaveBeenCalledWith(email);
          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
