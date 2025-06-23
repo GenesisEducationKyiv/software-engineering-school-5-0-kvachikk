@@ -4,7 +4,7 @@ import { ObjectSchema } from 'joi';
 interface ValidationError {
    field: string;
    message: string;
-   value?: any;
+   value?: unknown;
 }
 
 interface ValidationResponse {
@@ -14,10 +14,10 @@ interface ValidationResponse {
 }
 
 @Injectable()
-export class JoiValidationPipe implements PipeTransform {
+export class JoiValidationPipe implements PipeTransform<unknown, unknown> {
    constructor(private readonly schema: ObjectSchema) {}
 
-   transform(value: any): any {
+   transform(value: unknown): unknown {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const { error, value: validatedValue } = this.schema.validate(value, {
          abortEarly: false,

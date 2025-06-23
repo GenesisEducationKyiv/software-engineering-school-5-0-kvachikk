@@ -1,7 +1,10 @@
 import 'dotenv/config';
-import { AbstractWeatherHandler, Weather } from './weather.handler';
-import { Logger } from '../logger/logger.service';
 import { Injectable } from '@nestjs/common';
+
+import { weatherApiConfig } from '../config/weather-api.config';
+import { Logger } from '../logger/logger.service';
+
+import { AbstractWeatherHandler, Weather } from './weather.handler';
 
 export type WeatherApiResponse = {
    location: {
@@ -45,7 +48,7 @@ export class ApiWeatherHandler extends AbstractWeatherHandler {
    public async handle(city: string): Promise<Weather[]> {
       try {
          const response = await fetch(
-            `${process.env.WEATHERAPI_API_URL}/forecast.json?key=${process.env.WEATHERAPI_API_KEY}&q=${encodeURIComponent(city)}&days=4&aqi=no&alerts=no`,
+            `${weatherApiConfig.apiUrl}/forecast.json?key=${weatherApiConfig.apiKey}&q=${encodeURIComponent(city)}&days=4&aqi=no&alerts=no`,
          );
 
          if (!response.ok) {

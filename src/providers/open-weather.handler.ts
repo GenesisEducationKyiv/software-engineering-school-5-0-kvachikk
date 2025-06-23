@@ -1,9 +1,13 @@
 import 'dotenv/config';
-import { AbstractWeatherHandler, Weather } from './weather.handler';
-import { Coordinates } from '../interfaces/Coordinates';
-import { NotFoundError } from '../constants/errors/not-found.error';
-import { Logger } from '../logger/logger.service';
 import { Injectable } from '@nestjs/common';
+
+import { coordinatesConfig } from '../config/coordinates.config';
+import { openWeatherConfig } from '../config/open-weather.config';
+import { NotFoundError } from '../constants/errors/not-found.error';
+import { Coordinates } from '../interfaces/Coordinates';
+import { Logger } from '../logger/logger.service';
+
+import { AbstractWeatherHandler, Weather } from './weather.handler';
 
 export type OpenWeatherApiResponse = {
    cod: string;
@@ -54,7 +58,7 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
       try {
          const coordinates = await this.getCoordinates(city);
          const response = await fetch(
-            `${process.env.OPEN_WEATHER_API_URL}/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&cnt=40&appid=${process.env.OPEN_WEATHER_API_KEY}&units=metric`,
+            `${openWeatherConfig.apiUrl}/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&cnt=40&appid=${openWeatherConfig.apiKey}&units=metric`,
          );
 
          if (!response.ok) {
@@ -83,14 +87,15 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
    }
 
    public async getCoordinates(city: string): Promise<Coordinates> {
-      const geoUrl = `${process.env.OPEN_WEATHER_GEO_URL}?q=${encodeURIComponent(city)}&limit=1&appid=${process.env.OPEN_WEATHER_API_KEY}`;
-      const geoResponse = await fetch(geoUrl);
+      const geoResponse = await fetch(
+         `${coordinatesConfig.apiUrl}?q=${encodeURIComponent(city)}&limit=1&appid=${coordinatesConfig.apiKey}`,
+      );
 
       if (!geoResponse.ok) {
          this.handleAndThrowError(`Failed to fetch coordinates for city: ${city}. Status: ${geoResponse.status}`);
       }
 
-      const dataArray = (await geoResponse.json()) as any[];
+      const dataArray = (await geoResponse.json()) as unknown[];
 
       if (!dataArray || dataArray.length === 0) {
          this.handleAndThrowError(

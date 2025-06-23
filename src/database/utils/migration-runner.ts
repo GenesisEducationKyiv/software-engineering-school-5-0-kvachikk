@@ -1,5 +1,7 @@
 import * as path from 'node:path';
+
 import { Umzug, SequelizeStorage } from 'umzug';
+
 import { sequelize } from '../sequelize';
 
 export const runMigrations = async (): Promise<void> => {

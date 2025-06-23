@@ -1,9 +1,9 @@
 import { Controller, Get, HttpCode, HttpStatus, Query, UsePipes } from '@nestjs/common';
+
+import { Weather } from '../providers/weather.handler';
+import { WeatherServices } from '../services/weather/weather.services';
 import { JoiValidationPipe } from '../validation';
 import { weatherParamsSchema } from '../validation/weather.validation';
-
-import { WeatherServices } from '../services/weather/weather.services';
-import { Weather } from '../providers/weather.handler';
 
 @Controller('weather')
 export class WeatherController {

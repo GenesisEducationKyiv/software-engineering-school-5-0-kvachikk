@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import * as YAML from 'yamljs';
 import { SwaggerModule } from '@nestjs/swagger';
+import * as YAML from 'yamljs';
+
+import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 
 async function bootstrap() {

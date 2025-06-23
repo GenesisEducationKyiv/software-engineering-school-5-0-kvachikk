@@ -1,14 +1,16 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
+import { Injectable } from '@nestjs/common';
 import * as handlebars from 'handlebars';
 import { Resend } from 'resend';
-import { Injectable } from '@nestjs/common';
-import { EmailValidationService } from './validation';
-import { TemplateLetterParams } from '../../interfaces/TemplateLetterParams';
+
+import { appConfig, mailConfig } from '../../config';
 import { Subscription } from '../../interfaces/Subscription';
-import { appConfig } from '../../config';
-import { mailConfig } from '../../config';
+import { TemplateLetterParams } from '../../interfaces/TemplateLetterParams';
 import { WeatherServices } from '../weather/weather.services';
+
+import { EmailValidationService } from './validation';
 
 @Injectable()
 export class EmailService {

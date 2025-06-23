@@ -1,5 +1,6 @@
+import path from 'node:path';
+
 import { test, expect } from '@playwright/test';
-import path from 'path';
 
 const fileUrl = (filePath: string) => 'file://' + path.resolve(__dirname, '..', filePath);
 

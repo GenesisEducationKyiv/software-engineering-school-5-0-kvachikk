@@ -3,19 +3,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AppModule } from '../src/app.module';
-import { WeatherServices } from '../src/services/weather/weather.services';
-import { SubscriptionService } from '../src/services/subscription/subscription.service';
-import { subscriptionResponseMessages as subMsgs } from '../src/constants/message/subscription-responses';
-import { ConflictError } from '../src/constants/errors/conflict.error';
-import { EmailSchedulerLoader } from '../src/loaders/email-scheduler.loader';
-import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
-import { NotFoundError } from '../src/constants/errors/not-found.error';
 import { BadRequestError } from '../src/constants/errors/bad-request.error';
+import { ConflictError } from '../src/constants/errors/conflict.error';
+import { NotFoundError } from '../src/constants/errors/not-found.error';
+import { subscriptionResponseMessages as subMsgs } from '../src/constants/message/subscription-responses';
+import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
 import { DatabaseLoader } from '../src/loaders/database.loader';
+import { EmailSchedulerLoader } from '../src/loaders/email-scheduler.loader';
 import { EmailService } from '../src/services/emails/sender';
+import { SubscriptionService } from '../src/services/subscription/subscription.service';
+import { WeatherServices } from '../src/services/weather/weather.services';
 
 // Mock
-const weatherServiceMock: Partial<Record<keyof WeatherServices, any>> = {
+const weatherServiceMock: Partial<Record<keyof WeatherServices, jest.Mock>> = {
    getWeatherForecast: jest.fn().mockResolvedValue([
       {
          temperature: 12,
@@ -25,7 +25,7 @@ const weatherServiceMock: Partial<Record<keyof WeatherServices, any>> = {
    ]),
 };
 
-const subscriptionServiceMock: Partial<Record<keyof SubscriptionService, any>> = {
+const subscriptionServiceMock: Partial<Record<keyof SubscriptionService, jest.Mock>> = {
    subscribe: jest.fn().mockResolvedValue({}),
    confirmSubscription: jest.fn().mockResolvedValue({}),
    unsubscribe: jest.fn().mockResolvedValue({}),

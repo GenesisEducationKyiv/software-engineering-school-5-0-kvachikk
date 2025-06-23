@@ -1,9 +1,9 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
-import { testConnection } from '../database/utils/database-connect';
-import { runMigrations } from '../database/utils/migration-runner';
-import { seedFrequencies } from '../database/utils/frequency.seeder';
 import { databaseMessages as dbMessages } from '../constants/message/database';
+import { testConnection } from '../database/utils/database-connect';
+import { seedFrequencies } from '../database/utils/frequency.seeder';
+import { runMigrations } from '../database/utils/migration-runner';
 
 @Injectable()
 export class DatabaseLoader implements OnModuleInit {

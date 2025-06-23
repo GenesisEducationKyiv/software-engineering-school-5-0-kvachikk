@@ -1,69 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { Subscription } from '../interfaces/Subscription';
+
 import { FrequencyModel } from '../database/models/frequency.model';
+import { SubscriptionModel } from '../database/models/subscription.model';
 
-interface SubscriptionModel {
-   findOne(options: any): Promise<any>;
-   findAll(options: any): Promise<any[]>;
-   create(data: any): Promise<any>;
-}
+type SubscriptionStatic = typeof SubscriptionModel;
+type FrequencyStatic = typeof FrequencyModel;
 
-interface FrequencyInterface {
-   findOne(options: any): Promise<any>;
-}
-
-interface SubscriptionData {
-   email: string;
-   city: string;
-   verificationToken: string;
-   frequencyId: number;
-   isActive?: boolean;
-   isVerified?: boolean;
-}
-
-interface SubscriptionInstance {
-   save(): Promise<any>;
+interface FindableModel {
+   findOne(options: { where: Record<string, unknown> }): Promise<unknown>;
 }
 
 @Injectable()
 export class SubscriptionRepository {
    constructor(
-      private readonly subscriptionModel: SubscriptionModel,
-      private readonly frequencyModel: FrequencyInterface,
+      private readonly subscriptionModel: SubscriptionStatic,
+      private readonly frequencyModel: FrequencyStatic,
    ) {}
 
-   private getModel(model: 'subscription' | 'frequency'): SubscriptionModel | FrequencyInterface {
+   private getModel(model: 'subscription' | 'frequency'): SubscriptionStatic | FrequencyStatic {
       return model === 'subscription' ? this.subscriptionModel : this.frequencyModel;
    }
 
-   async find(model: 'subscription' | 'frequency', whereClause: Record<string, unknown>): Promise<any> {
-      const targetModel = this.getModel(model);
-      return targetModel.findOne({ where: whereClause });
+   private async find<T>(model: 'subscription' | 'frequency', whereClause: Record<string, unknown>): Promise<T | null> {
+      const targetModel = this.getModel(model) as FindableModel;
+      return (await targetModel.findOne({ where: whereClause })) as T | null;
    }
 
-   async findByEmail(email: string): Promise<Subscription> {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return this.find('subscription', { email });
+   async findByEmail(email: string): Promise<SubscriptionModel | null> {
+      return this.find<SubscriptionModel>('subscription', { email });
    }
 
-   async findByToken(verificationToken: string): Promise<any> {
-      return this.find('subscription', { verificationToken });
+   async findByToken(verificationToken: string): Promise<SubscriptionModel | null> {
+      return this.find<SubscriptionModel>('subscription', { verificationToken });
    }
 
-   async findFrequencyByTitle(title: string): Promise<FrequencyModel> {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return this.find('frequency', { title: title.toUpperCase() });
+   async create(subscription: Partial<SubscriptionModel>): Promise<SubscriptionModel> {
+      return this.subscriptionModel.create(subscription);
    }
 
-   async create(subscriptionData: SubscriptionData): Promise<any> {
-      return this.subscriptionModel.create(subscriptionData);
-   }
-
-   async save(subscriptionInstance: SubscriptionInstance): Promise<any> {
+   async save(subscriptionInstance: SubscriptionModel): Promise<SubscriptionModel> {
       return subscriptionInstance.save();
    }
 
-   async getActiveSubscriptionsByFrequency(frequencyTitle: string): Promise<any[]> {
+   async findFrequencyByTitle(title: string): Promise<FrequencyModel | null> {
+      return this.find<FrequencyModel>('frequency', { title: title.toUpperCase() });
+   }
+
+   async getActiveSubscriptionsByFrequency(frequencyTitle: string): Promise<unknown[]> {
       return this.subscriptionModel.findAll({
          where: { isActive: true, isVerified: true },
          include: [

@@ -1,16 +1,11 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UsePipes } from '@nestjs/common';
+
+import { subscriptionResponseMessages as messages } from '../constants/message/subscription-responses';
+import { SubscribeDto } from '../dtos/subscribe.dto';
+import { SubscriptionService } from '../services/subscription/subscription.service';
 import { JoiValidationPipe } from '../validation';
 import { subscriptionSchema } from '../validation/subscription.validation';
 import { verifyEmailSchema } from '../validation/verification.validation';
-
-import { SubscriptionService } from '../services/subscription/subscription.service';
-import { subscriptionResponseMessages as messages } from '../constants/message/subscription-responses';
-
-class SubscribeDto {
-   email: string;
-   city: string;
-   frequency: string;
-}
 
 @Controller()
 export class SubscriptionController {

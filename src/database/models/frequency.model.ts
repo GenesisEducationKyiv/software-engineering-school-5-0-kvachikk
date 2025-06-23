@@ -1,4 +1,5 @@
 import { Model, Table, Column, HasMany, DataType } from 'sequelize-typescript';
+
 import { SubscriptionModel } from './subscription.model';
 
 @Table({ tableName: 'Frequencies', timestamps: true })

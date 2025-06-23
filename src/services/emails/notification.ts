@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { EmailService } from './sender';
+
 import { appConfig } from '../../config';
+
+import { EmailService } from './sender';
 
 @Injectable()
 export class NotificationService {

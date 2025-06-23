@@ -1,7 +1,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as winston from 'winston';
+
 import { Injectable } from '@nestjs/common';
+import * as winston from 'winston';
 
 @Injectable()
 export class Logger {

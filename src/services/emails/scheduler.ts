@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { INTERVALS } from '../../constants/intervals';
+
 import { FREQUENCIES } from '../../constants/frequencies';
-import { EmailService } from './sender';
+import { INTERVALS } from '../../constants/intervals';
 import { Subscription } from '../../interfaces/Subscription';
+
+import { EmailService } from './sender';
 
 interface SubscriptionService {
    getActiveSubscriptions(frequency: string): Promise<Subscription[]>;
