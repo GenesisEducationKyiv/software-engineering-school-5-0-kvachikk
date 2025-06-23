@@ -46,7 +46,7 @@ export class SubscriptionRepository {
       return this.find<FrequencyModel>('frequency', { title: title.toUpperCase() });
    }
 
-   async getActiveSubscriptionsByFrequency(frequencyTitle: string): Promise<unknown[]> {
+   async getActiveSubscriptionsByFrequency(frequencyTitle: string): Promise<SubscriptionModel[]> {
       return this.subscriptionModel.findAll({
          where: { isActive: true, isVerified: true },
          include: [

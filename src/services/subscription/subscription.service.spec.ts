@@ -2,8 +2,8 @@ import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotFoundError } from '../../constants/errors/not-found.error';
 import { FrequencyModel } from '../../database/models/frequency.model';
 import { SubscriptionRepository } from '../../repositories/subscription-repository';
-import { NotificationService } from '../emails/notification';
-import { WeatherServices } from '../weather/weather.services';
+import { EmailerService } from '../emailer.service';
+import { WeatherService } from '../weather.service';
 
 import { SubscriptionService } from './subscription.service';
 
@@ -24,17 +24,17 @@ const createRepositoryMock = (): jest.Mocked<SubscriptionRepository> =>
       getActiveSubscriptionsByFrequency: jest.fn(),
    }) as unknown as jest.Mocked<SubscriptionRepository>;
 
-const createNotifierMock = (): jest.Mocked<NotificationService> =>
+const createNotifierMock = (): jest.Mocked<EmailerService> =>
    ({
       sendWelcomeEmail: jest.fn(),
       sendConfirmationEmail: jest.fn(),
       sendUnsubscribeEmail: jest.fn(),
-   }) as unknown as jest.Mocked<NotificationService>;
+   }) as unknown as jest.Mocked<EmailerService>;
 
-const createWeatherServiceMock = (): jest.Mocked<WeatherServices> =>
+const createWeatherServiceMock = (): jest.Mocked<WeatherService> =>
    ({
       getWeatherForecast: jest.fn(),
-   }) as unknown as jest.Mocked<WeatherServices>;
+   }) as unknown as jest.Mocked<WeatherService>;
 
 const makeService = (
    repository = createRepositoryMock(),

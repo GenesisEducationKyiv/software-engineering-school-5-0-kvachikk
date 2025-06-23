@@ -5,26 +5,25 @@ import { Injectable } from '@nestjs/common';
 import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotFoundError } from '../../constants/errors/not-found.error';
 import { subscriptionResponseMessages } from '../../constants/message/subscription-responses';
-import { FrequencyModel } from '../../database/models/frequency.model';
-import { SubscriptionModel } from '../../database/models/subscription.model';
+import { Subscription } from '../../interfaces/Subscription';
 import { SubscriptionRepository } from '../../repositories/subscription-repository';
-import { NotificationService } from '../emails/notification';
-import { WeatherServices } from '../weather/weather.services';
+import { EmailerService } from '../emailer.service';
+import { WeatherService } from '../weather.service';
 
 @Injectable()
 export class SubscriptionService {
    constructor(
       private readonly repository: SubscriptionRepository,
-      private readonly notifier: NotificationService,
-      private readonly weatherServices: WeatherServices,
+      private readonly emailer: EmailerService,
+      private readonly weatherServices: WeatherService,
    ) {}
 
    private generateToken(): string {
       return randomBytes(32).toString('hex');
    }
 
-   async subscribe(email: string, city: string, frequency: string): Promise<unknown> {
-      const frequencyEntity: FrequencyModel | null = await this.repository.findFrequencyByTitle(frequency);
+   async subscribe(email: string, city: string, frequency: string): Promise<Subscription> {
+      const frequencyEntity = await this.repository.findFrequencyByTitle(frequency);
 
       if (!frequencyEntity) {
          throw new NotFoundError(`Frequency: "${frequency}" not found`);
@@ -39,7 +38,7 @@ export class SubscriptionService {
 
       const token = this.generateToken();
 
-      const newSubscription: SubscriptionModel = await this.repository.create({
+      const newSubscription: Subscription = await this.repository.create({
          email,
          city,
          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -49,12 +48,12 @@ export class SubscriptionService {
          isActive: false,
       });
 
-      await this.notifier.sendWelcomeEmail(email, city, token);
+      await this.emailer.sendWelcomeEmail(email, city, token);
 
       return newSubscription;
    }
 
-   async confirmSubscription(token: string): Promise<SubscriptionModel> {
+   async confirmSubscription(token: string): Promise<void> {
       const subscription = await this.repository.findByToken(token);
       if (!subscription) {
          throw new NotFoundError(`Subscription: "${token}" not found`);
@@ -64,10 +63,7 @@ export class SubscriptionService {
       subscription.isVerified = true;
 
       await this.repository.save(subscription);
-
-      await this.notifier.sendConfirmationEmail(subscription.email, subscription.city, token);
-
-      return subscription;
+      await this.emailer.sendConfirmationEmail(subscription.email, subscription.city, token);
    }
 
    async unsubscribe(token: string): Promise<void> {
@@ -78,13 +74,10 @@ export class SubscriptionService {
 
       subscription.isActive = false;
       await this.repository.save(subscription);
-      await this.notifier.sendUnsubscribeEmail(subscription.email, subscription.city, token);
+      await this.emailer.sendUnsubscribeEmail(subscription.email, subscription.city, token);
    }
 
-   async getActiveSubscriptions(frequencyTitle: string): Promise<unknown[]> {
-      if (!frequencyTitle) {
-         throw new NotFoundError(frequencyTitle);
-      }
-      return this.repository.getActiveSubscriptionsByFrequency(frequencyTitle);
+   async getActiveSubscriptions(frequencyTitle: string): Promise<Subscription[]> {
+      return (await this.repository.getActiveSubscriptionsByFrequency(frequencyTitle)) as unknown as Subscription[];
    }
 }

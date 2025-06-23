@@ -10,12 +10,12 @@ import { subscriptionResponseMessages as subMsgs } from '../src/constants/messag
 import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
 import { DatabaseLoader } from '../src/loaders/database.loader';
 import { EmailSchedulerLoader } from '../src/loaders/email-scheduler.loader';
-import { EmailService } from '../src/services/emails/sender';
+import { EmailerService } from '../src/services/emailer.service';
 import { SubscriptionService } from '../src/services/subscription/subscription.service';
-import { WeatherServices } from '../src/services/weather/weather.services';
+import { WeatherService } from '../src/services/weather.service';
 
 // Mock
-const weatherServiceMock: Partial<Record<keyof WeatherServices, jest.Mock>> = {
+const weatherServiceMock: Partial<Record<keyof WeatherService, jest.Mock>> = {
    getWeatherForecast: jest.fn().mockResolvedValue([
       {
          temperature: 12,
@@ -32,7 +32,7 @@ const subscriptionServiceMock: Partial<Record<keyof SubscriptionService, jest.Mo
    getActiveSubscriptions: jest.fn().mockResolvedValue([]),
 };
 
-const emailServiceMock = { sendTemplateLetter: jest.fn(), sendSimpleLetter: jest.fn() } as Partial<EmailService>;
+const emailServiceMock = { sendTemplateLetter: jest.fn(), sendSimpleLetter: jest.fn() } as Partial<EmailerService>;
 
 // Helper
 const makeValidSubscriptionPayload = () => ({
@@ -49,7 +49,7 @@ describe('Weather-Forecast API (integration)', () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
          imports: [AppModule],
       })
-         .overrideProvider(WeatherServices)
+         .overrideProvider(WeatherService)
          .useValue(weatherServiceMock)
          .overrideProvider(SubscriptionService)
          .useValue(subscriptionServiceMock)
@@ -57,7 +57,7 @@ describe('Weather-Forecast API (integration)', () => {
          .useValue({ onModuleInit: jest.fn() })
          .overrideProvider(DatabaseLoader)
          .useValue({ onModuleInit: jest.fn() })
-         .overrideProvider(EmailService)
+         .overrideProvider(EmailerService)
          .useValue(emailServiceMock)
          .compile();
 

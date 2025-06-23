@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { FREQUENCIES } from '../../constants/frequencies';
-import { INTERVALS } from '../../constants/intervals';
-import { Subscription } from '../../interfaces/Subscription';
+import { FREQUENCIES } from '../constants/frequencies';
+import { INTERVALS } from '../constants/intervals';
+import { Subscription } from '../interfaces/Subscription';
 
-import { EmailService } from './sender';
+import { EmailerService } from './emailer.service';
 
 interface SubscriptionService {
    getActiveSubscriptions(frequency: string): Promise<Subscription[]>;
@@ -14,13 +14,14 @@ type FrequencyHandler = (subscriptionService: SubscriptionService) => Promise<vo
 
 @Injectable()
 export class SchedulerService {
-   constructor(private readonly emailService: EmailService) {}
+   constructor(private readonly emailer: EmailerService) {}
 
    private async processSubscriptions(subscriptions: Subscription[]): Promise<void> {
       if (subscriptions.length === 0) {
          return;
       }
-      const sendPromises = subscriptions.map((subscription) => this.emailService.sendForecastEmail(subscription));
+
+      const sendPromises = subscriptions.map((subscription) => this.emailer.sendForecastEmail(subscription));
       const results = await Promise.allSettled(sendPromises);
 
       results.forEach((result, index) => {

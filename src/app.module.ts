@@ -11,21 +11,20 @@ import { Logger } from './logger/logger.service';
 import { ApiWeatherHandler } from './providers/api-weather.handler';
 import { OpenWeatherHandler } from './providers/open-weather.handler';
 import { SubscriptionRepository } from './repositories/subscription-repository';
-import { NotificationService } from './services/emails/notification';
-import { SchedulerService } from './services/emails/scheduler';
-import { EmailService } from './services/emails/sender';
-import { EmailValidationService } from './services/emails/validation';
+import { EmailerService } from './services/emailer.service';
+import { SchedulerService } from './services/scheduler.service';
 import { SubscriptionService } from './services/subscription/subscription.service';
-import { WeatherServices } from './services/weather/weather.services';
+import { EmailValidationService } from './services/validator.service';
+import { WeatherService } from './services/weather.service';
 
 @Module({
    imports: [ConfigModule.forRoot({ isGlobal: true })],
    controllers: [SubscriptionController, WeatherController],
    providers: [
-      EmailService,
+      EmailerService,
       EmailValidationService,
-      NotificationService,
-      WeatherServices,
+      EmailerService,
+      WeatherService,
       SchedulerService,
       DatabaseLoader,
       EmailSchedulerLoader,

@@ -65,21 +65,22 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
             this.handleAndThrowError(`OpenWeather provider failed: ${response.status}`);
          }
 
-         const forecastData = (await response.json()) as OpenWeatherApiResponse;
-         const dailyForecasts: Weather[] = [];
+         const data = (await response.json()) as OpenWeatherApiResponse;
+         const forecast: Weather[] = [];
 
-         for (let i = 3; i < forecastData.list.length; i += 8) {
-            const entry = forecastData.list[i];
-            dailyForecasts.push({
+         for (let i = 3; i < data.list.length; i += 8) {
+            const entry = data.list[i];
+            forecast.push({
                temperature: entry.main.temp,
                humidity: entry.main.humidity,
                description: entry.weather[0].description,
+               icon: entry.weather[0].icon,
             });
-            if (dailyForecasts.length === 4) break;
+            if (forecast.length === 4) break;
          }
 
-         this.logger.response('Fetched forecast from OpenWeather', 'OpenWeather', dailyForecasts);
-         return dailyForecasts;
+         this.logger.response('Fetched forecast from OpenWeather', 'OpenWeather', forecast);
+         return forecast;
       } catch (error) {
          this.logger.error(`OpenWeatherHandler encountered an error: ${error}`);
          return super.handle(city);

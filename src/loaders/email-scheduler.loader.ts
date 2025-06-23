@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 
-import { SchedulerService } from '../services/emails/scheduler';
+import { SchedulerService } from '../services/scheduler.service';
 import { SubscriptionService } from '../services/subscription/subscription.service';
 
 @Injectable()

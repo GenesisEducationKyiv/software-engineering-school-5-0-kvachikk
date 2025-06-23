@@ -2,6 +2,7 @@ export type Weather = {
    temperature: number;
    humidity: number;
    description: string;
+   icon?: string;
 };
 
 export interface WeatherHandler {
