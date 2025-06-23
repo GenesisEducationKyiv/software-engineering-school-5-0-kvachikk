@@ -1,20 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { FREQUENCIES } from '../constants/frequencies';
-import { INTERVALS } from '../constants/intervals';
+import { FrequencyModel } from '../database/models/frequency.model';
 import { Subscription } from '../interfaces/Subscription';
 
 import { EmailerService } from './emailer.service';
-
-interface SubscriptionService {
-   getActiveSubscriptions(frequency: string): Promise<Subscription[]>;
-}
-
-type FrequencyHandler = (subscriptionService: SubscriptionService) => Promise<void>;
+import { SubscriptionService } from './subscription/subscription.service';
 
 @Injectable()
 export class SchedulerService {
-   constructor(private readonly emailer: EmailerService) {}
+   constructor(
+      private readonly emailer: EmailerService,
+      private readonly subscriptionService: SubscriptionService,
+   ) {}
 
    private async processSubscriptions(subscriptions: Subscription[]): Promise<void> {
       if (subscriptions.length === 0) {
@@ -32,39 +30,18 @@ export class SchedulerService {
       });
    }
 
-   private readonly FREQUENCY_HANDLERS: Record<string, FrequencyHandler> = {
-      HOURLY: async (subscriptionService: SubscriptionService) => {
-         const subscriptions = await subscriptionService.getActiveSubscriptions(FREQUENCIES.HOURLY);
-         await this.processSubscriptions(subscriptions);
-      },
-      DAILY: async (subscriptionService: SubscriptionService) => {
-         const subscriptions = await subscriptionService.getActiveSubscriptions(FREQUENCIES.DAILY);
-         await this.processSubscriptions(subscriptions);
-      },
-   };
-
-   private async createScheduler(
-      handler: FrequencyHandler,
-      interval: number,
-      subscriptionService: SubscriptionService,
-   ): Promise<void> {
-      const run = async (): Promise<void> => {
-         try {
-            await handler(subscriptionService);
-         } catch (error) {
-            console.error('Error during scheduled task execution:', error);
-         } finally {
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            setTimeout(run, interval);
-         }
-      };
-      await run();
+   private async handleFrequency(frequency: string): Promise<void> {
+      const subscriptions = await this.subscriptionService.getActiveSubscriptions(frequency);
+      await this.processSubscriptions(subscriptions);
    }
 
-   async startScheduler(subscriptionService: SubscriptionService): Promise<void> {
-      for (const handlerKey of Object.keys(this.FREQUENCY_HANDLERS)) {
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         await this.createScheduler(this.FREQUENCY_HANDLERS[handlerKey], INTERVALS[handlerKey], subscriptionService);
-      }
+   @Cron(CronExpression.EVERY_HOUR)
+   private async hourlyJob(): Promise<void> {
+      await this.handleFrequency(FrequencyModel.FREQUENCIES.HOURLY);
+   }
+
+   @Cron(CronExpression.EVERY_DAY_AT_1PM)
+   private async dailyJob(): Promise<void> {
+      await this.handleFrequency(FrequencyModel.FREQUENCIES.DAILY);
    }
 }

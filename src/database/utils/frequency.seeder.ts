@@ -6,5 +6,10 @@ export const seedFrequencies = async (): Promise<void> => {
       return;
    }
 
-   await FrequencyModel.bulkCreate([{ title: 'HOURLY' } as FrequencyModel, { title: 'DAILY' } as FrequencyModel]);
+   const { FREQUENCIES } = FrequencyModel;
+
+   await FrequencyModel.bulkCreate([
+      { title: FREQUENCIES.HOURLY } as FrequencyModel,
+      { title: FREQUENCIES.DAILY } as FrequencyModel,
+   ]);
 };

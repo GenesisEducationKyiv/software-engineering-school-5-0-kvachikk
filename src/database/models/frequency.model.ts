@@ -12,4 +12,9 @@ export class FrequencyModel extends Model<FrequencyModel> {
 
    @HasMany(() => SubscriptionModel, 'frequencyId')
    subscriptions: SubscriptionModel[];
+
+   static readonly FREQUENCIES = {
+      HOURLY: 'HOURLY',
+      DAILY: 'DAILY',
+   } as const;
 }

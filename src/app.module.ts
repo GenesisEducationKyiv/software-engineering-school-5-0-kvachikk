@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { SubscriptionController } from './controllers/subscription.controller';
 import { WeatherController } from './controllers/weather.controller';
 import { FrequencyModel } from './database/models/frequency.model';
 import { SubscriptionModel } from './database/models/subscription.model';
 import { DatabaseLoader } from './loaders/database.loader';
-import { EmailSchedulerLoader } from './loaders/email-scheduler.loader';
 import { Logger } from './logger/logger.service';
 import { ApiWeatherHandler } from './providers/api-weather.handler';
 import { OpenWeatherHandler } from './providers/open-weather.handler';
@@ -18,16 +18,14 @@ import { EmailValidationService } from './services/validator.service';
 import { WeatherService } from './services/weather.service';
 
 @Module({
-   imports: [ConfigModule.forRoot({ isGlobal: true })],
+   imports: [ConfigModule.forRoot({ isGlobal: true }), ScheduleModule.forRoot()],
    controllers: [SubscriptionController, WeatherController],
    providers: [
       EmailerService,
       EmailValidationService,
-      EmailerService,
       WeatherService,
       SchedulerService,
       DatabaseLoader,
-      EmailSchedulerLoader,
       Logger,
       OpenWeatherHandler,
       ApiWeatherHandler,
