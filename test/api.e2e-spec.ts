@@ -9,7 +9,6 @@ import { NotFoundError } from '../src/constants/errors/not-found.error';
 import { subscriptionResponseMessages as subMsgs } from '../src/constants/message/subscription-responses';
 import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
 import { DatabaseLoader } from '../src/loaders/database.loader';
-import { EmailSchedulerLoader } from '../src/loaders/email-scheduler.loader';
 import { EmailerService } from '../src/services/emailer.service';
 import { SubscriptionService } from '../src/services/subscription/subscription.service';
 import { WeatherService } from '../src/services/weather.service';
@@ -53,8 +52,6 @@ describe('Weather-Forecast API (integration)', () => {
          .useValue(weatherServiceMock)
          .overrideProvider(SubscriptionService)
          .useValue(subscriptionServiceMock)
-         .overrideProvider(EmailSchedulerLoader)
-         .useValue({ onModuleInit: jest.fn() })
          .overrideProvider(DatabaseLoader)
          .useValue({ onModuleInit: jest.fn() })
          .overrideProvider(EmailerService)
