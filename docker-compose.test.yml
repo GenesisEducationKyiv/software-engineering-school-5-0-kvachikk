@@ -1,8 +1,5 @@
 version: '3.9'
 
-# ---------------------------------------------------------------------------
-# Reusable settings applied to every test-runner container
-# ---------------------------------------------------------------------------
 x-test-runner: &test-runner
   build:
     context: .
@@ -15,9 +12,6 @@ x-test-runner: &test-runner
   networks:
     - test-net
 
-# ---------------------------------------------------------------------------
-# Named resources
-# ---------------------------------------------------------------------------
 volumes:
   pg-test-data:
 
@@ -25,11 +19,7 @@ networks:
   test-net:
     driver: bridge
 
-# ---------------------------------------------------------------------------
-# Service definitions
-# ---------------------------------------------------------------------------
 services:
-  # 1. Database used by integration/API tests
   postgres-test:
     container_name: postgres-test
     image: postgres:17-alpine
@@ -50,13 +40,11 @@ services:
     networks:
       - test-net
 
-  # 2. Pure unit tests – run entirely in-memory
   unit-tests:
     <<: *test-runner
     container_name: unit-tests
     command: npm run test:unit
 
-  # 4. API (integration) tests – require DB
   api-tests:
     <<: *test-runner
     container_name: api-tests
@@ -65,7 +53,6 @@ services:
         condition: service_healthy
     command: npm run test:e2e
 
-  # 5. UI / Playwright tests
   ui-tests:
     <<: *test-runner
     container_name: ui-tests

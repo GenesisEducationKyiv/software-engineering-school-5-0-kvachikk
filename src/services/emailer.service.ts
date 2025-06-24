@@ -33,7 +33,6 @@ export class EmailerService {
       let fullPath = path.join(__dirname, '../../constants/templates', templatePath);
 
       if (!fs.existsSync(fullPath)) {
-         // Fallback when running from compiled dist without copied assets
          fullPath = path.join(process.cwd(), 'src/constants/templates', templatePath);
       }
 

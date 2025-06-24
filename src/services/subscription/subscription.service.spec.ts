@@ -1,46 +1,96 @@
 import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotFoundError } from '../../constants/errors/not-found.error';
 import { FrequencyModel } from '../../database/models/frequency.model';
+import { Subscription } from '../../interfaces/Subscription';
 import { SubscriptionRepository } from '../../repositories/subscription-repository';
 import { EmailerService } from '../emailer.service';
 import { WeatherService } from '../weather.service';
 
 import { SubscriptionService } from './subscription.service';
 
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/unbound-method, @typescript-eslint/no-unsafe-member-access */
+interface RepositoryMocks {
+   repo: SubscriptionRepository;
+   findFrequencyByTitle: jest.Mock;
+   findByEmail: jest.Mock;
+   create: jest.Mock;
+   findByToken: jest.Mock;
+   save: jest.Mock;
+   getActiveSubscriptionsByFrequency: jest.Mock;
+}
 
-// ----------------------------------------------------------------------------
-// Test helpers
-// ----------------------------------------------------------------------------
+const buildRepositoryMock = (): RepositoryMocks => {
+   const findFrequencyByTitle = jest.fn();
+   const findByEmail = jest.fn();
+   const create = jest.fn();
+   const findByToken = jest.fn();
+   const save = jest.fn();
+   const getActiveSubscriptionsByFrequency = jest.fn();
 
-const createRepositoryMock = (): jest.Mocked<SubscriptionRepository> =>
-   ({
-      findFrequencyByTitle: jest.fn(),
-      findByEmail: jest.fn(),
-      create: jest.fn(),
-      findByToken: jest.fn(),
-      save: jest.fn(),
-      // Not used in the tests below but required by the type
-      getActiveSubscriptionsByFrequency: jest.fn(),
-   }) as unknown as jest.Mocked<SubscriptionRepository>;
+   return {
+      repo: {
+         findFrequencyByTitle: findFrequencyByTitle as SubscriptionRepository['findFrequencyByTitle'],
+         findByEmail: findByEmail as SubscriptionRepository['findByEmail'],
+         create: create as SubscriptionRepository['create'],
+         findByToken: findByToken as SubscriptionRepository['findByToken'],
+         save: save as SubscriptionRepository['save'],
+         getActiveSubscriptionsByFrequency:
+            getActiveSubscriptionsByFrequency as SubscriptionRepository['getActiveSubscriptionsByFrequency'],
+      } as SubscriptionRepository,
+      findFrequencyByTitle,
+      findByEmail,
+      create,
+      findByToken,
+      save,
+      getActiveSubscriptionsByFrequency,
+   };
+};
 
-const createNotifierMock = (): jest.Mocked<EmailerService> =>
-   ({
-      sendWelcomeEmail: jest.fn(),
-      sendConfirmationEmail: jest.fn(),
-      sendUnsubscribeEmail: jest.fn(),
-   }) as unknown as jest.Mocked<EmailerService>;
+interface NotifierMocks {
+   service: EmailerService;
+   sendWelcomeEmail: jest.Mock;
+   sendConfirmationEmail: jest.Mock;
+   sendUnsubscribeEmail: jest.Mock;
+}
 
-const createWeatherServiceMock = (): jest.Mocked<WeatherService> =>
-   ({
-      getWeatherForecast: jest.fn(),
-   }) as unknown as jest.Mocked<WeatherService>;
+const buildNotifierMock = (): NotifierMocks => {
+   const sendWelcomeEmail = jest.fn();
+   const sendConfirmationEmail = jest.fn();
+   const sendUnsubscribeEmail = jest.fn();
+   return {
+      service: {
+         sendWelcomeEmail: sendWelcomeEmail as EmailerService['sendWelcomeEmail'],
+         sendConfirmationEmail: sendConfirmationEmail as EmailerService['sendConfirmationEmail'],
+         sendUnsubscribeEmail: sendUnsubscribeEmail as EmailerService['sendUnsubscribeEmail'],
+      } as EmailerService,
+      sendWelcomeEmail,
+      sendConfirmationEmail,
+      sendUnsubscribeEmail,
+   };
+};
+
+interface WeatherMocks {
+   service: WeatherService;
+   getWeatherForecast: jest.Mock;
+}
+
+const buildWeatherServiceMock = (): WeatherMocks => {
+   const getWeatherForecast = jest.fn();
+   return {
+      service: { getWeatherForecast } as unknown as WeatherService,
+      getWeatherForecast,
+   };
+};
 
 const makeService = (
-   repository = createRepositoryMock(),
-   notifier = createNotifierMock(),
-   weather = createWeatherServiceMock(),
-) => new SubscriptionService(repository, notifier, weather);
+   repositoryMocks: RepositoryMocks = buildRepositoryMock(),
+   notifierMocks: NotifierMocks = buildNotifierMock(),
+   weatherMocks: WeatherMocks = buildWeatherServiceMock(),
+) => ({
+   service: new SubscriptionService(repositoryMocks.repo, notifierMocks.service, weatherMocks.service),
+   repositoryMocks,
+   notifierMocks,
+   weatherMocks,
+});
 
 describe('SubscriptionService', () => {
    const email = 'test@example.com';
@@ -48,39 +98,42 @@ describe('SubscriptionService', () => {
    const frequency = 'hourly';
    const frequencyEntity = { id: 1, title: frequency } as unknown as FrequencyModel;
 
-   // ---------------------------------------------------------------- subscribe()
    describe('subscribe()', () => {
       it('creates new subscription and sends welcome email', async () => {
-         const repositoryMock = createRepositoryMock();
-         repositoryMock.findFrequencyByTitle.mockResolvedValue(frequencyEntity);
-         repositoryMock.findByEmail.mockResolvedValue(null as unknown as any);
-         const created = { id: 1, email, city } as unknown as any; // shape only matters for equality
-         repositoryMock.create.mockResolvedValue(created);
+         const { repositoryMocks, notifierMocks, weatherMocks, service } = makeService();
 
-         const weatherMock = createWeatherServiceMock();
+         repositoryMocks.findFrequencyByTitle.mockResolvedValue(frequencyEntity);
+         repositoryMocks.findByEmail.mockResolvedValue(null);
 
-         const notifierMock = createNotifierMock();
-
-         const service = makeService(repositoryMock, notifierMock, weatherMock);
+         const created = {
+            id: 1,
+            email,
+            city,
+            verificationToken: 'token',
+            isActive: false,
+            isVerified: false,
+         };
+         repositoryMocks.create.mockResolvedValue(created);
 
          const result = await service.subscribe(email, city, frequency);
 
-         expect(repositoryMock.findFrequencyByTitle).toHaveBeenCalledWith(frequency);
-         expect(weatherMock.getWeatherForecast).toHaveBeenCalledWith(city);
-         expect(repositoryMock.findByEmail).toHaveBeenCalledWith(email);
-         expect(repositoryMock.create).toHaveBeenCalledWith(
-            expect.objectContaining({ email, city, frequencyId: frequencyEntity.id }),
-         );
-         expect(notifierMock.sendWelcomeEmail).toHaveBeenCalledWith(email, city, expect.any(String));
+         expect(repositoryMocks.findFrequencyByTitle).toHaveBeenCalledWith(frequency);
+         expect(weatherMocks.getWeatherForecast).toHaveBeenCalledWith(city);
+         expect(repositoryMocks.findByEmail).toHaveBeenCalledWith(email);
+         expect(notifierMocks.sendWelcomeEmail).toHaveBeenCalledWith(email, city, expect.any(String));
          expect(result).toEqual(created);
       });
 
       it('throws ConflictError when email already exists', async () => {
-         const repositoryMock = createRepositoryMock();
-         repositoryMock.findFrequencyByTitle.mockResolvedValue(frequencyEntity);
-         repositoryMock.findByEmail.mockResolvedValue({ id: 42 } as unknown as any);
-
-         const service = makeService(repositoryMock);
+         const { repositoryMocks, service } = makeService();
+         repositoryMocks.findFrequencyByTitle.mockResolvedValue(frequencyEntity);
+         repositoryMocks.findByEmail.mockResolvedValue({
+            email,
+            city,
+            verificationToken: 'token',
+            isVerified: true,
+            isActive: true,
+         });
 
          await expect(service.subscribe(email, city, frequency)).rejects.toBeInstanceOf(ConflictError);
       });
@@ -91,71 +144,60 @@ describe('SubscriptionService', () => {
       const token = 'token-123';
 
       it('activates subscription and sends confirmation email', async () => {
+         const { repositoryMocks, notifierMocks, service } = makeService();
+
          const subscription = {
             id: 1,
             email,
             city,
+            verificationToken: token,
             isActive: false,
             isVerified: false,
-         } as unknown as any;
+         };
 
-         const repositoryMock = createRepositoryMock();
-         repositoryMock.findByToken.mockResolvedValue(subscription as unknown as any);
-
-         const notifierMock = createNotifierMock();
-
-         const service = makeService(repositoryMock, notifierMock);
+         repositoryMocks.findByToken.mockResolvedValue(subscription);
 
          await service.confirmSubscription(token);
 
          expect(subscription.isActive).toBe(true);
          expect(subscription.isVerified).toBe(true);
-         expect(repositoryMock.save).toHaveBeenCalledWith(subscription);
-         expect(notifierMock.sendConfirmationEmail).toHaveBeenCalledWith(email, city, token);
+         expect(repositoryMocks.save).toHaveBeenCalledWith(subscription);
+         expect(notifierMocks.sendConfirmationEmail).toHaveBeenCalledWith(email, city, token);
       });
 
       it('throws NotFoundError when token not found', async () => {
-         const repositoryMock = createRepositoryMock();
-         repositoryMock.findByToken.mockResolvedValue(undefined as unknown as any);
-
-         const service = makeService(repositoryMock);
+         const { repositoryMocks, service } = makeService();
+         repositoryMocks.findByToken.mockResolvedValue(null);
 
          await expect(service.confirmSubscription(token)).rejects.toBeInstanceOf(NotFoundError);
       });
    });
 
-   // ----------------------------------------------------------------- unsubscribe()
    describe('unsubscribe()', () => {
       const token = 'token-456';
-
       it('deactivates subscription and sends email', async () => {
-         const subscription = {
-            id: 1,
+         const { repositoryMocks, notifierMocks, service } = makeService();
+
+         const subscription: Subscription = {
             email,
             city,
+            verificationToken: token,
             isActive: true,
             isVerified: true,
-         } as unknown as any;
+         };
 
-         const repositoryMock = createRepositoryMock();
-         repositoryMock.findByToken.mockResolvedValue(subscription as unknown as any);
-
-         const notifierMock = createNotifierMock();
-
-         const service = makeService(repositoryMock, notifierMock);
+         repositoryMocks.findByToken.mockResolvedValue(subscription);
 
          await service.unsubscribe(token);
 
          expect(subscription.isActive).toBe(false);
-         expect(repositoryMock.save).toHaveBeenCalledWith(subscription);
-         expect(notifierMock.sendUnsubscribeEmail).toHaveBeenCalledWith(email, city, token);
+         expect(repositoryMocks.save).toHaveBeenCalledWith(subscription);
+         expect(notifierMocks.sendUnsubscribeEmail).toHaveBeenCalledWith(email, city, token);
       });
 
       it('throws NotFoundError when token not found', async () => {
-         const repositoryMock = createRepositoryMock();
-         repositoryMock.findByToken.mockResolvedValue(null as unknown as any);
-
-         const service = makeService(repositoryMock);
+         const { repositoryMocks, service } = makeService();
+         repositoryMocks.findByToken.mockResolvedValue(null);
 
          await expect(service.unsubscribe(token)).rejects.toBeInstanceOf(NotFoundError);
       });

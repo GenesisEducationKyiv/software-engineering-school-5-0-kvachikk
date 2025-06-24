@@ -34,7 +34,7 @@ test.describe('Weather Page', () => {
 
    test('displays validation error when Get Weather clicked with empty input', async ({ page }) => {
       await page.getByText('Get Weather').click();
-      const errorBox = await page.locator('#searchWeatherMessage');
+      const errorBox = page.locator('#searchWeatherMessage');
       await expect(errorBox).toBeVisible();
       await expect(errorBox).toContainText('Please enter a city name');
    });

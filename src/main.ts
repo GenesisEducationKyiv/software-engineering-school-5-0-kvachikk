@@ -10,7 +10,7 @@ async function bootstrap() {
    app.setGlobalPrefix('api');
 
    const swaggerConfig = new DocumentBuilder().setTitle('Weather API').setVersion('1.0').build();
-   SwaggerModule.setup('docs', app, SwaggerModule.createDocument(app, swaggerConfig));
+   SwaggerModule.setup('/', app, SwaggerModule.createDocument(app, swaggerConfig));
 
    app.useGlobalFilters(new AllExceptionsFilter());
 

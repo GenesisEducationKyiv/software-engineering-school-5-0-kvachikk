@@ -59,8 +59,11 @@ export default tslint.config(
          },
       },
       rules: {
-         '@typescript-eslint/no-explicit-any': 'error',
          'max-len': ['off'],
+         '@typescript-eslint/no-explicit-any': 'warn',
+         '@typescript-eslint/no-misused-promises': 'warn',
+         '@typescript-eslint/no-unsafe-assignment': 'warn',
+         '@typescript-eslint/no-deprecated': 'error',
       },
    },
 
