@@ -6,7 +6,7 @@ import { applicationConfig } from './config';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 
 async function bootstrap() {
-   const app = await NestFactory.create(AppModule);
+   const app = await NestFactory.create(AppModule, { cors: true });
 
    if (applicationConfig.environment === 'development') {
       const swaggerDoc = SwaggerModule.createDocument(app, new DocumentBuilder().setTitle('Weather API').build());
