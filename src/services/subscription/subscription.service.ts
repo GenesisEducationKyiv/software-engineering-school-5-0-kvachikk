@@ -5,8 +5,8 @@ import { Injectable } from '@nestjs/common';
 import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotFoundError } from '../../constants/errors/not-found.error';
 import { subscriptionResponseMessages } from '../../constants/message/subscription-responses';
-import { Subscription } from '../../interfaces/Subscription';
 import { SubscriptionRepository } from '../../repositories/subscription-repository';
+import { Subscription } from '../../types/subscription';
 import { EmailerService } from '../emailer.service';
 import { WeatherService } from '../weather.service';
 
@@ -41,7 +41,6 @@ export class SubscriptionService {
       const newSubscription: Subscription = await this.repository.create({
          email,
          city,
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
          frequencyId: frequencyEntity.id,
          verificationToken: token,
          isVerified: false,
@@ -56,28 +55,33 @@ export class SubscriptionService {
    async confirmSubscription(token: string): Promise<void> {
       const subscription = await this.repository.findByToken(token);
       if (!subscription) {
-         throw new NotFoundError(`Subscription: "${token}" not found`);
+         throw new NotFoundError(`Subscription with token: "${token}" not found`);
       }
 
       subscription.isActive = true;
       subscription.isVerified = true;
 
-      await this.repository.save(subscription);
-      await this.emailer.sendConfirmationEmail(subscription.email, subscription.city, token);
+      await Promise.all([
+         await this.repository.save(subscription),
+         await this.emailer.sendConfirmationEmail(subscription.email, subscription.city, token),
+      ]);
    }
 
    async unsubscribe(token: string): Promise<void> {
       const subscription = await this.repository.findByToken(token);
-      if (!subscription) {
-         throw new NotFoundError(`Subscription: "${token}" not found`);
+      if (subscription == null) {
+         throw new NotFoundError(`Subscription with token: "${token}" not found`);
       }
 
       subscription.isActive = false;
-      await this.repository.save(subscription);
-      await this.emailer.sendUnsubscribeEmail(subscription.email, subscription.city, token);
+
+      await Promise.all([
+         this.repository.save(subscription),
+         this.emailer.sendUnsubscribeEmail(subscription.email, subscription.city, token),
+      ]);
    }
 
    async getActiveSubscriptions(frequencyTitle: string): Promise<Subscription[]> {
-      return (await this.repository.getActiveSubscriptionsByFrequency(frequencyTitle)) as unknown as Subscription[];
+      return await this.repository.getActiveSubscriptionsByFrequency(frequencyTitle);
    }
 }

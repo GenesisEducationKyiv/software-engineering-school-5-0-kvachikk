@@ -70,7 +70,6 @@ describe('Weather-Forecast API (integration)', () => {
          .compile();
 
       app = moduleFixture.createNestApplication();
-      app.setGlobalPrefix('api');
       app.useGlobalFilters(new AllExceptionsFilter());
       await app.init();
    });
@@ -80,10 +79,10 @@ describe('Weather-Forecast API (integration)', () => {
    });
 
    //  Weather
-   describe('GET /api/weather', () => {
+   describe('GET /weather/current', () => {
       it('returns 200 & weather data for a valid city', async () => {
          const city = 'Kyiv';
-         const res = await request(getServer()).get('/api/weather').query({ city }).expect(200);
+         const res = await request(getServer()).get('/weather/current').query({ city }).expect(200);
 
          expect(getWeatherForecastMock).toHaveBeenCalledWith(city);
          expect(res.body).toEqual(
@@ -96,7 +95,7 @@ describe('Weather-Forecast API (integration)', () => {
       });
 
       it('returns 400 when city parameter is missing', async () => {
-         const res = await request(getServer()).get('/api/weather').expect(400);
+         const res = await request(getServer()).get('/weather/current').expect(400);
 
          expect(res.body).toMatchObject({
             message: 'Validation failed',
@@ -105,7 +104,7 @@ describe('Weather-Forecast API (integration)', () => {
       });
 
       it('returns 400 when city name is too short', async () => {
-         const res = await request(getServer()).get('/api/weather').query({ city: 'A' }).expect(400);
+         const res = await request(getServer()).get('/weather/current').query({ city: 'A' }).expect(400);
          expect(res.body).toMatchObject({
             errors: expect.arrayContaining([
                expect.objectContaining({
@@ -121,7 +120,7 @@ describe('Weather-Forecast API (integration)', () => {
             throw new NotFoundError('City not found');
          });
 
-         await request(getServer()).get('/api/weather').query({ city: 'Kmish' }).expect(404);
+         await request(getServer()).get('/weather/current').query({ city: 'Kmish' }).expect(404);
       });
 
       it('returns 400 when weather service reports bad request', async () => {
@@ -129,16 +128,16 @@ describe('Weather-Forecast API (integration)', () => {
             throw new BadRequestError('Invalid city');
          });
 
-         await request(getServer()).get('/api/weather').query({ city: '??' }).expect(400);
+         await request(getServer()).get('/weather/current').query({ city: '??' }).expect(400);
       });
    });
 
    // ---------------------------------------------------------- Subscriptions
-   describe('POST /api/subscribe', () => {
+   describe('POST /subscribe', () => {
       it('creates a subscription with valid data', async () => {
          const payload = makeValidSubscriptionPayload();
 
-         const res = await request(getServer()).post('/api/subscribe').send(payload).expect(201);
+         const res = await request(getServer()).post('/subscribe').send(payload).expect(201);
 
          expect(subscribeMock).toHaveBeenCalledWith(payload.email, payload.city, payload.frequency);
          expect(res.body).toEqual({ message: subMsgs.SUBSCRIBE_SUCCESS });
@@ -146,7 +145,7 @@ describe('Weather-Forecast API (integration)', () => {
 
       it('returns 400 when email is missing', async () => {
          const { city, frequency } = makeValidSubscriptionPayload();
-         const res = await request(getServer()).post('/api/subscribe').send({ city, frequency }).expect(400);
+         const res = await request(getServer()).post('/subscribe').send({ city, frequency }).expect(400);
          expect(res.body).toMatchObject({
             errors: expect.arrayContaining([expect.objectContaining({ field: 'email' })]),
          });
@@ -154,7 +153,7 @@ describe('Weather-Forecast API (integration)', () => {
 
       it('returns 400 when city is missing', async () => {
          const { email, frequency } = makeValidSubscriptionPayload();
-         const res = await request(getServer()).post('/api/subscribe').send({ email, frequency }).expect(400);
+         const res = await request(getServer()).post('/subscribe').send({ email, frequency }).expect(400);
          expect(res.body).toMatchObject({
             errors: expect.arrayContaining([expect.objectContaining({ field: 'city' })]),
          });
@@ -162,7 +161,7 @@ describe('Weather-Forecast API (integration)', () => {
 
       it('returns 400 when frequency is missing', async () => {
          const { email, city } = makeValidSubscriptionPayload();
-         const res = await request(getServer()).post('/api/subscribe').send({ email, city }).expect(400);
+         const res = await request(getServer()).post('/subscribe').send({ email, city }).expect(400);
          expect(res.body).toMatchObject({
             errors: expect.arrayContaining([expect.objectContaining({ field: 'frequency' })]),
          });
@@ -174,7 +173,7 @@ describe('Weather-Forecast API (integration)', () => {
          });
 
          const payload = makeValidSubscriptionPayload();
-         const res = await request(getServer()).post('/api/subscribe').send(payload).expect(409);
+         const res = await request(getServer()).post('/subscribe').send(payload).expect(409);
 
          expect(res.body).toEqual({
             message: subMsgs.SUBSCRIPTION_ALREADY_EXISTS,
@@ -183,7 +182,7 @@ describe('Weather-Forecast API (integration)', () => {
 
       it('returns 400 when email format is invalid', async () => {
          const payload = { ...makeValidSubscriptionPayload(), email: 'invalid-email' };
-         const res = await request(getServer()).post('/api/subscribe').send(payload).expect(400);
+         const res = await request(getServer()).post('/subscribe').send(payload).expect(400);
 
          expect(res.body).toMatchObject({
             errors: expect.arrayContaining([expect.objectContaining({ field: 'email' })]),
@@ -192,7 +191,7 @@ describe('Weather-Forecast API (integration)', () => {
 
       it('returns 400 when city name is too short', async () => {
          const payload = { ...makeValidSubscriptionPayload(), city: 'A' };
-         const res = await request(getServer()).post('/api/subscribe').send(payload).expect(400);
+         const res = await request(getServer()).post('/subscribe').send(payload).expect(400);
 
          expect(res.body).toMatchObject({
             errors: expect.arrayContaining([expect.objectContaining({ field: 'city' })]),
@@ -201,11 +200,11 @@ describe('Weather-Forecast API (integration)', () => {
    });
 
    // ------------------------------------------------------ Confirmation flow
-   describe('GET /api/confirm/:token', () => {
+   describe('GET /confirm', () => {
       it('confirms a subscription with a valid token', async () => {
          const token = 'valid-token';
 
-         const res = await request(getServer()).get(`/api/confirm/${token}`).expect(200);
+         const res = await request(getServer()).get(`/confirm`).query({ token }).expect(200);
 
          expect(confirmSubscriptionMock).toHaveBeenCalledWith(token);
          expect(res.body).toEqual({ message: subMsgs.CONFIRM_SUCCESS });
@@ -216,14 +215,14 @@ describe('Weather-Forecast API (integration)', () => {
             throw new NotFoundError('Token not found');
          });
 
-         await request(getServer()).get('/api/confirm/unknown-token').expect(404);
+         await request(getServer()).get('/confirm').query({ token: 'unknown-token' }).expect(404);
       });
    });
 
-   describe('GET /api/unsubscribe/:token', () => {
+   describe('GET /unsubscribe', () => {
       it('unsubscribes successfully with a valid token', async () => {
          const token = 'valid-token';
-         const res = await request(getServer()).get(`/api/unsubscribe/${token}`).expect(200);
+         const res = await request(getServer()).get(`/unsubscribe`).query({ token }).expect(200);
 
          expect(unsubscribeMock).toHaveBeenCalledWith(token);
          expect(res.body).toEqual({ message: subMsgs.UNSUBSCRIBE_SUCCESS });
@@ -234,7 +233,7 @@ describe('Weather-Forecast API (integration)', () => {
             throw new NotFoundError('Token not found');
          });
 
-         await request(getServer()).get('/api/unsubscribe/unknown-token').expect(404);
+         await request(getServer()).get('/unsubscribe').query({ token: 'unknown-token' }).expect(404);
       });
    });
 });

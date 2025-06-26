@@ -1,23 +1,37 @@
-import { Controller, Get, HttpCode, HttpStatus, Query, UsePipes } from '@nestjs/common';
+import { Controller, Get, Query, UsePipes } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Weather } from '../providers/weather.handler';
 import { WeatherService } from '../services/weather.service';
+import { Weather } from '../types/weather';
 import { JoiValidationPipe } from '../validation';
 import { weatherParamsSchema } from '../validation/weather.validation';
 
+const weatherQueryDecorator = ApiQuery({
+   name: 'city',
+   type: String,
+   description: 'City name',
+   example: 'Kyiv',
+});
+
 @ApiTags('Weather')
 @Controller('weather')
+@UsePipes(new JoiValidationPipe(weatherParamsSchema))
 export class WeatherController {
    constructor(private readonly weatherService: WeatherService) {}
 
-   @Get()
-   @ApiQuery({ name: 'city', type: String, description: 'City name', example: 'Kyiv' })
+   @Get('current')
+   @weatherQueryDecorator
    @ApiOperation({ summary: 'Get current weather for a city' })
-   @ApiResponse({ status: 200, description: 'Current weather data.' })
-   @HttpCode(HttpStatus.OK)
-   @UsePipes(new JoiValidationPipe(weatherParamsSchema))
-   async getWeather(@Query() query: { city: string }): Promise<Weather> {
-      return (await this.weatherService.getWeatherForecast(query.city))[0];
+   @ApiResponse({ status: 200, description: 'Current weather data' })
+   async getCurrentWeather(@Query() { city }: { city: string }): Promise<Weather> {
+      return (await this.weatherService.getWeatherForecast(city))[0];
+   }
+
+   @Get('forecast')
+   @weatherQueryDecorator
+   @ApiOperation({ summary: 'Get weather forecast for a city' })
+   @ApiResponse({ status: 200, description: 'Weather forecast data' })
+   async getWeatherForecast(@Query() { city }: { city: string }): Promise<Weather[]> {
+      return this.weatherService.getWeatherForecast(city);
    }
 }

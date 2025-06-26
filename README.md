@@ -31,7 +31,7 @@ npm install
 ```
 
 ```bash
-npm run start
+npm start
 ```
 
 ## How to set up ```.env``` [(.env.example)](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-5-gof/.env.example)

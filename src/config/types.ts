@@ -26,7 +26,7 @@ export interface MailConfig {
    senderEmail: string;
 }
 
-export interface AppConfig {
+export interface ApplicationConfig {
    port: number;
    baseUrl: string;
    environment: string;

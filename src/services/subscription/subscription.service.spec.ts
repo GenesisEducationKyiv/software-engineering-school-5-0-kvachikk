@@ -1,8 +1,8 @@
 import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotFoundError } from '../../constants/errors/not-found.error';
 import { FrequencyModel } from '../../database/models/frequency.model';
-import { Subscription } from '../../interfaces/Subscription';
 import { SubscriptionRepository } from '../../repositories/subscription-repository';
+import { Subscription } from '../../types/subscription';
 import { EmailerService } from '../emailer.service';
 import { WeatherService } from '../weather.service';
 

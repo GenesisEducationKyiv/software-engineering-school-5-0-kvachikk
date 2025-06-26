@@ -5,9 +5,9 @@ import { Injectable } from '@nestjs/common';
 import handlebars from 'handlebars';
 import { Resend } from 'resend';
 
-import { appConfig, mailConfig } from '../config';
-import { Subscription } from '../interfaces/Subscription';
-import { TemplateLetterParams } from '../interfaces/TemplateLetterParams';
+import { applicationConfig, mailConfig } from '../config';
+import { Subscription } from '../types/subscription';
+import { TemplateLetterParams } from '../types/template-letter-params';
 
 import { EmailValidationService } from './validator.service';
 import { WeatherService } from './weather.service';
@@ -66,8 +66,8 @@ export class EmailerService {
          templatePath: 'welcome.html',
          templateVars: {
             city,
-            confirmUrl: `${appConfig.baseUrl}/api/confirm/${token}`,
-            unsubscribeUrl: `${appConfig.baseUrl}/api/unsubscribe/${token}`,
+            confirmUrl: `${applicationConfig.baseUrl}/confirm?token=${token}`,
+            unsubscribeUrl: `${applicationConfig.baseUrl}/unsubscribe?token=${token}`,
          },
       });
    }
@@ -79,7 +79,7 @@ export class EmailerService {
          templatePath: 'confirmed.html',
          templateVars: {
             city,
-            unsubscribeUrl: `${appConfig.baseUrl}/api/unsubscribe/${token}`,
+            unsubscribeUrl: `${applicationConfig.baseUrl}/unsubscribe?token=${token}`,
          },
       });
    }
@@ -91,7 +91,7 @@ export class EmailerService {
          templatePath: 'unsubscribed.html',
          templateVars: {
             city,
-            subscribe: `${appConfig.baseUrl}/api/confirm/${token}`,
+            subscribe: `${applicationConfig.baseUrl}/confirm?token=${token}`,
          },
       });
    }
@@ -104,7 +104,7 @@ export class EmailerService {
          templateVars: {
             city: subscription.city,
             forecast: await this.weatherService.getWeatherForecast(subscription.city),
-            unsubscribeUrl: `${appConfig.baseUrl}/api/unsubscribe/${subscription.verificationToken}`,
+            unsubscribeUrl: `${applicationConfig.baseUrl}/unsubscribe?token=${subscription.verificationToken}`,
          },
       });
    }

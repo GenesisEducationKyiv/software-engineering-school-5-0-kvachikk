@@ -4,49 +4,12 @@ import { Injectable } from '@nestjs/common';
 import { coordinatesConfig } from '../config/coordinates.config';
 import { openWeatherConfig } from '../config/open-weather.config';
 import { NotFoundError } from '../constants/errors/not-found.error';
-import { Coordinates } from '../interfaces/Coordinates';
 import { Logger } from '../logger/logger.service';
+import { Coordinates } from '../types/coordinates';
+import { OpenWeatherApiResponse } from '../types/open-weather-api-response';
+import { Weather } from '../types/weather';
 
-import { AbstractWeatherHandler, Weather } from './weather.handler';
-
-export type OpenWeatherApiResponse = {
-   cod: string;
-   message: number;
-   cnt: number;
-   list: Array<{
-      dt: number;
-      main: {
-         temp: number;
-         feels_like: number;
-         temp_min: number;
-         temp_max: number;
-         pressure: number;
-         sea_level: number;
-         grnd_level: number;
-         humidity: number;
-         temp_kf: number;
-      };
-      weather: Array<{
-         id: number;
-         main: string;
-         description: string;
-         icon: string;
-      }>;
-   }>;
-   city: {
-      id: number;
-      name: string;
-      coord: {
-         lat: number;
-         lon: number;
-      };
-      country: string;
-      population: number;
-      timezone: number;
-      sunrise: number;
-      sunset: number;
-   };
-};
+import { AbstractWeatherHandler } from './weather.handler';
 
 @Injectable()
 export class OpenWeatherHandler extends AbstractWeatherHandler {
@@ -74,7 +37,6 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
                temperature: entry.main.temp,
                humidity: entry.main.humidity,
                description: entry.weather[0].description,
-               icon: entry.weather[0].icon,
             });
             if (forecast.length === 4) break;
          }

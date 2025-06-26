@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class SubscribeDto {
+export class CreateSubscriptionDto {
    @ApiProperty({ example: 'user@example.com', description: 'Email of the subscriber' })
    email: string;
 

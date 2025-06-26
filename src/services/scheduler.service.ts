@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { FrequencyModel } from '../database/models/frequency.model';
-import { Subscription } from '../interfaces/Subscription';
+import { Subscription } from '../types/subscription';
 
 import { EmailerService } from './emailer.service';
 import { SubscriptionService } from './subscription/subscription.service';

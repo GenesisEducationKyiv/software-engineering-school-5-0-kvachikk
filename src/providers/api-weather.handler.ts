@@ -3,41 +3,10 @@ import { Injectable } from '@nestjs/common';
 
 import { weatherApiConfig } from '../config/weather-api.config';
 import { Logger } from '../logger/logger.service';
+import { Weather } from '../types/weather';
+import { WeatherApiResponse } from '../types/weather-api-response';
 
-import { AbstractWeatherHandler, Weather } from './weather.handler';
-
-export type WeatherApiResponse = {
-   location: {
-      name: string;
-      region: string;
-      country: string;
-      lat: number;
-      lon: number;
-      tz_id: string;
-      localtime_epoch: number;
-      localtime: string;
-   };
-   current: {
-      temp_c: number;
-      condition: {
-         text: string;
-      };
-      humidity: number;
-   };
-   forecast: {
-      forecastday: {
-         date: string;
-         date_epoch: number;
-         day: {
-            maxtemp_c: number;
-            avghumidity: number;
-            condition: {
-               text: string;
-            };
-         };
-      }[];
-   };
-};
+import { AbstractWeatherHandler } from './weather.handler';
 
 @Injectable()
 export class ApiWeatherHandler extends AbstractWeatherHandler {

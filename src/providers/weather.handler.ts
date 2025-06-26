@@ -1,9 +1,4 @@
-export type Weather = {
-   temperature: number;
-   humidity: number;
-   description: string;
-   icon?: string;
-};
+import { Weather } from '../types/weather';
 
 export interface WeatherHandler {
    setNext(handler: WeatherHandler): WeatherHandler;
@@ -11,7 +6,7 @@ export interface WeatherHandler {
    handle(city: string): Promise<Weather[]>;
 }
 
-export abstract class AbstractWeatherHandler implements WeatherHandler {
+export class AbstractWeatherHandler implements WeatherHandler {
    private nextHandler: WeatherHandler;
 
    public setNext(handler: WeatherHandler): WeatherHandler {
