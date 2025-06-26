@@ -1,7 +1,7 @@
-const WEATHER_API_URL="http://localhost:3000/weather/current";
-const WEATHER_FORECAST_API_URL="http://localhost:3000/weather/forecast";
+const WEATHER_API_URL="https://software-engineering-school-5-0-kvachikk.onrender.com/weather/current";
+const WEATHER_FORECAST_API_URL="https://software-engineering-school-5-0-kvachikk.onrender.com/weather/forecast";
 
-const SUBSCRIBE_API_URL="http://localhost:3000/subscribe";
+const SUBSCRIBE_API_URL="https://software-engineering-school-5-0-kvachikk.onrender.com/subscribe";
 
 const IP_GEOLOCATION_API_URL="https://ipapi.co/json/";
 

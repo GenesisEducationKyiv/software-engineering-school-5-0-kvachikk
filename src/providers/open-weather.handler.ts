@@ -20,26 +20,9 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
    public override async handle(city: string): Promise<Weather[]> {
       try {
          const coordinates = await this.getCoordinates(city);
-         const response = await fetch(
-            `${openWeatherConfig.apiUrl}/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&cnt=40&appid=${openWeatherConfig.apiKey}&units=metric`,
-         );
-
-         if (!response.ok) {
-            this.handleAndThrowError(`OpenWeather provider failed: ${response.status}`);
-         }
-
-         const data = (await response.json()) as OpenWeatherApiResponse;
-         const forecast: Weather[] = [];
-
-         for (let i = 3; i < data.list.length; i += 8) {
-            const entry = data.list[i];
-            forecast.push({
-               temperature: entry.main.temp,
-               humidity: entry.main.humidity,
-               description: entry.weather[0].description,
-            });
-            if (forecast.length === 4) break;
-         }
+         const url = this.buildApiUrl(coordinates);
+         const data = await this.fetchWeatherData(url);
+         const forecast = this.formatWeatherData(data);
 
          this.logger.response('Fetched forecast from OpenWeather', 'OpenWeather', forecast);
          return forecast;
@@ -80,5 +63,38 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
          throw error;
       }
       throw new Error(message);
+   }
+
+   private buildApiUrl(coordinates: Coordinates): string {
+      return `${openWeatherConfig.apiUrl}/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&cnt=40&appid=${openWeatherConfig.apiKey}&units=metric`;
+   }
+
+   private async fetchWeatherData(url: string): Promise<OpenWeatherApiResponse> {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+         this.handleAndThrowError(`OpenWeather provider failed: ${response.status}`);
+      }
+
+      return (await response.json()) as OpenWeatherApiResponse;
+   }
+
+   private formatWeatherData(data: OpenWeatherApiResponse): Weather[] {
+      const forecast: Weather[] = [];
+
+      // The OpenWeather 3-hourly forecast returns 40 entries (5 days * 8).
+      // We pick midday (index 3) for each following day.
+      for (let i = 3; i < data.list.length; i += 8) {
+         const entry = data.list[i];
+         forecast.push({
+            temperature: entry.main.temp,
+            humidity: entry.main.humidity,
+            description: entry.weather[0].description,
+         });
+
+         if (forecast.length === 4) break;
+      }
+
+      return forecast;
    }
 }

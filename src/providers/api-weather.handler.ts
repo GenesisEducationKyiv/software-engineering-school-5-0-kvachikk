@@ -16,36 +16,38 @@ export class ApiWeatherHandler extends AbstractWeatherHandler {
 
    public async handle(city: string): Promise<Weather[]> {
       try {
-         const response = await fetch(
-            `${weatherApiConfig.apiUrl}/forecast.json?key=${weatherApiConfig.apiKey}&q=${encodeURIComponent(city)}&days=4&aqi=no&alerts=no`,
-         );
+         const url = this.buildApiUrl(city);
+         const data = await this.fetchWeatherData(url);
+         const formattedResponse = this.formatWeatherData(data);
 
-         if (!response.ok) {
-            this.logger.error(`WeatherAPI provider failed: ${response.status}`);
-            throw new Error(`WeatherAPI provider failed: ${response.status}`);
-         }
-
-         const data = (await response.json()) as WeatherApiResponse;
-
-         const currentWeather: Weather = {
-            temperature: data.current.temp_c,
-            humidity: data.current.humidity,
-            description: data.current.condition.text,
-         };
-
-         const forecastWeathers: Weather[] = data.forecast.forecastday.map((day) => ({
-            temperature: day.day.maxtemp_c,
-            humidity: day.day.avghumidity,
-            description: day.day.condition.text,
-         }));
-
-         const formattedResponse = [currentWeather, ...forecastWeathers.slice(1, 4)];
          this.logger.response('Fetched forecast from WeatherAPI', 'WeatherAPI', formattedResponse);
-
          return formattedResponse;
       } catch (error) {
          this.logger.error(`ApiWeatherHandler error: ${error}`);
          return super.handle(city);
       }
+   }
+
+   private buildApiUrl(city: string): string {
+      return `${weatherApiConfig.apiUrl}/forecast.json?key=${weatherApiConfig.apiKey}&q=${encodeURIComponent(city)}&days=4&aqi=no&alerts=no`;
+   }
+
+   private async fetchWeatherData(url: string): Promise<WeatherApiResponse> {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+         this.logger.error(`WeatherAPI provider failed: ${response.status}`);
+         throw new Error(`WeatherAPI provider failed: ${response.status}`);
+      }
+
+      return (await response.json()) as WeatherApiResponse;
+   }
+
+   private formatWeatherData(data: WeatherApiResponse): Weather[] {
+      return data.forecast.forecastday.map((day) => ({
+         temperature: day.day.maxtemp_c,
+         humidity: day.day.avghumidity,
+         description: day.day.condition.text,
+      }));
    }
 }
