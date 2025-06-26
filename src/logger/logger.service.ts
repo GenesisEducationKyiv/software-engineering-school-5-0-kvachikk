@@ -4,12 +4,15 @@ import * as path from 'node:path';
 import { Injectable } from '@nestjs/common';
 import * as winston from 'winston';
 
+import { ConsolePrettyLogger } from './console-pretty.logger';
+import { ILogger } from './logger.interface';
+
 @Injectable()
-export class Logger {
+export class FileLogger implements ILogger {
    private readonly logger: winston.Logger;
 
    constructor() {
-      const logDir = path.join(__dirname, '../../../logs');
+      const logDir = path.join(__dirname, '../../logs');
 
       if (!fs.existsSync(logDir)) {
          fs.mkdirSync(logDir, { recursive: true });
@@ -64,5 +67,32 @@ export class Logger {
          source,
          data,
       });
+   }
+}
+
+@Injectable()
+export class Logger implements ILogger {
+   private readonly decorated: ILogger;
+
+   constructor(private readonly base: FileLogger) {
+      let logger: ILogger = base;
+      logger = new ConsolePrettyLogger(logger);
+      this.decorated = logger;
+   }
+
+   info(msg: string): void {
+      this.decorated.info(msg);
+   }
+
+   warning(msg: string): void {
+      this.decorated.warning(msg);
+   }
+
+   error(msg: string): void {
+      this.decorated.error(msg);
+   }
+
+   response(msg: string, source: string, data: unknown): void {
+      this.decorated.response(msg, source, data);
    }
 }

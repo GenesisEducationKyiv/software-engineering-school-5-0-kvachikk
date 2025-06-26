@@ -7,7 +7,7 @@ import { WeatherController } from './controllers/weather.controller';
 import { FrequencyModel } from './database/models/frequency.model';
 import { SubscriptionModel } from './database/models/subscription.model';
 import { DatabaseLoader } from './loaders/database.loader';
-import { Logger } from './logger/logger.service';
+import { Logger, FileLogger } from './logger/logger.service';
 import { ApiWeatherHandler } from './providers/api-weather.handler';
 import { OpenWeatherHandler } from './providers/open-weather.handler';
 import { SubscriptionRepository } from './repositories/subscription-repository';
@@ -26,6 +26,7 @@ import { WeatherService } from './services/weather.service';
       WeatherService,
       SchedulerService,
       DatabaseLoader,
+      FileLogger,
       Logger,
       OpenWeatherHandler,
       ApiWeatherHandler,
