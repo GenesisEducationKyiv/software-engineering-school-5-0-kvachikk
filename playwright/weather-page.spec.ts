@@ -6,8 +6,8 @@ const fileUrl = (filePath: string) => 'file://' + path.resolve(__dirname, '..', 
 
 test.describe('Weather Page', () => {
    test.beforeEach(async ({ page }) => {
-      // Route weather API requests
-      await page.route('**/api/weather*', async (route) => {
+      // Route current weather API requests used by the frontend (see public/app.js constants)
+      await page.route('**/weather/current*', async (route) => {
          const url = new URL(route.request().url());
          const city = url.searchParams.get('city');
          if (!city) {
@@ -21,7 +21,8 @@ test.describe('Weather Page', () => {
          return route.fulfill({ status: 200, body: JSON.stringify(fixture) });
       });
 
-      await page.route('**/api/subscribe', async (route) => {
+      // Route subscription API requests
+      await page.route('**/subscribe', async (route) => {
          const postData = await route.request().postDataJSON();
          if (!postData.email || !postData.city) {
             return route.fulfill({ status: 400, body: JSON.stringify({ message: 'Invalid' }) });
