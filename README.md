@@ -7,7 +7,7 @@
 ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
 - **Hosted API**: [software-engineering-school-5-0-kvachikk.onrender.com](https://software-engineering-school-5-0-kvachikk.onrender.com)
-- **Example Request**: [/weather?city=Rivne](https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne)
+- **Example Request**: [/weather?city=Rivne](https://software-engineering-school-5-0-kvachikk.onrender.com/weather?city=Rivne)
 
 ---
 
