@@ -27,6 +27,8 @@ services:
     environment:
       POSTGRES_URL: postgresql://app:example@pg:5432/app
       PORT: 3000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     env_file:
       - .env
     ports:
@@ -34,6 +36,14 @@ services:
     depends_on:
       pg:
         condition: service_healthy
+      redis:
+        condition: service_started
+
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
 
 volumes:
   pg-data:

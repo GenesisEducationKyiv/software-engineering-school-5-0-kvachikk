@@ -1,4 +1,6 @@
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Controller, Get, Query, UsePipes } from '@nestjs/common';
+import { UseInterceptors } from '@nestjs/common/decorators';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { WeatherService } from '../services/weather.service';
@@ -15,6 +17,7 @@ const weatherQueryDecorator = ApiQuery({
 
 @ApiTags('Weather')
 @Controller('weather')
+@UseInterceptors(CacheInterceptor)
 @UsePipes(new JoiValidationPipe(weatherParamsSchema))
 export class WeatherController {
    constructor(private readonly weatherService: WeatherService) {}
