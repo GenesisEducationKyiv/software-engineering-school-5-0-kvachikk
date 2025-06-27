@@ -1,50 +1,37 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { SubscriptionController } from './controllers/subscription.controller';
 import { WeatherController } from './controllers/weather.controller';
-
-import { EmailService } from './services/emails/sender';
-import { EmailValidationService } from './services/emails/validation';
-import { NotificationService } from './services/emails/notification';
-import { ForecastFetchingService } from './services/forecast/fetching';
-import { ForecastHandlingService } from './services/forecast/handling';
-import { ForecastService } from './services/forecast/forecast.service';
-import { SubscriptionService } from './services/subscription/subscription.service';
-import { CurrentWeatherService } from './services/weather/current';
-import { SchedulerService } from './services/emails/scheduler';
-
-import { SubscriptionRepository } from './repositories/subscription-repository';
-
 import { SubscriptionModel } from './database/models/subscription.model';
-import { FrequencyModel } from './database/models/frequency.model';
-
 import { DatabaseLoader } from './loaders/database.loader';
-import { EmailSchedulerLoader } from './loaders/email-scheduler.loader';
+import { Logger, FileLogger } from './logger/logger.service';
+import { ApiWeatherHandler } from './providers/api-weather.handler';
+import { OpenWeatherHandler } from './providers/open-weather.handler';
+import { SubscriptionRepository } from './repositories/subscription.repository';
+import { EmailerService } from './services/emailer.service';
+import { SchedulerService } from './services/scheduler.service';
+import { SubscriptionService } from './services/subscription/subscription.service';
+import { EmailValidationService } from './services/validator.service';
+import { WeatherService } from './services/weather.service';
 
 @Module({
-   imports: [ConfigModule.forRoot({ isGlobal: true })],
+   imports: [ConfigModule.forRoot({ isGlobal: true }), ScheduleModule.forRoot()],
    controllers: [SubscriptionController, WeatherController],
    providers: [
-      EmailService,
+      EmailerService,
       EmailValidationService,
-      NotificationService,
-      ForecastFetchingService,
-      ForecastHandlingService,
-      ForecastService,
-      CurrentWeatherService,
+      WeatherService,
       SchedulerService,
       DatabaseLoader,
-      EmailSchedulerLoader,
+      FileLogger,
+      Logger,
+      OpenWeatherHandler,
+      ApiWeatherHandler,
       {
          provide: SubscriptionRepository,
-         useFactory: () =>
-            new SubscriptionRepository(
-               // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-               SubscriptionModel as any,
-               // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-               FrequencyModel as any,
-            ),
+         useFactory: () => new SubscriptionRepository(SubscriptionModel),
       },
       SubscriptionService,
    ],

@@ -1,106 +1,88 @@
-import { Injectable } from '@nestjs/common';
 import { randomBytes } from 'node:crypto';
 
-import { SubscriptionRepository } from '../../repositories/subscription-repository';
-import { NotFoundError } from '../../constants/errors/not-found.error';
+import { Injectable } from '@nestjs/common';
+
 import { ConflictError } from '../../constants/errors/conflict.error';
-import { NotificationService } from '../emails/notification';
-import { ForecastFetchingService } from '../forecast/fetching';
+import { NotFoundError } from '../../constants/errors/not-found.error';
 import { subscriptionResponseMessages } from '../../constants/message/subscription-responses';
+import { SubscriptionModel } from '../../database/models/subscription.model';
+import { SubscriptionRepository } from '../../repositories/subscription.repository';
+import { Subscription } from '../../types/subscription';
+import { EmailerService } from '../emailer.service';
+import { WeatherService } from '../weather.service';
 
 @Injectable()
 export class SubscriptionService {
    constructor(
-      private readonly repository: SubscriptionRepository,
-      private readonly notifier: NotificationService,
-      private readonly weatherService: ForecastFetchingService,
+      private readonly subscriptionRepository: SubscriptionRepository,
+      private readonly emailer: EmailerService,
+      private readonly weatherServices: WeatherService,
    ) {}
 
    private generateToken(): string {
       return randomBytes(32).toString('hex');
    }
 
-   async subscribe(email: string, city: string, frequency: string): Promise<any> {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const frequencyEntity = await this.repository.findFrequencyByTitle(frequency);
+   async subscribe(email: string, city: string, frequency: string): Promise<Subscription> {
+      const freqUpper = frequency.toUpperCase();
 
-      await this.weatherService.fetchRawForecast(city);
+      const allowedFrequencies = Object.values(SubscriptionModel.FREQUENCIES) as string[];
+      if (!allowedFrequencies.includes(freqUpper)) {
+         throw new NotFoundError(`Frequency: "${frequency}" not supported`);
+      }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const existing = await this.repository.findByEmail(email);
-      if (existing) {
+      await this.weatherServices.getWeatherForecast(city);
+
+      const subscription = await this.subscriptionRepository.findByEmail(email);
+      if (subscription) {
          throw new ConflictError(subscriptionResponseMessages.SUBSCRIPTION_ALREADY_EXISTS);
       }
 
       const token = this.generateToken();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const newSubscription = await this.repository.create({
-         email,
-         city,
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-         frequencyId: frequencyEntity.id,
+
+      const newSubscription: Subscription = await this.subscriptionRepository.create({
+         email: email.toUpperCase(),
+         city: city.toUpperCase(),
+         frequency: freqUpper,
          verificationToken: token,
          isVerified: false,
          isActive: false,
       });
 
-      await this.notifier.sendWelcomeEmail(email, city, token);
-
+      await this.emailer.sendWelcomeEmail(email, city, token);
       return newSubscription;
    }
 
-   async confirmSubscription(token: string): Promise<any> {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const subscription = await this.repository.findByToken(token);
+   async confirmSubscription(token: string): Promise<void> {
+      const subscription = await this.subscriptionRepository.findByToken(token);
       if (!subscription) {
-         throw new NotFoundError(`Subscription: "${token}" not found`);
+         throw new NotFoundError(`Subscription with token: "${token}" not found`);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       subscription.isActive = true;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       subscription.isVerified = true;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await this.repository.save(subscription);
 
-      await this.notifier.sendConfirmationEmail(
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument
-         subscription.email,
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument
-         subscription.city,
-         token,
-      );
-
-      return subscription;
+      await Promise.all([
+         await this.subscriptionRepository.save(subscription),
+         await this.emailer.sendConfirmationEmail(subscription.email, subscription.city, token),
+      ]);
    }
 
-   async unsubscribe(token: string): Promise<any> {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const subscription = await this.repository.findByToken(token);
-      if (!subscription) {
-         throw new NotFoundError(`Subscription: "${token}" not found`);
+   async unsubscribe(token: string): Promise<void> {
+      const subscription = await this.subscriptionRepository.findByToken(token);
+      if (subscription == null) {
+         throw new NotFoundError(`Subscription with token: "${token}" not found`);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       subscription.isActive = false;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await this.repository.save(subscription);
 
-      await this.notifier.sendUnsubscribeEmail(
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument
-         subscription.email,
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
-         subscription.city,
-         token,
-      );
-
-      return subscription;
+      await Promise.all([
+         this.subscriptionRepository.save(subscription),
+         this.emailer.sendUnsubscribeEmail(subscription.email, subscription.city, token),
+      ]);
    }
 
-   async getActiveSubscriptions(frequencyTitle: string): Promise<any[]> {
-      if (!frequencyTitle) {
-         throw new NotFoundError(frequencyTitle);
-      }
-      return this.repository.getActiveSubscriptionsByFrequency(frequencyTitle);
+   async getActiveSubscriptions(frequencyTitle: string): Promise<Subscription[]> {
+      return await this.subscriptionRepository.getActiveSubscriptionsByFrequency(frequencyTitle);
    }
 }

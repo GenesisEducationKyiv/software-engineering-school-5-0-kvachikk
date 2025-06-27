@@ -1,24 +1,23 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 import { ObjectSchema } from 'joi';
 
-interface IValidationError {
+interface ValidationError {
    field: string;
    message: string;
-   value?: any;
+   value?: unknown;
 }
 
-interface IValidationResponse {
+interface ValidationResponse {
    success: boolean;
    message: string;
-   errors: IValidationError[];
+   errors: ValidationError[];
 }
 
 @Injectable()
-export class JoiValidationPipe implements PipeTransform {
+export class JoiValidationPipe implements PipeTransform<unknown, unknown> {
    constructor(private readonly schema: ObjectSchema) {}
 
-   transform(value: any): any {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+   transform(value: unknown): unknown {
       const { error, value: validatedValue } = this.schema.validate(value, {
          abortEarly: false,
          stripUnknown: true,
@@ -26,14 +25,13 @@ export class JoiValidationPipe implements PipeTransform {
       });
 
       if (error) {
-         const errors: IValidationError[] = error.details.map((detail) => ({
+         const errors: ValidationError[] = error.details.map((detail) => ({
             field: detail.path.join('.'),
             message: detail.message,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             value: detail.context?.value,
          }));
 
-         const validationResponse: IValidationResponse = {
+         const validationResponse: ValidationResponse = {
             success: false,
             message: 'Validation failed',
             errors,

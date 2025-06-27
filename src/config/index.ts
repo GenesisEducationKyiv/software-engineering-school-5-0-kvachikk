@@ -1,5 +1,4 @@
 export { databaseConfig } from './database.config';
-export { weatherConfig } from './weather.config';
 export { mailConfig } from './mail.config';
-export { appConfig } from './app.config';
+export { applicationConfig } from './application.config';
 export * from './types';

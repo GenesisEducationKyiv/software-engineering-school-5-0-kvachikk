@@ -1,4 +1,5 @@
 import Joi from 'joi';
+
 import { validationMessages } from '../constants/message/validation';
 
 export const subscriptionSchema = Joi.object({

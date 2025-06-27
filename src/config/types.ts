@@ -16,9 +16,8 @@ export interface DatabaseConfig {
    };
 }
 
-export interface WeatherConfig {
-   baseUrl: string;
-   coordinatesUrl: string;
+export interface DataProviderConfig {
+   apiUrl: string;
    apiKey: string;
 }
 
@@ -27,7 +26,7 @@ export interface MailConfig {
    senderEmail: string;
 }
 
-export interface AppConfig {
+export interface ApplicationConfig {
    port: number;
    baseUrl: string;
    environment: string;

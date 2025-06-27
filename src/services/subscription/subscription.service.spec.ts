@@ -1,81 +1,134 @@
 import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotFoundError } from '../../constants/errors/not-found.error';
+import { SubscriptionRepository } from '../../repositories/subscription.repository';
+import { Subscription } from '../../types/subscription';
+import { EmailerService } from '../emailer.service';
+import { WeatherService } from '../weather.service';
+
 import { SubscriptionService } from './subscription.service';
 
-// ----------------------------------------------------------------------------
-// Mocks
-// ----------------------------------------------------------------------------
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const repositoryMock = {
-   findFrequencyByTitle: jest.fn(),
-   findByEmail: jest.fn(),
-   create: jest.fn(),
-   findByToken: jest.fn(),
-   save: jest.fn(),
-} as any;
+interface RepositoryMocks {
+   repo: SubscriptionRepository;
+   findByEmail: jest.Mock;
+   create: jest.Mock;
+   findByToken: jest.Mock;
+   save: jest.Mock;
+   getActiveSubscriptionsByFrequency: jest.Mock;
+}
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const notifierMock = {
-   sendWelcomeEmail: jest.fn(),
-   sendConfirmationEmail: jest.fn(),
-   sendUnsubscribeEmail: jest.fn(),
-} as any;
+const buildRepositoryMock = (): RepositoryMocks => {
+   const findByEmail = jest.fn();
+   const create = jest.fn();
+   const findByToken = jest.fn();
+   const save = jest.fn();
+   const getActiveSubscriptionsByFrequency = jest.fn();
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const weatherServiceMock = {
-   fetchRawForecast: jest.fn(),
-} as any;
+   return {
+      repo: {
+         findByEmail: findByEmail as SubscriptionRepository['findByEmail'],
+         create: create as SubscriptionRepository['create'],
+         findByToken: findByToken as SubscriptionRepository['findByToken'],
+         save: save as SubscriptionRepository['save'],
+         getActiveSubscriptionsByFrequency:
+            getActiveSubscriptionsByFrequency as SubscriptionRepository['getActiveSubscriptionsByFrequency'],
+      } as SubscriptionRepository,
+      findByEmail,
+      create,
+      findByToken,
+      save,
+      getActiveSubscriptionsByFrequency,
+   };
+};
 
-const makeService = () =>
-   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-   new SubscriptionService(repositoryMock, notifierMock, weatherServiceMock);
+interface NotifierMocks {
+   service: EmailerService;
+   sendWelcomeEmail: jest.Mock;
+   sendConfirmationEmail: jest.Mock;
+   sendUnsubscribeEmail: jest.Mock;
+}
 
-const resetMocks = () => jest.clearAllMocks();
+const buildNotifierMock = (): NotifierMocks => {
+   const sendWelcomeEmail = jest.fn();
+   const sendConfirmationEmail = jest.fn();
+   const sendUnsubscribeEmail = jest.fn();
+   return {
+      service: {
+         sendWelcomeEmail: sendWelcomeEmail as EmailerService['sendWelcomeEmail'],
+         sendConfirmationEmail: sendConfirmationEmail as EmailerService['sendConfirmationEmail'],
+         sendUnsubscribeEmail: sendUnsubscribeEmail as EmailerService['sendUnsubscribeEmail'],
+      } as EmailerService,
+      sendWelcomeEmail,
+      sendConfirmationEmail,
+      sendUnsubscribeEmail,
+   };
+};
+
+interface WeatherMocks {
+   service: WeatherService;
+   getWeatherForecast: jest.Mock;
+}
+
+const buildWeatherServiceMock = (): WeatherMocks => {
+   const getWeatherForecast = jest.fn();
+   return {
+      service: { getWeatherForecast } as unknown as WeatherService,
+      getWeatherForecast,
+   };
+};
+
+const makeService = (
+   repositoryMocks: RepositoryMocks = buildRepositoryMock(),
+   notifierMocks: NotifierMocks = buildNotifierMock(),
+   weatherMocks: WeatherMocks = buildWeatherServiceMock(),
+) => ({
+   service: new SubscriptionService(repositoryMocks.repo, notifierMocks.service, weatherMocks.service),
+   repositoryMocks,
+   notifierMocks,
+   weatherMocks,
+});
 
 describe('SubscriptionService', () => {
    const email = 'test@example.com';
    const city = 'Kyiv';
    const frequency = 'hourly';
-   const frequencyEntity = { id: 1, title: frequency };
 
-   beforeEach(() => {
-      resetMocks();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-      repositoryMock.findFrequencyByTitle.mockResolvedValue(frequencyEntity);
-   });
-
-   // ---------------------------------------------------------------- subscribe()
    describe('subscribe()', () => {
       it('creates new subscription and sends welcome email', async () => {
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-         repositoryMock.findByEmail.mockResolvedValue(null);
-         const created = { id: 1, email, city };
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-         repositoryMock.create.mockResolvedValue(created);
+         const { repositoryMocks, notifierMocks, weatherMocks, service } = makeService();
 
-         const service = makeService();
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+         repositoryMocks.findByEmail.mockResolvedValue(null);
+
+         const created = {
+            id: 1,
+            email,
+            city,
+            verificationToken: 'token',
+            isActive: false,
+            isVerified: false,
+         };
+         repositoryMocks.create.mockResolvedValue(created);
+
          const result = await service.subscribe(email, city, frequency);
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(repositoryMock.findFrequencyByTitle).toHaveBeenCalledWith(frequency);
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(weatherServiceMock.fetchRawForecast).toHaveBeenCalledWith(city);
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(repositoryMock.findByEmail).toHaveBeenCalledWith(email);
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(repositoryMock.create).toHaveBeenCalledWith(
-            expect.objectContaining({ email, city, frequencyId: frequencyEntity.id }),
+         expect(repositoryMocks.findByEmail).toHaveBeenCalledWith(email);
+         expect(weatherMocks.getWeatherForecast).toHaveBeenCalledWith(city);
+         expect(repositoryMocks.create).toHaveBeenCalledWith(
+            expect.objectContaining({ frequency: frequency.toUpperCase() }),
          );
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(notifierMock.sendWelcomeEmail).toHaveBeenCalledWith(email, city, expect.any(String));
+         expect(notifierMocks.sendWelcomeEmail).toHaveBeenCalledWith(email, city, expect.any(String));
          expect(result).toEqual(created);
       });
 
       it('throws ConflictError when email already exists', async () => {
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-         repositoryMock.findByEmail.mockResolvedValue({ id: 42 });
-         const service = makeService();
+         const { repositoryMocks, service } = makeService();
+         repositoryMocks.findByEmail.mockResolvedValue({
+            email,
+            city,
+            verificationToken: 'token',
+            isVerified: true,
+            isActive: true,
+         });
+
          await expect(service.subscribe(email, city, frequency)).rejects.toBeInstanceOf(ConflictError);
       });
    });
@@ -85,52 +138,61 @@ describe('SubscriptionService', () => {
       const token = 'token-123';
 
       it('activates subscription and sends confirmation email', async () => {
-         const subscription = { id: 1, email, city, isActive: false, isVerified: false };
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-         repositoryMock.findByToken.mockResolvedValue(subscription);
+         const { repositoryMocks, notifierMocks, service } = makeService();
 
-         const service = makeService();
+         const subscription = {
+            id: 1,
+            email,
+            city,
+            verificationToken: token,
+            isActive: false,
+            isVerified: false,
+         };
+
+         repositoryMocks.findByToken.mockResolvedValue(subscription);
+
          await service.confirmSubscription(token);
 
          expect(subscription.isActive).toBe(true);
          expect(subscription.isVerified).toBe(true);
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(repositoryMock.save).toHaveBeenCalledWith(subscription);
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(notifierMock.sendConfirmationEmail).toHaveBeenCalledWith(email, city, token);
+         expect(repositoryMocks.save).toHaveBeenCalledWith(subscription);
+         expect(notifierMocks.sendConfirmationEmail).toHaveBeenCalledWith(email, city, token);
       });
 
       it('throws NotFoundError when token not found', async () => {
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-         repositoryMock.findByToken.mockResolvedValue(undefined);
-         const service = makeService();
+         const { repositoryMocks, service } = makeService();
+         repositoryMocks.findByToken.mockResolvedValue(null);
+
          await expect(service.confirmSubscription(token)).rejects.toBeInstanceOf(NotFoundError);
       });
    });
 
-   // ----------------------------------------------------------------- unsubscribe()
    describe('unsubscribe()', () => {
       const token = 'token-456';
-
       it('deactivates subscription and sends email', async () => {
-         const subscription = { id: 1, email, city, isActive: true, isVerified: true };
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-         repositoryMock.findByToken.mockResolvedValue(subscription);
+         const { repositoryMocks, notifierMocks, service } = makeService();
 
-         const service = makeService();
+         const subscription: Subscription = {
+            email,
+            city,
+            verificationToken: token,
+            isActive: true,
+            isVerified: true,
+         };
+
+         repositoryMocks.findByToken.mockResolvedValue(subscription);
+
          await service.unsubscribe(token);
 
          expect(subscription.isActive).toBe(false);
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(repositoryMock.save).toHaveBeenCalledWith(subscription);
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(notifierMock.sendUnsubscribeEmail).toHaveBeenCalledWith(email, city, token);
+         expect(repositoryMocks.save).toHaveBeenCalledWith(subscription);
+         expect(notifierMocks.sendUnsubscribeEmail).toHaveBeenCalledWith(email, city, token);
       });
 
       it('throws NotFoundError when token not found', async () => {
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-         repositoryMock.findByToken.mockResolvedValue(null);
-         const service = makeService();
+         const { repositoryMocks, service } = makeService();
+         repositoryMocks.findByToken.mockResolvedValue(null);
+
          await expect(service.unsubscribe(token)).rejects.toBeInstanceOf(NotFoundError);
       });
    });
