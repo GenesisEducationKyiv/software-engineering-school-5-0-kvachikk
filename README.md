@@ -4,13 +4,12 @@
 ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=Sequelize&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
 - **Hosted API**: [software-engineering-school-5-0-kvachikk.onrender.com](https://software-engineering-school-5-0-kvachikk.onrender.com)
-- **Swagger**: [software-engineering-school-5-0-kvachikk.onrender.com/docs](https://software-engineering-school-5-0-kvachikk.onrender.com/docs)
-- **Example Request**: [software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne](https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne)
+- **Example Request**: [/weather?city=Rivne](https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne)
 
-
-## [Testing](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-4-tests/docs/testing.md)
+---
 
 ## Running locally:
 
@@ -34,7 +33,7 @@ npm install
 npm start
 ```
 
-## How to set up ```.env``` [(.env.example)](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-5-gof/.env.example)
+## How to set up ```.env``` [(.env.example)](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-6-redis/.env.example)
 ##### Resend (email provider)
 1. Register domain via any provider (for example [Google Cloud](https://cloud.google.com/domains/docs/register-domain))
 2. Register it on Resend.com
@@ -74,3 +73,53 @@ TEST_DB_URL=postgresql://.....
 DEVELOPMENT_DB_URL=postgresql://.....
 PRODUCTION_DB_URL=postgresql://......
 ```
+
+<br>
+
+#### Redis (cache manager)
+```dotenv
+REDIS_HOST=localhost
+REDIS_PORT=6379
+```
+
+---
+
+
+## Testing
+```
+npm test            # runs unit -> api e2e -> ui e2e
+```
+
+green check marks will be shown at each stage, if you do not see them, then the tests have failed
+
+
+## run tests separately:
+
+### unit tests
+```
+npm run test:unit
+```
+
+### api e2e tests
+```
+npm run test:e2e
+```
+
+### ui e2e tests (playwright)
+```
+npm install
+```
+```
+npx playwright install --with-deps
+``` 
+```
+npm run test:ui
+```
+
+## ci pipelines
+* github actions already has three jobs:
+    * `unit-tests` – jest unit tests
+    * `e2e-api-tests` – jest api tests
+    * `ui-tests` – playwright ui tests
+
+all jobs run automatically on every push and pull request.
