@@ -1,6 +1,4 @@
-import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
-
-import { FrequencyModel } from './frequency.model';
+import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 @Table({ tableName: 'Subscriptions', modelName: 'SubscriptionModel' })
 export class SubscriptionModel extends Model {
@@ -34,12 +32,11 @@ export class SubscriptionModel extends Model {
    })
    declare verificationToken: string;
 
-   @ForeignKey(() => FrequencyModel)
    @Column({
-      type: DataType.INTEGER,
+      type: DataType.STRING,
       allowNull: false,
    })
-   declare frequencyId: number;
+   declare frequency: string;
 
    @Column({
       type: DataType.DATE,
@@ -47,9 +44,8 @@ export class SubscriptionModel extends Model {
    })
    declare lastSentAt: Date;
 
-   @BelongsTo(() => FrequencyModel, {
-      foreignKey: 'frequencyId',
-      as: 'Frequency',
-   })
-   declare frequency: FrequencyModel;
+   static readonly FREQUENCIES = {
+      HOURLY: 'HOURLY',
+      DAILY: 'DAILY',
+   } as const;
 }

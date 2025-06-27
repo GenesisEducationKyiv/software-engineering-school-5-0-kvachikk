@@ -18,4 +18,8 @@ export class WeatherService {
    public async getWeatherForecast(city: string): Promise<Weather[]> {
       return this.handler.handle(city);
    }
+
+   public async getCurrentWeather(city: string): Promise<Weather> {
+      return (await this.handler.handle(city))[0];
+   }
 }

@@ -24,7 +24,7 @@ export class WeatherController {
    @ApiOperation({ summary: 'Get current weather for a city' })
    @ApiResponse({ status: 200, description: 'Current weather data' })
    async getCurrentWeather(@Query() { city }: { city: string }): Promise<Weather> {
-      return (await this.weatherService.getWeatherForecast(city))[0];
+      return this.weatherService.getCurrentWeather(city);
    }
 
    @Get('forecast')

@@ -4,6 +4,8 @@ import * as path from 'node:path';
 import { Injectable } from '@nestjs/common';
 import * as winston from 'winston';
 
+import { applicationConfig } from '../config/application.config';
+
 import { ConsolePrettyLogger } from './console-pretty.logger';
 import { ILogger } from './logger.interface';
 
@@ -41,11 +43,13 @@ export class FileLogger implements ILogger {
          ],
       });
 
-      this.logger.add(
-         new winston.transports.Console({
-            format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
-         }),
-      );
+      if (applicationConfig.environment !== 'production') {
+         this.logger.add(
+            new winston.transports.Console({
+               format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
+            }),
+         );
+      }
    }
 
    info(log: string): void {
@@ -76,7 +80,9 @@ export class Logger implements ILogger {
 
    constructor(private readonly base: FileLogger) {
       let logger: ILogger = base;
-      logger = new ConsolePrettyLogger(logger);
+      if (applicationConfig.environment !== 'production') {
+         logger = new ConsolePrettyLogger(logger);
+      }
       this.decorated = logger;
    }
 

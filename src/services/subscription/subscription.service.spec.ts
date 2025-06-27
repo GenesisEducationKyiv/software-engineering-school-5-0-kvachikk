@@ -1,7 +1,6 @@
 import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotFoundError } from '../../constants/errors/not-found.error';
-import { FrequencyModel } from '../../database/models/frequency.model';
-import { SubscriptionRepository } from '../../repositories/subscription-repository';
+import { SubscriptionRepository } from '../../repositories/subscription.repository';
 import { Subscription } from '../../types/subscription';
 import { EmailerService } from '../emailer.service';
 import { WeatherService } from '../weather.service';
@@ -10,7 +9,6 @@ import { SubscriptionService } from './subscription.service';
 
 interface RepositoryMocks {
    repo: SubscriptionRepository;
-   findFrequencyByTitle: jest.Mock;
    findByEmail: jest.Mock;
    create: jest.Mock;
    findByToken: jest.Mock;
@@ -19,7 +17,6 @@ interface RepositoryMocks {
 }
 
 const buildRepositoryMock = (): RepositoryMocks => {
-   const findFrequencyByTitle = jest.fn();
    const findByEmail = jest.fn();
    const create = jest.fn();
    const findByToken = jest.fn();
@@ -28,7 +25,6 @@ const buildRepositoryMock = (): RepositoryMocks => {
 
    return {
       repo: {
-         findFrequencyByTitle: findFrequencyByTitle as SubscriptionRepository['findFrequencyByTitle'],
          findByEmail: findByEmail as SubscriptionRepository['findByEmail'],
          create: create as SubscriptionRepository['create'],
          findByToken: findByToken as SubscriptionRepository['findByToken'],
@@ -36,7 +32,6 @@ const buildRepositoryMock = (): RepositoryMocks => {
          getActiveSubscriptionsByFrequency:
             getActiveSubscriptionsByFrequency as SubscriptionRepository['getActiveSubscriptionsByFrequency'],
       } as SubscriptionRepository,
-      findFrequencyByTitle,
       findByEmail,
       create,
       findByToken,
@@ -96,13 +91,11 @@ describe('SubscriptionService', () => {
    const email = 'test@example.com';
    const city = 'Kyiv';
    const frequency = 'hourly';
-   const frequencyEntity = { id: 1, title: frequency } as unknown as FrequencyModel;
 
    describe('subscribe()', () => {
       it('creates new subscription and sends welcome email', async () => {
          const { repositoryMocks, notifierMocks, weatherMocks, service } = makeService();
 
-         repositoryMocks.findFrequencyByTitle.mockResolvedValue(frequencyEntity);
          repositoryMocks.findByEmail.mockResolvedValue(null);
 
          const created = {
@@ -117,16 +110,17 @@ describe('SubscriptionService', () => {
 
          const result = await service.subscribe(email, city, frequency);
 
-         expect(repositoryMocks.findFrequencyByTitle).toHaveBeenCalledWith(frequency);
-         expect(weatherMocks.getWeatherForecast).toHaveBeenCalledWith(city);
          expect(repositoryMocks.findByEmail).toHaveBeenCalledWith(email);
+         expect(weatherMocks.getWeatherForecast).toHaveBeenCalledWith(city);
+         expect(repositoryMocks.create).toHaveBeenCalledWith(
+            expect.objectContaining({ frequency: frequency.toUpperCase() }),
+         );
          expect(notifierMocks.sendWelcomeEmail).toHaveBeenCalledWith(email, city, expect.any(String));
          expect(result).toEqual(created);
       });
 
       it('throws ConflictError when email already exists', async () => {
          const { repositoryMocks, service } = makeService();
-         repositoryMocks.findFrequencyByTitle.mockResolvedValue(frequencyEntity);
          repositoryMocks.findByEmail.mockResolvedValue({
             email,
             city,

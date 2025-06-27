@@ -13,6 +13,12 @@ import { EmailerService } from '../src/services/emailer.service';
 import { SubscriptionService } from '../src/services/subscription/subscription.service';
 import { WeatherService } from '../src/services/weather.service';
 
+const getCurrentWeatherMock = jest.fn().mockResolvedValue({
+   temperature: 12,
+   humidity: 67,
+   description: 'Clear sky',
+});
+
 const getWeatherForecastMock = jest.fn().mockResolvedValue([
    {
       temperature: 12,
@@ -22,6 +28,7 @@ const getWeatherForecastMock = jest.fn().mockResolvedValue([
 ]);
 
 const weatherServiceMock = {
+   getCurrentWeather: getCurrentWeatherMock,
    getWeatherForecast: getWeatherForecastMock,
 } as unknown as WeatherService;
 
@@ -84,7 +91,7 @@ describe('Weather-Forecast API (integration)', () => {
          const city = 'Kyiv';
          const res = await request(getServer()).get('/weather/current').query({ city }).expect(200);
 
-         expect(getWeatherForecastMock).toHaveBeenCalledWith(city);
+         expect(getCurrentWeatherMock).toHaveBeenCalledWith(city);
          expect(res.body).toEqual(
             expect.objectContaining({
                temperature: expect.any(Number),
@@ -116,7 +123,7 @@ describe('Weather-Forecast API (integration)', () => {
       });
 
       it('returns 404 when city is not found', async () => {
-         getWeatherForecastMock.mockImplementationOnce(() => {
+         getCurrentWeatherMock.mockImplementationOnce(() => {
             throw new NotFoundError('City not found');
          });
 
@@ -124,7 +131,7 @@ describe('Weather-Forecast API (integration)', () => {
       });
 
       it('returns 400 when weather service reports bad request', async () => {
-         getWeatherForecastMock.mockImplementationOnce(() => {
+         getCurrentWeatherMock.mockImplementationOnce(() => {
             throw new BadRequestError('Invalid city');
          });
 

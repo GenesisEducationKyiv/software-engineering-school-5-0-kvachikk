@@ -2,7 +2,6 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
 import { databaseMessages as dbMessages } from '../constants/message/database';
 import { testConnection } from '../database/utils/database-connect';
-import { seedFrequencies } from '../database/utils/frequency.seeder';
 import { runMigrations } from '../database/utils/migration-runner';
 
 @Injectable()
@@ -15,8 +14,5 @@ export class DatabaseLoader implements OnModuleInit {
 
       await runMigrations();
       this.logger.log(dbMessages.MIGRATION_APPLIED);
-
-      await seedFrequencies();
-      this.logger.log(dbMessages.SEEDING_SUCCESS);
    }
 }

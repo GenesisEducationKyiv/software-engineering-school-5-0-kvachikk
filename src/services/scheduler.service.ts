@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { FrequencyModel } from '../database/models/frequency.model';
+import { SubscriptionModel } from '../database/models/subscription.model';
+import { Logger } from '../logger/logger.service';
 import { Subscription } from '../types/subscription';
 
 import { EmailerService } from './emailer.service';
@@ -12,6 +13,7 @@ export class SchedulerService {
    constructor(
       private readonly emailer: EmailerService,
       private readonly subscriptionService: SubscriptionService,
+      private readonly logger: Logger,
    ) {}
 
    private async processSubscriptions(subscriptions: Subscription[]): Promise<void> {
@@ -25,7 +27,7 @@ export class SchedulerService {
       results.forEach((result, index) => {
          if (result.status === 'rejected') {
             const failedSubscription = subscriptions[index];
-            console.error(`Failed to send forecast to ${failedSubscription.email}:`, result.reason);
+            this.logger.error(`Failed to send forecast to ${failedSubscription.email}: ${result.reason}`);
          }
       });
    }
@@ -37,11 +39,11 @@ export class SchedulerService {
 
    @Cron(CronExpression.EVERY_HOUR)
    private async hourlyJob(): Promise<void> {
-      await this.handleFrequency(FrequencyModel.FREQUENCIES.HOURLY);
+      await this.handleFrequency(SubscriptionModel.FREQUENCIES.HOURLY);
    }
 
    @Cron(CronExpression.EVERY_DAY_AT_1PM)
    private async dailyJob(): Promise<void> {
-      await this.handleFrequency(FrequencyModel.FREQUENCIES.DAILY);
+      await this.handleFrequency(SubscriptionModel.FREQUENCIES.DAILY);
    }
 }

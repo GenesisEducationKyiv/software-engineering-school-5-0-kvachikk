@@ -4,13 +4,12 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { SubscriptionController } from './controllers/subscription.controller';
 import { WeatherController } from './controllers/weather.controller';
-import { FrequencyModel } from './database/models/frequency.model';
 import { SubscriptionModel } from './database/models/subscription.model';
 import { DatabaseLoader } from './loaders/database.loader';
 import { Logger, FileLogger } from './logger/logger.service';
 import { ApiWeatherHandler } from './providers/api-weather.handler';
 import { OpenWeatherHandler } from './providers/open-weather.handler';
-import { SubscriptionRepository } from './repositories/subscription-repository';
+import { SubscriptionRepository } from './repositories/subscription.repository';
 import { EmailerService } from './services/emailer.service';
 import { SchedulerService } from './services/scheduler.service';
 import { SubscriptionService } from './services/subscription/subscription.service';
@@ -32,7 +31,7 @@ import { WeatherService } from './services/weather.service';
       ApiWeatherHandler,
       {
          provide: SubscriptionRepository,
-         useFactory: () => new SubscriptionRepository(SubscriptionModel, FrequencyModel),
+         useFactory: () => new SubscriptionRepository(SubscriptionModel),
       },
       SubscriptionService,
    ],

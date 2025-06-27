@@ -7,7 +7,7 @@ import tslint from 'typescript-eslint';
 
 export default tslint.config(
    {
-      ignores: ['dist', 'node_modules', 'logs', 'eslint.config.mjs'],
+      ignores: ['dist', 'node_modules', 'src/database/migrations', 'logs', 'eslint.config.mjs'],
    },
    eslint.configs.recommended,
    {
