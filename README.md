@@ -80,6 +80,7 @@ PRODUCTION_DB_URL=postgresql://......
 ```dotenv
 REDIS_HOST=localhost
 REDIS_PORT=6379
+TTL=900000
 ```
 
 ---

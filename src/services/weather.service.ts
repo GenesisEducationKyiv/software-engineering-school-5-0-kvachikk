@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { CacheTTL } from '../constants/cache-ttl';
 import { ApiWeatherHandler } from '../providers/api-weather.handler';
 import { OpenWeatherHandler } from '../providers/open-weather.handler';
 import { WeatherHandler } from '../providers/weather.handler';
@@ -28,7 +29,7 @@ export class WeatherService {
 
       const weatherData = await this.handler.handle(city);
 
-      await this.cacheService.setData(key, weatherData, 60 * 60); //saves cache for 1 hour
+      await this.cacheService.setData(key, weatherData, CacheTTL.TEN_MINUTE);
       return weatherData;
    }
 

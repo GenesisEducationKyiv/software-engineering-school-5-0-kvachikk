@@ -1,9 +1,9 @@
 import { LoggerDecorator } from './logger.decorator';
-import { ILogger } from './logger.interface';
+import { LoggerInterface } from './logger.interface';
 
 export class ConsolePrettyLogger extends LoggerDecorator {
-   constructor(inner: ILogger) {
-      super(inner);
+   constructor(logger: LoggerInterface) {
+      super(logger);
    }
 
    private colorize(colorCode: string, msg: string): string {

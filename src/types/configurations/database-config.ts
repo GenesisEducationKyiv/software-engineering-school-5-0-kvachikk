@@ -15,19 +15,3 @@ export interface DatabaseConfig {
       };
    };
 }
-
-export interface DataProviderConfig {
-   apiUrl: string;
-   apiKey: string;
-}
-
-export interface MailConfig {
-   apiKey: string;
-   senderEmail: string;
-}
-
-export interface ApplicationConfig {
-   port: number;
-   baseUrl: string;
-   environment: string;
-}

@@ -1,7 +1,10 @@
+import { join } from 'node:path';
+
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { RedisConfig } from './config/redis.config';
 import { SubscriptionController } from './controllers/subscription.controller';
@@ -21,6 +24,10 @@ import { WeatherService } from './services/weather.service';
 
 @Module({
    imports: [
+      ServeStaticModule.forRoot({
+         rootPath: join(__dirname, '..', 'public'),
+         serveRoot: '/public',
+      }),
       ConfigModule.forRoot({ isGlobal: true }),
       ScheduleModule.forRoot(),
       CacheModule.registerAsync(RedisConfig),

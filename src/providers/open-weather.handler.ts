@@ -6,7 +6,7 @@ import { openWeatherConfig } from '../config/open-weather.config';
 import { NotFoundError } from '../constants/errors/not-found.error';
 import { Logger } from '../logger/logger.service';
 import { Coordinates } from '../types/coordinates';
-import { OpenWeatherApiResponse } from '../types/open-weather-api-response';
+import { OpenWeatherApiResponse } from '../types/responses/open-weather-api-response';
 import { Weather } from '../types/weather';
 
 import { AbstractWeatherHandler } from './weather.handler';

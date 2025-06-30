@@ -7,10 +7,10 @@ import * as winston from 'winston';
 import { applicationConfig } from '../config/application.config';
 
 import { ConsolePrettyLogger } from './console-pretty.logger';
-import { ILogger } from './logger.interface';
+import { LoggerInterface } from './logger.interface';
 
 @Injectable()
-export class FileLogger implements ILogger {
+export class FileLogger implements LoggerInterface {
    private readonly logger: winston.Logger;
 
    constructor() {
@@ -75,11 +75,11 @@ export class FileLogger implements ILogger {
 }
 
 @Injectable()
-export class Logger implements ILogger {
-   private readonly decorated: ILogger;
+export class Logger implements LoggerInterface {
+   private readonly decorated: LoggerInterface;
 
    constructor(private readonly base: FileLogger) {
-      let logger: ILogger = base;
+      let logger: LoggerInterface = base;
       if (applicationConfig.environment !== 'production') {
          logger = new ConsolePrettyLogger(logger);
       }

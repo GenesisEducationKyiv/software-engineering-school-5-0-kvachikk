@@ -2,6 +2,8 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
+import { CacheTTL } from '../constants/cache-ttl';
+
 @Injectable()
 export class CacheService {
    constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
@@ -10,15 +12,11 @@ export class CacheService {
       return await this.cacheManager.get<T>(key);
    }
 
-   async setData(key: string, value: unknown, ttl?: number) {
+   async setData(key: string, value: unknown, ttl: number = CacheTTL.TEN_MINUTE) {
       if (ttl) {
          await this.cacheManager.set(key, value, ttl);
       } else {
          await this.cacheManager.set(key, value);
       }
-   }
-
-   async deleteData(key: string) {
-      await this.cacheManager.del(key);
    }
 }

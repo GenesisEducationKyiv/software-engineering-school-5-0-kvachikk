@@ -3,8 +3,8 @@ import { Injectable } from '@nestjs/common';
 
 import { weatherApiConfig } from '../config/weather-api.config';
 import { Logger } from '../logger/logger.service';
+import { WeatherApiResponse } from '../types/responses/weather-api-response';
 import { Weather } from '../types/weather';
-import { WeatherApiResponse } from '../types/weather-api-response';
 
 import { AbstractWeatherHandler } from './weather.handler';
 

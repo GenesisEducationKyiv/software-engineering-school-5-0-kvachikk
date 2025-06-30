@@ -6,7 +6,7 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "check": "npm i && npm run format && npm run lint && nest build && npm run test && npm run start",
+    "check": "npm run format && npm run lint && nest build && npm run test && npm run start",
     "start": "nest start",
     "start:prod": "node dist/main",
     "dev": "nest start --watch",
@@ -30,9 +30,9 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/schedule": "^6.0.0",
     "@nestjs/sequelize": "^11.0.0",
+    "@nestjs/serve-static": "^5.0.3",
     "@nestjs/swagger": "^11.2.0",
     "cache-manager": "^7.0.0",
-    "cache-manager-ioredis": "^2.1.0",
     "cache-manager-redis-store": "^3.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -41,7 +41,6 @@
     "ioredis": "^5.6.1",
     "joi": "^17.13.3",
     "nest-winston": "^1.10.2",
-    "open": "^10.1.2",
     "pg": "^8.16.0",
     "pg-hstore": "^2.3.4",
     "reflect-metadata": "^0.2.2",
@@ -62,12 +61,10 @@
     "@playwright/test": "^1.53.0",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
-    "@types/cache-manager-ioredis": "^2.0.7",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
-    "@types/yamljs": "^0.2.34",
     "cross-env": "^7.0.3",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
@@ -84,8 +81,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0",
-    "wait-on": "^8.0.3"
+    "typescript-eslint": "^8.20.0"
   },
   "jest": {
     "moduleFileExtensions": [
