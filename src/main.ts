@@ -1,18 +1,20 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
 import { AppModule } from './app.module';
-import * as YAML from 'yamljs';
-import { SwaggerModule } from '@nestjs/swagger';
+import { applicationConfig } from './config';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 
 async function bootstrap() {
-   const app = await NestFactory.create(AppModule);
+   const app = await NestFactory.create(AppModule, { cors: true });
 
-   app.setGlobalPrefix('api');
-   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-   const swaggerDocument = YAML.load('./swagger.yaml');
-   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-   SwaggerModule.setup('docs', app, swaggerDocument);
+   if (applicationConfig.environment !== 'production') {
+      const swaggerDoc = SwaggerModule.createDocument(app, new DocumentBuilder().setTitle('Weather API').build());
+      SwaggerModule.setup('/', app, swaggerDoc);
+   }
+
    app.useGlobalFilters(new AllExceptionsFilter());
-   await app.listen(process.env.PORT ?? 3000);
+   await app.listen(applicationConfig.port);
 }
+
 bootstrap().catch(console.error);

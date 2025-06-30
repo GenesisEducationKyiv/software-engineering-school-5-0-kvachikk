@@ -1,523 +1,156 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Weather Forecast</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-            rel="stylesheet"
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Forecast</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="icon"
+    type="image/x-icon"
+    href="https://cdn-icons-png.flaticon.com/512/169/169367.png"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="flex flex-col items-center py-6 px-4">
+<div class="w-full max-w-6xl mx-auto space-y-6 md:space-y-8">
+  <section id="featuredCitiesSection">
+    <div
+      id="keyCitiesGrid"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
+    ></div>
+    <div
+      id="keyCitiesMessage"
+      class="message-box"
+      style="display: none"
+    ></div>
+  </section>
+
+  <section id="weather-search-section" class="content-section">
+    <div class="flex flex-col sm:flex-row gap-4 mb-6">
+      <input
+        type="text"
+        id="cityInput"
+        class="flex-grow p-3 outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Enter city name (e.g., London)"
+        autofocus
+      />
+      <button id="getWeatherBtn" class="btn-primary p-3">
+        Get Weather
+      </button>
+    </div>
+    <div
+      id="searchWeatherResultCardWrapper"
+      class="weather-card-wrapper"
+    ></div>
+    <div
+      id="searchWeatherMessage"
+      class="message-box"
+      style="display: none"
+    ></div>
+  </section>
+
+  <section id="forecast-section" class="content-section">
+    <h2 class="text-2xl md:text-3xl font-bold text-center mb-6 text-blue-600">
+      Weather Forecast
+    </h2>
+    <div class="flex flex-col sm:flex-row gap-4 mb-6">
+      <input
+        type="text"
+        id="cityForecastInput"
+        class="flex-grow p-3 outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Enter city name (e.g., London)"
+      />
+      <button id="getForecastBtn" class="btn-primary p-3">
+        Get Forecast
+      </button>
+    </div>
+    <div
+      id="forecastWeatherResultWrapper"
+      class="weather-card-wrapper"
+    ></div>
+    <div
+      id="forecastWeatherMessage"
+      class="message-box"
+      style="display: none"
+    ></div>
+  </section>
+
+  <section id="subscription-section" class="content-section">
+    <h2
+      class="text-2xl md:text-3xl font-bold text-center mb-6 text-blue-600"
+    >
+      Subscribe to Updates
+    </h2>
+    <form id="subscriptionForm" class="space-y-4">
+      <div>
+        <label
+          for="emailInput"
+          class="block text-sm font-medium text-blue-700 mb-1"
+        >Email:</label
+        >
+        <input
+          type="email"
+          id="emailInput"
+          name="email"
+          required
+          class="w-full p-3 outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="your.email@example.com"
         />
-        <link
-            rel="icon"
-            type="image/x-icon"
-            href="https://cdn-icons-png.flaticon.com/512/169/169367.png"
+      </div>
+      <div>
+        <label
+          for="citySubInput"
+          class="block text-sm font-medium text-blue-700 mb-1"
+        >City:</label
+        >
+        <input
+          type="text"
+          id="citySubInput"
+          name="city"
+          required
+          class="w-full p-3 outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="City name"
         />
-        <style>
-            body {
-                font-family: 'Inter', sans-serif;
-                background-image: linear-gradient(to bottom, #e0f2fe, white);
-                color: #1e40af;
-                min-height: 100vh;
-            }
+      </div>
+      <div>
+        <label
+          for="frequencyInput"
+          class="block text-sm font-medium text-blue-700 mb-1"
+        >FrequencyModel:</label
+        >
+        <select
+          id="frequencyInput"
+          name="frequency"
+          class="w-full p-3 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="daily">Daily</option>
+          <option value="hourly">Hourly</option>
+        </select>
+      </div>
+      <button
+        type="submit"
+        id="subscribeBtn"
+        class="w-full btn-primary p-3"
+      >
+        Subscribe
+      </button>
+    </form>
+    <div
+      id="subscriptionMessage"
+      class="message-box"
+      style="display: none"
+    ></div>
+  </section>
 
-            .content-section {
-                background-color: white;
-                border-radius: 1rem;
-                box-shadow:
-                    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-                    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            }
 
-            @media (min-width: 768px) {
-                .content-section {
-                    padding: 2rem;
-                }
-            }
+</div>
 
-            input[type='text'],
-            input[type='email'],
-            select {
-                border: 1px solid #93c5fd;
-                color: #1e40af;
-                border-radius: 0.5rem;
-            }
-
-            input[type='text']::placeholder,
-            input[type='email']::placeholder {
-                color: #60a5fa;
-            }
-
-            button.btn-primary {
-                background-color: #3b82f6;
-                color: white;
-                transition: background-color 0.3s ease;
-                border-radius: 0.5rem;
-            }
-
-            button.btn-primary:hover {
-                background-color: #2563eb;
-            }
-
-            .weather-card-wrapper {
-                opacity: 0;
-                transform: translateY(20px);
-                transition:
-                    opacity 0.5s ease-out,
-                    transform 0.5s ease-out;
-            }
-
-            .weather-card-wrapper.visible {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-            .message-box {
-                padding: 0.75rem 1rem;
-                border-radius: 0.5rem;
-                margin-top: 1rem;
-                font-weight: 500;
-                text-align: center;
-            }
-
-            .message-success {
-                background-color: #d1fae5;
-                color: #065f46;
-                border: 1px solid #6ee7b7;
-            }
-
-            .message-error {
-                background-color: #fee2e2;
-                color: #991b1b;
-                border: 1px solid #fca5a5;
-            }
-
-            .message-loading {
-                background-color: #fef3c7;
-                color: #92400e;
-                border: 1px solid #fcd34d;
-            }
-
-            .weather-card-item {
-                background-color: white;
-                border-radius: 1.5rem;
-                box-shadow:
-                    0 8px 12px -3px rgba(0, 0, 0, 0.07),
-                    0 3px 5px -2px rgba(0, 0, 0, 0.04);
-                color: #1e3a8a;
-                height: 90%;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-
-            .my-location-highlight .weather-card-item {
-                background-color: white;
-                border: 2px solid #3b82f6;
-                animation: pulseAnimation 2.5s infinite ease-in-out;
-            }
-
-            @keyframes pulseAnimation {
-                0%,
-                100% {
-                    transform: scale(1);
-                    box-shadow:
-                        0 8px 12px -3px rgba(59, 130, 246, 0.15),
-                        0 3px 5px -2px rgba(59, 130, 246, 0.1);
-                }
-
-                50% {
-                    transform: scale(1.03);
-                    box-shadow:
-                        0 12px 18px -3px rgba(59, 130, 246, 0.2),
-                        0 5px 8px -2px rgba(59, 130, 246, 0.15);
-                }
-            }
-        </style>
-    </head>
-
-    <body class="flex flex-col items-center py-6 px-4">
-        <div class="w-full max-w-6xl mx-auto space-y-6 md:space-y-8">
-            <section id="featuredCitiesSection">
-                <div
-                    id="keyCitiesGrid"
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
-                ></div>
-                <div
-                    id="keyCitiesMessage"
-                    class="message-box"
-                    style="display: none"
-                ></div>
-            </section>
-
-            <section id="weather-search-section" class="content-section">
-                <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                    <input
-                        type="text"
-                        id="cityInput"
-                        class="flex-grow p-3 outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter city name (e.g., London)"
-                        autofocus
-                    />
-                    <button id="getWeatherBtn" class="btn-primary p-3">
-                        Get Weather
-                    </button>
-                </div>
-                <div
-                    id="searchWeatherResultCardWrapper"
-                    class="weather-card-wrapper"
-                ></div>
-                <div
-                    id="searchWeatherMessage"
-                    class="message-box"
-                    style="display: none"
-                ></div>
-            </section>
-
-            <section id="subscription-section" class="content-section">
-                <h2
-                    class="text-2xl md:text-3xl font-bold text-center mb-6 text-blue-600"
-                >
-                    Subscribe to Updates
-                </h2>
-                <form id="subscriptionForm" class="space-y-4">
-                    <div>
-                        <label
-                            for="emailInput"
-                            class="block text-sm font-medium text-blue-700 mb-1"
-                            >Email:</label
-                        >
-                        <input
-                            type="email"
-                            id="emailInput"
-                            name="email"
-                            required
-                            class="w-full p-3 outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="your.email@example.com"
-                        />
-                    </div>
-                    <div>
-                        <label
-                            for="citySubInput"
-                            class="block text-sm font-medium text-blue-700 mb-1"
-                            >City:</label
-                        >
-                        <input
-                            type="text"
-                            id="citySubInput"
-                            name="city"
-                            required
-                            class="w-full p-3 outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="City name"
-                        />
-                    </div>
-                    <div>
-                        <label
-                            for="frequencyInput"
-                            class="block text-sm font-medium text-blue-700 mb-1"
-                            >FrequencyModel:</label
-                        >
-                        <select
-                            id="frequencyInput"
-                            name="frequency"
-                            class="w-full p-3 bg-white outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="daily">Daily</option>
-                            <option value="hourly">Hourly</option>
-                        </select>
-                    </div>
-                    <button
-                        type="submit"
-                        id="subscribeBtn"
-                        class="w-full btn-primary p-3"
-                    >
-                        Subscribe
-                    </button>
-                </form>
-                <div
-                    id="subscriptionMessage"
-                    class="message-box"
-                    style="display: none"
-                ></div>
-            </section>
-        </div>
-
-        <script>
-            const WEATHER_API_URL =
-                'https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather';
-            const SUBSCRIBE_API_URL =
-                'https://software-engineering-school-5-0-kvachikk.onrender.com/api/subscribe';
-            const IP_GEOLOCATION_API_URL = 'https://ipapi.co/json/';
-
-            const cityInput = document.getElementById('cityInput');
-            const getWeatherBtn = document.getElementById('getWeatherBtn');
-            const searchWeatherResultCardWrapper = document.getElementById(
-                'searchWeatherResultCardWrapper'
-            );
-            const searchWeatherMessageDiv = document.getElementById(
-                'searchWeatherMessage'
-            );
-
-            const subscriptionForm =
-                document.getElementById('subscriptionForm');
-            const subscribeBtn = document.getElementById('subscribeBtn');
-            const subscriptionMessageDiv = document.getElementById(
-                'subscriptionMessage'
-            );
-
-            const keyCitiesGrid = document.getElementById('keyCitiesGrid');
-            const keyCitiesMessageDiv =
-                document.getElementById('keyCitiesMessage');
-            const DEMO_CITIES = ['Kyiv', 'Kharkiv', 'Dnipro', 'Odesa', 'Lviv'];
-
-            function showMessage(element, message, type = 'info') {
-                element.innerHTML = message;
-                element.className = 'message-box';
-                if (type === 'success')
-                    element.classList.add('message-success');
-                else if (type === 'error')
-                    element.classList.add('message-error');
-                else if (type === 'loading')
-                    element.classList.add('message-loading');
-                element.style.display = 'block';
-            }
-
-            function hideMessage(element) {
-                element.style.display = 'none';
-                element.innerHTML = '';
-            }
-
-            function createWeatherCardHTML(city, weatherData) {
-                if (
-                    !weatherData ||
-                    typeof weatherData.temperature === 'undefined'
-                ) {
-                    return `<div class="weather-card-item p-6 text-center"><h3 class="text-xl font-semibold mb-2">${city.charAt(0).toUpperCase() + city.slice(1)}</h3><p class="text-red-500">Could not load weather data.</p></div>`;
-                }
-                return `
-                <div class="weather-card-item p-4 md:p-5 transform transition-transform duration-300">
-                    <h3 class="text-xl lg:text-2xl font-bold mb-2">${city.charAt(0).toUpperCase() + city.slice(1)}</h3>
-                    <div class="my-3 md:my-4">
-                        <p class="text-4xl lg:text-5xl font-bold">${weatherData.temperature?.toFixed(1)}°C</p>
-                        <p class="text-md lg:text-lg text-blue-500 capitalize">${weatherData.description || 'N/A'}</p>
-                    </div>
-                    <div class="text-sm md:text-md">
-                        <p>Humidity: ${weatherData.humidity || 'N/A'}%</p>
-                    </div>
-                </div>
-            `;
-            }
-
-            async function fetchAndDisplayWeather(
-                city,
-                cardWrapperElement,
-                messageDivElement,
-                isMyLocation = false
-            ) {
-                if (messageDivElement)
-                    showMessage(
-                        messageDivElement,
-                        `Loading weather for ${city}...`,
-                        'loading'
-                    );
-
-                let tempCardWrapper;
-                if (cardWrapperElement.id === 'keyCitiesGrid') {
-                    tempCardWrapper = document.createElement('div');
-                    if (isMyLocation)
-                        tempCardWrapper.classList.add('my-location-highlight');
-                    tempCardWrapper.classList.add('weather-card-wrapper');
-                    if (isMyLocation) keyCitiesGrid.prepend(tempCardWrapper);
-                    else keyCitiesGrid.appendChild(tempCardWrapper);
-                } else {
-                    tempCardWrapper = cardWrapperElement;
-                    tempCardWrapper.innerHTML = '';
-                }
-
-                try {
-                    const response = await fetch(
-                        `${WEATHER_API_URL}?city=${encodeURIComponent(city)}`
-                    );
-                    const data = await response.json();
-                    if (messageDivElement) hideMessage(messageDivElement);
-
-                    tempCardWrapper.innerHTML = createWeatherCardHTML(
-                        city,
-                        response.ok ? data : null
-                    );
-                    setTimeout(
-                        () => tempCardWrapper.classList.add('visible'),
-                        50
-                    );
-                } catch (error) {
-                    if (messageDivElement)
-                        showMessage(
-                            messageDivElement,
-                            `Network error fetching weather for ${city}.`,
-                            'error'
-                        );
-                    tempCardWrapper.innerHTML = createWeatherCardHTML(
-                        city,
-                        null
-                    );
-                    setTimeout(
-                        () => tempCardWrapper.classList.add('visible'),
-                        50
-                    );
-                }
-            }
-
-            getWeatherBtn.addEventListener('click', () => {
-                const city = cityInput.value.trim();
-                if (!city) {
-                    showMessage(
-                        searchWeatherMessageDiv,
-                        'Please enter a city name.',
-                        'error'
-                    );
-                    searchWeatherResultCardWrapper.classList.remove('visible');
-                    searchWeatherResultCardWrapper.innerHTML = '';
-                    return;
-                }
-                fetchAndDisplayWeather(
-                    city,
-                    searchWeatherResultCardWrapper,
-                    searchWeatherMessageDiv
-                );
-            });
-
-            subscriptionForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const email = subscriptionForm.email.value.trim();
-                const city = subscriptionForm.city.value.trim();
-                const frequency = subscriptionForm.frequency.value;
-
-                if (!email || !city) {
-                    showMessage(
-                        subscriptionMessageDiv,
-                        'Please fill in all fields.',
-                        'error'
-                    );
-                    return;
-                }
-
-                hideMessage(subscriptionMessageDiv);
-                showMessage(
-                    subscriptionMessageDiv,
-                    'Processing subscription...',
-                    'loading'
-                );
-                subscribeBtn.disabled = true;
-
-                const formData = new URLSearchParams({
-                    email,
-                    city,
-                    frequency,
-                });
-
-                try {
-                    const response = await fetch(SUBSCRIBE_API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: formData.toString(),
-                    });
-                    const responseData = await response.json();
-
-                    if (response.status === 200 || response.status === 201) {
-                        showMessage(
-                            subscriptionMessageDiv,
-                            responseData.message ||
-                                'Subscription successful. Confirmation email sent.',
-                            'success'
-                        );
-                        subscriptionForm.reset();
-                    } else {
-                        let errorMessages = `Error ${response.status}: `;
-                        if (
-                            responseData.errors &&
-                            Array.isArray(responseData.errors)
-                        ) {
-                            errorMessages += responseData.errors
-                                .map((err) => err.msg)
-                                .join(', ');
-                        } else {
-                            errorMessages +=
-                                responseData.message || 'Failed to subscribe.';
-                        }
-                        showMessage(
-                            subscriptionMessageDiv,
-                            errorMessages,
-                            'error'
-                        );
-                    }
-                } catch (error) {
-                    showMessage(
-                        subscriptionMessageDiv,
-                        'Network error during subscription. Please try again.',
-                        'error'
-                    );
-                } finally {
-                    subscribeBtn.disabled = false;
-                }
-            });
-
-            async function initializePage() {
-                showMessage(
-                    keyCitiesMessageDiv,
-                    'Detecting location and loading key cities...',
-                    'loading'
-                );
-                let userCity = null;
-                try {
-                    const response = await fetch(IP_GEOLOCATION_API_URL);
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.city) userCity = data.city;
-                    }
-                } catch (error) {
-                    console.warn(
-                        'Could not fetch user location via IP:',
-                        error
-                    );
-                }
-
-                if (userCity) {
-                    await fetchAndDisplayWeather(
-                        userCity,
-                        keyCitiesGrid,
-                        keyCitiesMessageDiv,
-                        true
-                    );
-                } else {
-                    const placeholderMyLocationCard =
-                        document.createElement('div');
-                    placeholderMyLocationCard.classList.add(
-                        'my-location-highlight',
-                        'weather-card-wrapper',
-                        'visible'
-                    );
-                    placeholderMyLocationCard.innerHTML = createWeatherCardHTML(
-                        'My Location',
-                        null
-                    ).replace(
-                        'Could not load weather data.',
-                        'Location not found. Search manually.'
-                    );
-                    keyCitiesGrid.prepend(placeholderMyLocationCard);
-                }
-
-                const demoCityPromises = DEMO_CITIES.map((city) =>
-                    fetchAndDisplayWeather(city, keyCitiesGrid, null, false)
-                );
-
-                await Promise.allSettled(demoCityPromises);
-                hideMessage(keyCitiesMessageDiv);
-            }
-
-            document.addEventListener('DOMContentLoaded', initializePage);
-        </script>
-    </body>
+<script src="app.js"></script>
+</body>
 </html>

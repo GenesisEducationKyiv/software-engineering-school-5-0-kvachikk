@@ -3,65 +3,80 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AppModule } from '../src/app.module';
-import { CurrentWeatherService } from '../src/services/weather/current';
-import { SubscriptionService } from '../src/services/subscription/subscription.service';
-import { weatherResponseMessages as weatherMsgs } from '../src/constants/message/weather-responses';
-import { subscriptionResponseMessages as subMsgs } from '../src/constants/message/subscription-responses';
-import { ConflictError } from '../src/constants/errors/conflict.error';
-import { EmailSchedulerLoader } from '../src/loaders/email-scheduler.loader';
-import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
-import { NotFoundError } from '../src/constants/errors/not-found.error';
 import { BadRequestError } from '../src/constants/errors/bad-request.error';
+import { ConflictError } from '../src/constants/errors/conflict.error';
+import { NotFoundError } from '../src/constants/errors/not-found.error';
+import { subscriptionResponseMessages as subMsgs } from '../src/constants/message/subscription-responses';
+import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
 import { DatabaseLoader } from '../src/loaders/database.loader';
-import { EmailService } from '../src/services/emails/sender';
+import { EmailerService } from '../src/services/emailer.service';
+import { SubscriptionService } from '../src/services/subscription/subscription.service';
+import { WeatherService } from '../src/services/weather.service';
 
-// Mock
-const weatherServiceMock: Partial<Record<keyof CurrentWeatherService, any>> = {
-   getWeatherByCity: jest.fn().mockResolvedValue({
+const getCurrentWeatherMock = jest.fn().mockResolvedValue({
+   temperature: 12,
+   humidity: 67,
+   description: 'Clear sky',
+});
+
+const getWeatherForecastMock = jest.fn().mockResolvedValue([
+   {
       temperature: 12,
       humidity: 67,
       description: 'Clear sky',
-   }),
-};
+   },
+]);
 
-const subscriptionServiceMock: Partial<Record<keyof SubscriptionService, any>> = {
-   subscribe: jest.fn().mockResolvedValue({}),
-   confirmSubscription: jest.fn().mockResolvedValue({}),
-   unsubscribe: jest.fn().mockResolvedValue({}),
-   getActiveSubscriptions: jest.fn().mockResolvedValue([]),
-};
+const weatherServiceMock = {
+   getCurrentWeather: getCurrentWeatherMock,
+   getWeatherForecast: getWeatherForecastMock,
+} as unknown as WeatherService;
 
-const emailServiceMock = { sendTemplateLetter: jest.fn(), sendSimpleLetter: jest.fn() } as Partial<EmailService>;
+const subscribeMock = jest.fn().mockResolvedValue({});
+const confirmSubscriptionMock = jest.fn().mockResolvedValue({});
+const unsubscribeMock = jest.fn().mockResolvedValue({});
+const getActiveSubscriptionsMock = jest.fn().mockResolvedValue([]);
 
-// Helper
+const subscriptionServiceMock = {
+   subscribe: subscribeMock,
+   confirmSubscription: confirmSubscriptionMock,
+   unsubscribe: unsubscribeMock,
+   getActiveSubscriptions: getActiveSubscriptionsMock,
+} as unknown as SubscriptionService;
+
+const sendTemplateLetterMock = jest.fn();
+const sendSimpleLetterMock = jest.fn();
+
+const emailServiceMock = {
+   sendTemplateLetter: sendTemplateLetterMock,
+   sendSimpleLetter: sendSimpleLetterMock,
+} as unknown as EmailerService;
+
 const makeValidSubscriptionPayload = () => ({
    email: `test-${Date.now()}@example.com`,
    city: 'Kyiv',
    frequency: 'hourly',
 });
 
-// Tests
 describe('Weather-Forecast API (integration)', () => {
    let app: INestApplication;
+   const getServer = () => app.getHttpServer() as import('http').Server;
 
    beforeAll(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
          imports: [AppModule],
       })
-         .overrideProvider(CurrentWeatherService)
+         .overrideProvider(WeatherService)
          .useValue(weatherServiceMock)
          .overrideProvider(SubscriptionService)
          .useValue(subscriptionServiceMock)
-         .overrideProvider(EmailSchedulerLoader)
-         .useValue({ onModuleInit: jest.fn() })
          .overrideProvider(DatabaseLoader)
          .useValue({ onModuleInit: jest.fn() })
-         .overrideProvider(EmailService)
+         .overrideProvider(EmailerService)
          .useValue(emailServiceMock)
          .compile();
 
       app = moduleFixture.createNestApplication();
-      app.setGlobalPrefix('api');
       app.useGlobalFilters(new AllExceptionsFilter());
       await app.init();
    });
@@ -71,124 +86,101 @@ describe('Weather-Forecast API (integration)', () => {
    });
 
    //  Weather
-   describe('GET /api/weather', () => {
+   describe('GET /weather/current', () => {
       it('returns 200 & weather data for a valid city', async () => {
          const city = 'Kyiv';
+         const res = await request(getServer()).get('/weather/current').query({ city }).expect(200);
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).get('/api/weather').query({ city }).expect(200);
-
-         expect(weatherServiceMock.getWeatherByCity).toHaveBeenCalledWith(city);
-         expect(res.body).toEqual({
-            message: weatherMsgs.WEATHER_DATA_FETCHED,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            data: expect.objectContaining({
-               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+         expect(getCurrentWeatherMock).toHaveBeenCalledWith(city);
+         expect(res.body).toEqual(
+            expect.objectContaining({
                temperature: expect.any(Number),
-               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                humidity: expect.any(Number),
-               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                description: expect.any(String),
             }),
-         });
-      });
-
-      it('returns 400 when city parameter is missing', async () => {
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).get('/api/weather').expect(400);
-
-         expect(res.body).toMatchObject({
-            message: 'Validation failed',
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            errors: expect.arrayContaining([expect.objectContaining({ field: 'city' })]),
-         });
-      });
-
-      it('returns 400 when city name is too short', async () => {
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).get('/api/weather').query({ city: 'A' }).expect(400);
-
-         // Should contain validation error mentioning "City name must be at least 2 characters long"
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(res.body.errors).toEqual(
-            expect.arrayContaining([
-               expect.objectContaining({
-                  field: 'city',
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  message: expect.stringContaining('at least 2 characters'),
-               }),
-            ]),
          );
       });
 
+      it('returns 400 when city parameter is missing', async () => {
+         const res = await request(getServer()).get('/weather/current').expect(400);
+
+         expect(res.body).toMatchObject({
+            message: 'Validation failed',
+         });
+         expect(Array.isArray((res.body as { errors: unknown }).errors)).toBe(true);
+      });
+
+      it('returns 400 when city name is too short', async () => {
+         const res = await request(getServer()).get('/weather/current').query({ city: 'A' }).expect(400);
+         expect(res.body).toMatchObject({
+            errors: expect.arrayContaining([
+               expect.objectContaining({
+                  field: 'city',
+                  message: expect.stringContaining('at least 2 characters'),
+               }),
+            ]),
+         });
+      });
+
       it('returns 404 when city is not found', async () => {
-         (weatherServiceMock.getWeatherByCity as jest.Mock).mockImplementationOnce(() => {
+         getCurrentWeatherMock.mockImplementationOnce(() => {
             throw new NotFoundError('City not found');
          });
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         await request(app.getHttpServer()).get('/api/weather').query({ city: 'Kmish' }).expect(404);
+         await request(getServer()).get('/weather/current').query({ city: 'Kmish' }).expect(404);
       });
 
       it('returns 400 when weather service reports bad request', async () => {
-         (weatherServiceMock.getWeatherByCity as jest.Mock).mockImplementationOnce(() => {
+         getCurrentWeatherMock.mockImplementationOnce(() => {
             throw new BadRequestError('Invalid city');
          });
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         await request(app.getHttpServer()).get('/api/weather').query({ city: '??' }).expect(400);
+         await request(getServer()).get('/weather/current').query({ city: '??' }).expect(400);
       });
    });
 
    // ---------------------------------------------------------- Subscriptions
-   describe('POST /api/subscribe', () => {
+   describe('POST /subscribe', () => {
       it('creates a subscription with valid data', async () => {
          const payload = makeValidSubscriptionPayload();
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).post('/api/subscribe').send(payload).expect(201);
+         const res = await request(getServer()).post('/subscribe').send(payload).expect(201);
 
-         expect(subscriptionServiceMock.subscribe).toHaveBeenCalledWith(payload.email, payload.city, payload.frequency);
+         expect(subscribeMock).toHaveBeenCalledWith(payload.email, payload.city, payload.frequency);
          expect(res.body).toEqual({ message: subMsgs.SUBSCRIBE_SUCCESS });
       });
 
       it('returns 400 when email is missing', async () => {
          const { city, frequency } = makeValidSubscriptionPayload();
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).post('/api/subscribe').send({ city, frequency }).expect(400);
-
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(res.body.errors).toEqual(expect.arrayContaining([expect.objectContaining({ field: 'email' })]));
+         const res = await request(getServer()).post('/subscribe').send({ city, frequency }).expect(400);
+         expect(res.body).toMatchObject({
+            errors: expect.arrayContaining([expect.objectContaining({ field: 'email' })]),
+         });
       });
 
       it('returns 400 when city is missing', async () => {
          const { email, frequency } = makeValidSubscriptionPayload();
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).post('/api/subscribe').send({ email, frequency }).expect(400);
-
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(res.body.errors).toEqual(expect.arrayContaining([expect.objectContaining({ field: 'city' })]));
+         const res = await request(getServer()).post('/subscribe').send({ email, frequency }).expect(400);
+         expect(res.body).toMatchObject({
+            errors: expect.arrayContaining([expect.objectContaining({ field: 'city' })]),
+         });
       });
 
       it('returns 400 when frequency is missing', async () => {
          const { email, city } = makeValidSubscriptionPayload();
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).post('/api/subscribe').send({ email, city }).expect(400);
-
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(res.body.errors).toEqual(expect.arrayContaining([expect.objectContaining({ field: 'frequency' })]));
+         const res = await request(getServer()).post('/subscribe').send({ email, city }).expect(400);
+         expect(res.body).toMatchObject({
+            errors: expect.arrayContaining([expect.objectContaining({ field: 'frequency' })]),
+         });
       });
 
       it('rejects duplicate emails with 409 status', async () => {
-         // Next call to subscribe should throw a ConflictError
-         (subscriptionServiceMock.subscribe as jest.Mock).mockImplementationOnce(() => {
+         subscribeMock.mockImplementationOnce(() => {
             throw new ConflictError(subMsgs.SUBSCRIPTION_ALREADY_EXISTS);
          });
 
          const payload = makeValidSubscriptionPayload();
-
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).post('/api/subscribe').send(payload).expect(409);
+         const res = await request(getServer()).post('/subscribe').send(payload).expect(409);
 
          expect(res.body).toEqual({
             message: subMsgs.SUBSCRIPTION_ALREADY_EXISTS,
@@ -197,65 +189,58 @@ describe('Weather-Forecast API (integration)', () => {
 
       it('returns 400 when email format is invalid', async () => {
          const payload = { ...makeValidSubscriptionPayload(), email: 'invalid-email' };
+         const res = await request(getServer()).post('/subscribe').send(payload).expect(400);
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).post('/api/subscribe').send(payload).expect(400);
-
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(res.body.errors).toEqual(expect.arrayContaining([expect.objectContaining({ field: 'email' })]));
+         expect(res.body).toMatchObject({
+            errors: expect.arrayContaining([expect.objectContaining({ field: 'email' })]),
+         });
       });
 
       it('returns 400 when city name is too short', async () => {
          const payload = { ...makeValidSubscriptionPayload(), city: 'A' };
+         const res = await request(getServer()).post('/subscribe').send(payload).expect(400);
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).post('/api/subscribe').send(payload).expect(400);
-
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-         expect(res.body.errors).toEqual(expect.arrayContaining([expect.objectContaining({ field: 'city' })]));
+         expect(res.body).toMatchObject({
+            errors: expect.arrayContaining([expect.objectContaining({ field: 'city' })]),
+         });
       });
    });
 
    // ------------------------------------------------------ Confirmation flow
-   describe('GET /api/confirm/:token', () => {
+   describe('GET /confirm', () => {
       it('confirms a subscription with a valid token', async () => {
          const token = 'valid-token';
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).get(`/api/confirm/${token}`).expect(200);
+         const res = await request(getServer()).get(`/confirm`).query({ token }).expect(200);
 
-         expect(subscriptionServiceMock.confirmSubscription).toHaveBeenCalledWith(token);
+         expect(confirmSubscriptionMock).toHaveBeenCalledWith(token);
          expect(res.body).toEqual({ message: subMsgs.CONFIRM_SUCCESS });
       });
 
       it('returns 404 when token not found', async () => {
-         (subscriptionServiceMock.confirmSubscription as jest.Mock).mockImplementationOnce(() => {
+         confirmSubscriptionMock.mockImplementationOnce(() => {
             throw new NotFoundError('Token not found');
          });
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         await request(app.getHttpServer()).get('/api/confirm/unknown-token').expect(404);
+         await request(getServer()).get('/confirm').query({ token: 'unknown-token' }).expect(404);
       });
    });
 
-   describe('GET /api/unsubscribe/:token', () => {
+   describe('GET /unsubscribe', () => {
       it('unsubscribes successfully with a valid token', async () => {
          const token = 'valid-token';
+         const res = await request(getServer()).get(`/unsubscribe`).query({ token }).expect(200);
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         const res = await request(app.getHttpServer()).get(`/api/unsubscribe/${token}`).expect(200);
-
-         expect(subscriptionServiceMock.unsubscribe).toHaveBeenCalledWith(token);
+         expect(unsubscribeMock).toHaveBeenCalledWith(token);
          expect(res.body).toEqual({ message: subMsgs.UNSUBSCRIBE_SUCCESS });
       });
 
       it('returns 404 when token not found', async () => {
-         (subscriptionServiceMock.unsubscribe as jest.Mock).mockImplementationOnce(() => {
+         unsubscribeMock.mockImplementationOnce(() => {
             throw new NotFoundError('Token not found');
          });
 
-         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-         await request(app.getHttpServer()).get('/api/unsubscribe/unknown-token').expect(404);
+         await request(getServer()).get('/unsubscribe').query({ token: 'unknown-token' }).expect(404);
       });
    });
 });
