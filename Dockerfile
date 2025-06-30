@@ -1,13 +1,13 @@
-FROM node:22
-
+FROM node:24
 WORKDIR /app
 
 COPY package*.json ./
-
-RUN npm install
+RUN npm ci
 
 COPY . .
+ENV RUN_ENVIRONMENT production
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["node", "index.js"]
+CMD npm run start

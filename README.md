@@ -1,88 +1,76 @@
-## Key Features
+[![Licence](https://img.shields.io/github/license/Ileriayo/markdown-badges?style=for-the-badge)](./LICENSE)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=Sequelize&logoColor=white)
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D22.0.0-green.svg)
+- **Hosted API**: [software-engineering-school-5-0-kvachikk.onrender.com](https://software-engineering-school-5-0-kvachikk.onrender.com)
+- **Swagger**: [software-engineering-school-5-0-kvachikk.onrender.com/docs](https://software-engineering-school-5-0-kvachikk.onrender.com/docs)
+- **Example Request**: [software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne](https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne)
 
-- **Hosted API**: [https://software-engineering-school-5-0-kvachikk.onrender.com](https://software-engineering-school-5-0-kvachikk.onrender.com)
-- **Swagger**: [https://software-engineering-school-5-0-kvachikk.onrender.com/docs](https://software-engineering-school-5-0-kvachikk.onrender.com/docs)
-- **Example Request**: [https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne](https://software-engineering-school-5-0-kvachikk.onrender.com/api/weather?city=Rivne)
 
-> **Known Issue**: Gmail's anti-spam system automatically follows all links in emails, which can cause automatic confirmation of subscriptions. The API works perfectly with other email providers like Proton Mail. Changing to POST requests would fix this, but that would require modifying the swagger specification.
+## [Testing](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-4-tests/docs/testing.md)
 
 ## Running locally:
 
-```
+```bash
 git clone https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk
 ```
 
-```
+```bash
 cd software-engineering-school-5-0-kvachikk
 ```
 
-```
+```bash
 npm install
 ```
 
 ```
+----YOU MUST SETUP .env ------
+```
+
+```bash
 npm start
 ```
 
-Other available commands:
-
-- `npm test`
-- `npm run dev` (nodemon will restart local server when notice changes on project)
-
-## Implemented Features
-
-I tried to implement all the requirements that were given, maybe I missed something small, but the project still implements absolutely all the points of the task
-
-- **Weather Data Endpoint**: GET `/api/weather?city={city}` - Retrieves current weather for a specified city, including temperature, humidity, and weather description.
-- **Subscription Endpoint**: POST `/api/subscribe` - Subscribes an email to weather updates for a specific city with selected frequency (daily or hourly).
-- **Confirmation Endpoint**: GET `/api/confirm/{token}` - Confirms email subscription via token sent in the confirmation email.
-- **Unsubscribe Endpoint**: GET `/api/unsubscribe/{token}` - Allows users to unsubscribe from weather updates using a token included in each weather update email.
-- **Full API Documentation**: Available via Swagger UI at the `/docs` endpoint.
-- **Bonus Features**:
-    - Deployed API on Render hosting
-    - Simple HTML subscription page
-    - API covered with functional tests
-
----
-
-## Technology Stack
-
-### Core Technologies
-
-- Node.js with Express.js
-- PostgreSQL database (hosted on NeonDB) (tested with DataGrip)
-- Sequelize ORM
-
-### Key Dependencies
-
+## How to set up ```.env``` [(.env.example)](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-5-gof/.env.example)
+##### Resend (email provider)
+1. Register domain via any provider (for example [Google Cloud](https://cloud.google.com/domains/docs/register-domain))
+2. Register it on Resend.com
+3. Get API KEY and SENDER EMAIL
+```dotenv
+MAIL_PROVIDER_API_KEY=re_...........
+MAIL_PROVIDER_SENDER_EMAIL=mail@mail.com......
 ```
-+-- @eslint/js@9.28.0
-+-- axios@1.9.0
-+-- cors@2.8.5
-+-- dotenv@16.5.0
-+-- eslint-config-prettier@10.1.5
-+-- eslint-plugin-prettier@5.4.1
-+-- eslint@9.28.0
-+-- express-validator@7.2.1
-+-- express@5.1.0
-+-- globals@16.2.0
-+-- handlebars@4.7.8
-+-- helmet@8.1.0
-+-- jest@29.7.0
-+-- morgan@1.10.0
-+-- node-cron@4.1.0
-+-- nodemon@3.1.10
-+-- pg-hstore@2.3.4
-+-- pg@8.16.0
-+-- prettier@3.5.3
-+-- resend@4.5.2
-+-- sequelize-cli@6.6.3
-+-- sequelize@6.37.7
-+-- supertest@7.1.1
-+-- swagger-ui-express@5.0.1
-+-- umzug@3.8.2
-`-- yamljs@0.3.0
+<br>
+
+#### OpenWeatherMap (weather forecast provider)
+1. Register account  [openweathermap.org](https://openweathermap.org/)
+2. Get API_KEY (appid)
+
+```dotenv
+OPEN_WEATHER_API_URL=https://api.openweathermap.org/data/2.5
+COORDINATES_API_URL=http://api.openweathermap.org/geo/1.0/direct?q=
+OPEN_WEATHER_API_KEY=234sdf..........
+```
+<br>
+
+#### WeatherAPI (additional weather forecast provider)
+1. Register account  [weatherapi.com](https://www.weatherapi.com/)
+2. Get API_KEY 
+```dotenv
+WEATHERAPI_API_URL=https://api.weatherapi.com/v1
+WEATHERAPI_API_KEY=adf234..........
+```
+
+<br>
+
+#### Hosted Database
+1. You can use any Postgres database provider (for example [Neon](https://neon.com/))
+2. Get connection string and paste into ```.env```
+```dotenv
+TEST_DB_URL=postgresql://.....
+DEVELOPMENT_DB_URL=postgresql://.....
+PRODUCTION_DB_URL=postgresql://......
 ```
