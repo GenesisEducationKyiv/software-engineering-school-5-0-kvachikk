@@ -5,7 +5,8 @@ import { Injectable } from '@nestjs/common';
 import handlebars from 'handlebars';
 import { Resend } from 'resend';
 
-import { applicationConfig, mailConfig } from '../config';
+import { applicationConfig } from '../config/application.config';
+import { mailConfig } from '../config/mail.config';
 import { Subscription } from '../types/subscription';
 import { TemplateLetterParams } from '../types/template-letter-params';
 
