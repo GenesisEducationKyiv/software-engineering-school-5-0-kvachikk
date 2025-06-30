@@ -1,0 +1,59 @@
+version: '3.9'
+
+x-test-runner: &test-runner
+  build:
+    context: .
+    dockerfile: Dockerfile.test
+  env_file:
+    - .env.test
+  working_dir: /home/node/app
+  volumes:
+    - ./:/home/node/app
+  networks:
+    - test-net
+
+volumes:
+  pg-test-data:
+
+networks:
+  test-net:
+    driver: bridge
+
+services:
+  postgres-test:
+    container_name: postgres-test
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: app_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5434:5432"
+    volumes:
+      - pg-test-data:/var/lib/postgresql/data
+    networks:
+      - test-net
+
+  unit-tests:
+    <<: *test-runner
+    container_name: unit-tests
+    command: npm run test:unit
+
+  api-tests:
+    <<: *test-runner
+    container_name: api-tests
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    command: npm run test:e2e
+
+  ui-tests:
+    <<: *test-runner
+    container_name: ui-tests
+    command: npm run test:ui
