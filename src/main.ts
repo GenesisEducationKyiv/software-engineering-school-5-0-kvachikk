@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
-import { AppModule } from './app.module';
 import { applicationConfig } from './config/application.config';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+import { AppModule } from './modules/app.module';
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule, { cors: true });
