@@ -1,10 +1,10 @@
 import { join } from 'node:path';
 
+import { HttpModule, HttpService } from '@nestjs/axios';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { HttpModule, HttpService } from '@nestjs/axios';
 
 import { RedisConfig } from './config/redis.config';
 import { SubscriptionController } from './controllers/subscription.controller';
@@ -13,6 +13,7 @@ import { SubscriptionModel } from './database/models/subscription.model';
 import { DatabaseLoader } from './loaders/database.loader';
 import { Logger, FileLogger } from './logger/logger.service';
 import { ApiWeatherProvider } from './providers/api-weather-provider';
+import { CacheWeatherDecorator } from './providers/cache-weather.decorator';
 import { LoggingWeatherDecorator } from './providers/logging-weather.decorator';
 import { OpenWeatherProvider } from './providers/open-weather.provider';
 import { SubscriptionRepository } from './repositories/subscription.repository';
@@ -59,11 +60,11 @@ import { WeatherService } from './services/weather.service';
       },
       {
          provide: 'WeatherHandler',
-         useFactory: (openWeather: OpenWeatherProvider, apiWeather: ApiWeatherProvider) => {
+         useFactory: (openWeather: OpenWeatherProvider, apiWeather: ApiWeatherProvider, cacheService: CacheService) => {
             openWeather.setNext(apiWeather);
-            return openWeather;
+            return new CacheWeatherDecorator(openWeather, cacheService);
          },
-         inject: [OpenWeatherProvider, ApiWeatherProvider],
+         inject: [OpenWeatherProvider, ApiWeatherProvider, CacheService],
       },
       {
          provide: SubscriptionRepository,
