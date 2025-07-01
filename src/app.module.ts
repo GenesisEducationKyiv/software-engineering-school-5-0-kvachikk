@@ -5,22 +5,22 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
-import { RedisConfig } from '../config/redis.config';
-import { SubscriptionController } from '../controllers/subscription.controller';
-import { WeatherController } from '../controllers/weather.controller';
-import { SubscriptionModel } from '../database/models/subscription.model';
-import { DatabaseLoader } from '../loaders/database.loader';
-import { Logger, FileLogger } from '../logger/logger.service';
-import { ApiWeatherHandler } from '../providers/api-weather.handler';
-import { LoggingWeatherHandlerDecorator } from '../providers/logging-weather.decorator';
-import { OpenWeatherHandler } from '../providers/open-weather.handler';
-import { SubscriptionRepository } from '../repositories/subscription.repository';
-import { CacheService } from '../services/cache.service';
-import { EmailTemplateService } from '../services/email-template.service';
-import { EmailerService } from '../services/emailer.service';
-import { SubscriptionService } from '../services/subscription/subscription.service';
-import { EmailValidationService } from '../services/validator.service';
-import { WeatherService } from '../services/weather.service';
+import { RedisConfig } from './config/redis.config';
+import { SubscriptionController } from './controllers/subscription.controller';
+import { WeatherController } from './controllers/weather.controller';
+import { SubscriptionModel } from './database/models/subscription.model';
+import { DatabaseLoader } from './loaders/database.loader';
+import { Logger, FileLogger } from './logger/logger.service';
+import { ApiWeatherHandler } from './providers/api-weather.handler';
+import { LoggingWeatherHandlerDecorator } from './providers/logging-weather.decorator';
+import { OpenWeatherHandler } from './providers/open-weather.handler';
+import { SubscriptionRepository } from './repositories/subscription.repository';
+import { CacheService } from './services/cache.service';
+import { EmailTemplateService } from './services/email-template.service';
+import { EmailerService } from './services/emailer.service';
+import { SubscriptionService } from './services/subscription/subscription.service';
+import { EmailValidationService } from './services/validator.service';
+import { WeatherService } from './services/weather.service';
 
 @Module({
    imports: [
@@ -54,6 +54,14 @@ import { WeatherService } from '../services/weather.service';
             return new LoggingWeatherHandlerDecorator(handler, logger, 'WeatherAPI');
          },
          inject: [Logger],
+      },
+      {
+         provide: 'WeatherHandler',
+         useFactory: (openWeather: OpenWeatherHandler, apiWeather: ApiWeatherHandler) => {
+            openWeather.setNext(apiWeather);
+            return openWeather;
+         },
+         inject: [OpenWeatherHandler, ApiWeatherHandler],
       },
       {
          provide: SubscriptionRepository,

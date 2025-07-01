@@ -2,13 +2,13 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
+import { AppModule } from '../src/app.module';
 import { BadRequestError } from '../src/constants/errors/bad-request.error';
 import { ConflictError } from '../src/constants/errors/conflict.error';
 import { NotFoundError } from '../src/constants/errors/not-found.error';
 import { subscriptionResponseMessages as subMsgs } from '../src/constants/message/subscription-responses';
 import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
 import { DatabaseLoader } from '../src/loaders/database.loader';
-import { AppModule } from '../src/modules/app.module';
 import { EmailerService } from '../src/services/emailer.service';
 import { SubscriptionService } from '../src/services/subscription/subscription.service';
 import { WeatherService } from '../src/services/weather.service';
