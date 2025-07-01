@@ -1,5 +1,7 @@
 import 'dotenv/config';
+import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
 
 import { coordinatesConfig } from '../config/coordinates.config';
 import { openWeatherConfig } from '../config/open-weather.config';
@@ -13,39 +15,43 @@ import { ChainableWeatherProvider } from './chainable-weather-provider';
 
 @Injectable()
 export class OpenWeatherProvider extends ChainableWeatherProvider {
-   constructor() {
+   constructor(private readonly httpService: HttpService) {
       super();
    }
 
    async getWeather(options: GetWeatherOptions): Promise<Weather[]> {
       const coordinates = await this.getCoordinates(options.city);
-      const data = await this.fetchWeatherData(this.buildApiUrl(coordinates));
+      const data = await this.fetchWeatherData(coordinates);
       return this.formatWeatherData(data);
    }
 
    public async getCoordinates(city: string): Promise<Coordinates> {
-      const geoResponse = await fetch(
-         `${coordinatesConfig.apiUrl}?q=${encodeURIComponent(city)}&limit=1&appid=${coordinatesConfig.apiKey}`,
-      );
+      try {
+         const params = {
+            q: city,
+            limit: 1,
+            appid: coordinatesConfig.apiKey,
+         } as const;
 
-      if (!geoResponse.ok) {
-         this.handleAndThrowError(`Failed to fetch coordinates for city: ${city}. Status: ${geoResponse.status}`);
+         const response = await firstValueFrom(this.httpService.get<unknown[]>(coordinatesConfig.apiUrl, { params }));
+
+         const dataArray = response.data;
+
+         if (!dataArray || dataArray.length === 0) {
+            this.handleAndThrowError(
+               `Unable to determine coordinates for city: ${city}`,
+               new NotFoundError(`Unable to determine coordinates for city: ${city}`),
+            );
+         }
+
+         const coordinates = dataArray[0] as Coordinates;
+         return {
+            lat: coordinates.lat,
+            lon: coordinates.lon,
+         };
+      } catch (error) {
+         this.handleAndThrowError(`Failed to fetch coordinates for city: ${city}`, error as Error);
       }
-
-      const dataArray = (await geoResponse.json()) as unknown[];
-
-      if (!dataArray || dataArray.length === 0) {
-         this.handleAndThrowError(
-            `Unable to determine coordinates for city: ${city}`,
-            new NotFoundError(`Unable to determine coordinates for city: ${city}`),
-         );
-      }
-
-      const coordinates = dataArray[0] as Coordinates;
-      return {
-         lat: coordinates.lat,
-         lon: coordinates.lon,
-      };
    }
 
    private handleAndThrowError(message: string, error?: Error): never {
@@ -55,18 +61,24 @@ export class OpenWeatherProvider extends ChainableWeatherProvider {
       throw new Error(message);
    }
 
-   private buildApiUrl(coordinates: Coordinates): string {
-      return `${openWeatherConfig.apiUrl}/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&cnt=40&appid=${openWeatherConfig.apiKey}&units=metric`;
-   }
+   private async fetchWeatherData(coordinates: Coordinates): Promise<OpenWeatherApiResponse> {
+      try {
+         const params = {
+            lat: coordinates.lat,
+            lon: coordinates.lon,
+            cnt: 40,
+            appid: openWeatherConfig.apiKey,
+            units: 'metric',
+         } as const;
 
-   private async fetchWeatherData(url: string): Promise<OpenWeatherApiResponse> {
-      const response = await fetch(url);
+         const response = await firstValueFrom(
+            this.httpService.get<OpenWeatherApiResponse>(`${openWeatherConfig.apiUrl}/forecast`, { params }),
+         );
 
-      if (!response.ok) {
-         this.handleAndThrowError(`OpenWeather provider failed: ${response.status}`);
+         return response.data;
+      } catch (error) {
+         this.handleAndThrowError(`OpenWeather provider failed`, error as Error);
       }
-
-      return (await response.json()) as OpenWeatherApiResponse;
    }
 
    private formatWeatherData(data: OpenWeatherApiResponse): Weather[] {

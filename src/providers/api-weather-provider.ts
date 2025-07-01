@@ -1,4 +1,6 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
 
 import { weatherApiConfig } from '../config/weather-api.config';
 import { WeatherApiResponse } from '../types/responses/weather-api-response';
@@ -9,28 +11,33 @@ import { ChainableWeatherProvider } from './chainable-weather-provider';
 
 @Injectable()
 export class ApiWeatherProvider extends ChainableWeatherProvider {
-   constructor() {
+   constructor(private readonly httpService: HttpService) {
       super();
    }
 
    async getWeather(options: GetWeatherOptions): Promise<Weather[]> {
-      const url = this.buildApiUrl(options.city);
-      const data = await this.fetchWeatherData(url);
+      const data = await this.fetchWeatherData(options.city);
       return this.formatWeatherData(data);
    }
 
-   private buildApiUrl(city: string): string {
-      return `${weatherApiConfig.apiUrl}/forecast.json?key=${weatherApiConfig.apiKey}&q=${encodeURIComponent(city)}&days=4&aqi=no&alerts=no`;
-   }
+   private async fetchWeatherData(city: string): Promise<WeatherApiResponse> {
+      try {
+         const params = {
+            key: weatherApiConfig.apiKey,
+            q: city,
+            days: 4,
+            aqi: 'no',
+            alerts: 'no',
+         } as const;
 
-   private async fetchWeatherData(url: string): Promise<WeatherApiResponse> {
-      const response = await fetch(url);
+         const response = await firstValueFrom(
+            this.httpService.get<WeatherApiResponse>(`${weatherApiConfig.apiUrl}/forecast.json`, { params }),
+         );
 
-      if (!response.ok) {
-         throw new Error(`WeatherAPI provider failed: ${response.status}`);
+         return response.data;
+      } catch (error) {
+         throw new Error(`WeatherAPI provider failed: ${error}`);
       }
-
-      return (await response.json()) as WeatherApiResponse;
    }
 
    private formatWeatherData(data: WeatherApiResponse): Weather[] {

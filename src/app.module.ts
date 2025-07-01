@@ -4,6 +4,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { HttpModule, HttpService } from '@nestjs/axios';
 
 import { RedisConfig } from './config/redis.config';
 import { SubscriptionController } from './controllers/subscription.controller';
@@ -30,6 +31,7 @@ import { WeatherService } from './services/weather.service';
       }),
       ConfigModule.forRoot({ isGlobal: true }),
       CacheModule.registerAsync(RedisConfig),
+      HttpModule,
    ],
    controllers: [SubscriptionController, WeatherController],
    providers: [
@@ -41,19 +43,19 @@ import { WeatherService } from './services/weather.service';
       Logger,
       {
          provide: OpenWeatherProvider,
-         useFactory: (logger: Logger) => {
-            const provider = new OpenWeatherProvider();
+         useFactory: (logger: Logger, httpService: HttpService) => {
+            const provider = new OpenWeatherProvider(httpService);
             return new LoggingWeatherDecorator(provider, logger, 'OpenWeather');
          },
-         inject: [Logger],
+         inject: [Logger, HttpService],
       },
       {
          provide: ApiWeatherProvider,
-         useFactory: (logger: Logger) => {
-            const provider = new ApiWeatherProvider();
+         useFactory: (logger: Logger, httpService: HttpService) => {
+            const provider = new ApiWeatherProvider(httpService);
             return new LoggingWeatherDecorator(provider, logger, 'WeatherAPI');
          },
-         inject: [Logger],
+         inject: [Logger, HttpService],
       },
       {
          provide: 'WeatherHandler',
