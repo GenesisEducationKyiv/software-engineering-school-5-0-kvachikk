@@ -7,23 +7,20 @@ import { NotFoundError } from '../constants/errors/not-found.error';
 import { Coordinates } from '../types/coordinates';
 import { OpenWeatherApiResponse } from '../types/responses/open-weather-api-response';
 import { Weather } from '../types/weather';
+import { GetWeatherOptions } from '../types/weather.options';
 
-import { AbstractWeatherHandler } from './weather.handler';
+import { ChainableWeatherProvider } from './chainable-weather-provider';
 
 @Injectable()
-export class OpenWeatherHandler extends AbstractWeatherHandler {
+export class OpenWeatherProvider extends ChainableWeatherProvider {
    constructor() {
       super();
    }
 
-   public override async handle(city: string): Promise<Weather[]> {
-      try {
-         const coordinates = await this.getCoordinates(city);
-         const data = await this.fetchWeatherData(this.buildApiUrl(coordinates));
-         return this.formatWeatherData(data);
-      } catch (error) {
-         return super.handle(city);
-      }
+   async getWeather(options: GetWeatherOptions): Promise<Weather[]> {
+      const coordinates = await this.getCoordinates(options.city);
+      const data = await this.fetchWeatherData(this.buildApiUrl(coordinates));
+      return this.formatWeatherData(data);
    }
 
    public async getCoordinates(city: string): Promise<Coordinates> {

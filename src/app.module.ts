@@ -11,9 +11,9 @@ import { WeatherController } from './controllers/weather.controller';
 import { SubscriptionModel } from './database/models/subscription.model';
 import { DatabaseLoader } from './loaders/database.loader';
 import { Logger, FileLogger } from './logger/logger.service';
-import { ApiWeatherHandler } from './providers/api-weather.handler';
-import { LoggingWeatherHandlerDecorator } from './providers/logging-weather.decorator';
-import { OpenWeatherHandler } from './providers/open-weather.handler';
+import { ApiWeatherProvider } from './providers/api-weather-provider';
+import { LoggingWeatherDecorator } from './providers/logging-weather.decorator';
+import { OpenWeatherProvider } from './providers/open-weather.provider';
 import { SubscriptionRepository } from './repositories/subscription.repository';
 import { CacheService } from './services/cache.service';
 import { EmailTemplateService } from './services/email-template.service';
@@ -40,28 +40,28 @@ import { WeatherService } from './services/weather.service';
       FileLogger,
       Logger,
       {
-         provide: OpenWeatherHandler,
+         provide: OpenWeatherProvider,
          useFactory: (logger: Logger) => {
-            const handler = new OpenWeatherHandler();
-            return new LoggingWeatherHandlerDecorator(handler, logger, 'OpenWeather');
+            const provider = new OpenWeatherProvider();
+            return new LoggingWeatherDecorator(provider, logger, 'OpenWeather');
          },
          inject: [Logger],
       },
       {
-         provide: ApiWeatherHandler,
+         provide: ApiWeatherProvider,
          useFactory: (logger: Logger) => {
-            const handler = new ApiWeatherHandler();
-            return new LoggingWeatherHandlerDecorator(handler, logger, 'WeatherAPI');
+            const provider = new ApiWeatherProvider();
+            return new LoggingWeatherDecorator(provider, logger, 'WeatherAPI');
          },
          inject: [Logger],
       },
       {
          provide: 'WeatherHandler',
-         useFactory: (openWeather: OpenWeatherHandler, apiWeather: ApiWeatherHandler) => {
+         useFactory: (openWeather: OpenWeatherProvider, apiWeather: ApiWeatherProvider) => {
             openWeather.setNext(apiWeather);
             return openWeather;
          },
-         inject: [OpenWeatherHandler, ApiWeatherHandler],
+         inject: [OpenWeatherProvider, ApiWeatherProvider],
       },
       {
          provide: SubscriptionRepository,

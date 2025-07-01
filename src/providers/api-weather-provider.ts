@@ -3,23 +3,20 @@ import { Injectable } from '@nestjs/common';
 import { weatherApiConfig } from '../config/weather-api.config';
 import { WeatherApiResponse } from '../types/responses/weather-api-response';
 import { Weather } from '../types/weather';
+import { GetWeatherOptions } from '../types/weather.options';
 
-import { AbstractWeatherHandler } from './weather.handler';
+import { ChainableWeatherProvider } from './chainable-weather-provider';
 
 @Injectable()
-export class ApiWeatherHandler extends AbstractWeatherHandler {
+export class ApiWeatherProvider extends ChainableWeatherProvider {
    constructor() {
       super();
    }
 
-   public async handle(city: string): Promise<Weather[]> {
-      try {
-         const url = this.buildApiUrl(city);
-         const data = await this.fetchWeatherData(url);
-         return this.formatWeatherData(data);
-      } catch (error) {
-         return super.handle(city);
-      }
+   async getWeather(options: GetWeatherOptions): Promise<Weather[]> {
+      const url = this.buildApiUrl(options.city);
+      const data = await this.fetchWeatherData(url);
+      return this.formatWeatherData(data);
    }
 
    private buildApiUrl(city: string): string {

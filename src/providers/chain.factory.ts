@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 
-import { ApiWeatherHandler } from './api-weather.handler';
-import { OpenWeatherHandler } from './open-weather.handler';
-import { WeatherHandler } from './weather.handler';
+import { ApiWeatherProvider } from './api-weather-provider';
+import { ChainableWeatherProvider } from './chainable-weather-provider';
+import { OpenWeatherProvider } from './open-weather.provider';
 
 @Injectable()
 export class WeatherHandlerChainFactory {
    constructor(
-      private readonly openWeather: OpenWeatherHandler,
-      private readonly apiWeather: ApiWeatherHandler,
+      private readonly openWeather: OpenWeatherProvider,
+      private readonly apiWeather: ApiWeatherProvider,
    ) {}
 
-   create(): WeatherHandler {
+   create(): ChainableWeatherProvider {
       this.openWeather.setNext(this.apiWeather);
       return this.openWeather;
    }
