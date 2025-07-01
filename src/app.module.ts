@@ -13,6 +13,7 @@ import { SubscriptionModel } from './database/models/subscription.model';
 import { DatabaseLoader } from './loaders/database.loader';
 import { Logger, FileLogger } from './logger/logger.service';
 import { ApiWeatherHandler } from './providers/api-weather.handler';
+import { LoggingWeatherHandlerDecorator } from './providers/logging-weather.decorator';
 import { OpenWeatherHandler } from './providers/open-weather.handler';
 import { SubscriptionRepository } from './repositories/subscription.repository';
 import { CacheService } from './services/cache.service';
@@ -42,8 +43,22 @@ import { WeatherService } from './services/weather.service';
       DatabaseLoader,
       FileLogger,
       Logger,
-      OpenWeatherHandler,
-      ApiWeatherHandler,
+      {
+         provide: OpenWeatherHandler,
+         useFactory: (logger: Logger) => {
+            const handler = new OpenWeatherHandler();
+            return new LoggingWeatherHandlerDecorator(handler, logger, 'OpenWeather');
+         },
+         inject: [Logger],
+      },
+      {
+         provide: ApiWeatherHandler,
+         useFactory: (logger: Logger) => {
+            const handler = new ApiWeatherHandler();
+            return new LoggingWeatherHandlerDecorator(handler, logger, 'WeatherAPI');
+         },
+         inject: [Logger],
+      },
       {
          provide: SubscriptionRepository,
          useFactory: () => new SubscriptionRepository(SubscriptionModel),

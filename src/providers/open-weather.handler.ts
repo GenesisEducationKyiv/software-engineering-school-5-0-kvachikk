@@ -4,7 +4,6 @@ import { Injectable } from '@nestjs/common';
 import { coordinatesConfig } from '../config/coordinates.config';
 import { openWeatherConfig } from '../config/open-weather.config';
 import { NotFoundError } from '../constants/errors/not-found.error';
-import { Logger } from '../logger/logger.service';
 import { Coordinates } from '../types/coordinates';
 import { OpenWeatherApiResponse } from '../types/responses/open-weather-api-response';
 import { Weather } from '../types/weather';
@@ -13,21 +12,16 @@ import { AbstractWeatherHandler } from './weather.handler';
 
 @Injectable()
 export class OpenWeatherHandler extends AbstractWeatherHandler {
-   constructor(private readonly logger: Logger) {
+   constructor() {
       super();
    }
 
    public override async handle(city: string): Promise<Weather[]> {
       try {
          const coordinates = await this.getCoordinates(city);
-         const url = this.buildApiUrl(coordinates);
-         const data = await this.fetchWeatherData(url);
-         const forecast = this.formatWeatherData(data);
-
-         this.logger.response('Fetched forecast from OpenWeather', 'OpenWeather', forecast);
-         return forecast;
+         const data = await this.fetchWeatherData(this.buildApiUrl(coordinates));
+         return this.formatWeatherData(data);
       } catch (error) {
-         this.logger.error(`OpenWeatherHandler encountered an error: ${error}`);
          return super.handle(city);
       }
    }
@@ -58,7 +52,6 @@ export class OpenWeatherHandler extends AbstractWeatherHandler {
    }
 
    private handleAndThrowError(message: string, error?: Error): never {
-      this.logger.error(message);
       if (error) {
          throw error;
       }

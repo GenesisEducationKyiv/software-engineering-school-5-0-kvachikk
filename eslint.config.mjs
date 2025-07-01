@@ -64,6 +64,7 @@ export default tslint.config(
          '@typescript-eslint/no-misused-promises': 'warn',
          '@typescript-eslint/no-unsafe-assignment': 'warn',
          '@typescript-eslint/no-deprecated': 'error',
+         '@typescript-eslint/no-unused-vars': 'warn',
       },
    },
 
