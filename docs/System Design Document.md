@@ -63,7 +63,7 @@ Bandwidth
 
 ## 4. Detailed Component Design
 
-4.1 API Service (Node.js / Express)
+4.1 API Service
 **Responsibilities:**
 
 - Handling REST API requests
