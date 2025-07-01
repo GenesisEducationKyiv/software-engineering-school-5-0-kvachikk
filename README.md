@@ -6,8 +6,9 @@
 ![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=Sequelize&logoColor=white)
 ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
-- **Hosted API**: [software-engineering-school-5-0-kvachikk.onrender.com](https://software-engineering-school-5-0-kvachikk.onrender.com)
-- **Example Request**: [/weather?city=Rivne](https://software-engineering-school-5-0-kvachikk.onrender.com/weather?city=Rivne)
+# Weather API
+- **Link**: [software-engineering-school-5-0-kvachikk.onrender.com](https://software-engineering-school-5-0-kvachikk.onrender.com)
+- **Example Request**: [/weather/forecast?city=Kyiv](https://software-engineering-school-5-0-kvachikk.onrender.com/weather/forecast?city=Kyiv)
 
 ---
 
@@ -33,39 +34,14 @@ npm install
 npm start
 ```
 
-## How to set up ```.env``` [(.env.example)](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-6-redis/.env.example)
-##### Resend (email provider)
-1. Register domain via any provider (for example [Google Cloud](https://cloud.google.com/domains/docs/register-domain))
-2. Register it on Resend.com
-3. Get API KEY and SENDER EMAIL
+## How to set up ```.env``` [(.env.example)](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/main/.env.example)
+#### Redis
 ```dotenv
-MAIL_PROVIDER_API_KEY=re_...........
-MAIL_PROVIDER_SENDER_EMAIL=mail@mail.com......
-```
-<br>
-
-#### OpenWeatherMap (weather forecast provider)
-1. Register account  [openweathermap.org](https://openweathermap.org/)
-2. Get API_KEY (appid)
-
-```dotenv
-OPEN_WEATHER_API_URL=https://api.openweathermap.org/data/2.5
-COORDINATES_API_URL=http://api.openweathermap.org/geo/1.0/direct?q=
-OPEN_WEATHER_API_KEY=234sdf..........
-```
-<br>
-
-#### WeatherAPI (additional weather forecast provider)
-1. Register account  [weatherapi.com](https://www.weatherapi.com/)
-2. Get API_KEY 
-```dotenv
-WEATHERAPI_API_URL=https://api.weatherapi.com/v1
-WEATHERAPI_API_KEY=adf234..........
+REDIS_HOST=localhost
+REDIS_PORT=6379
 ```
 
-<br>
-
-#### Hosted Database
+#### Database
 1. You can use any Postgres database provider (for example [Neon](https://neon.com/))
 2. Get connection string and paste into ```.env```
 ```dotenv
@@ -74,13 +50,36 @@ DEVELOPMENT_DB_URL=postgresql://.....
 PRODUCTION_DB_URL=postgresql://......
 ```
 
-<br>
-
-#### Redis (cache manager)
+#### Resend (email provider)
+1. Register domain via any provider (for example [Google Cloud](https://cloud.google.com/domains/docs/register-domain))
+2. Register it on Resend.com
+3. Get API KEY and SENDER EMAIL
 ```dotenv
-REDIS_HOST=localhost
-REDIS_PORT=6379
-TTL=900000
+MAIL_PROVIDER_API_KEY=re_PXd54sfg...........
+MAIL_PROVIDER_SENDER_EMAIL=mail@mail.com..........
+```
+
+#### WeatherAPI (weather forecast provider)
+1. Register account  [weatherapi.com](https://www.weatherapi.com/)
+2. Get API_KEY
+```dotenv
+WEATHERAPI_API_URL=https://api.weatherapi.com/v1
+WEATHERAPI_API_KEY=adf234..........
+```
+
+#### OpenWeatherMap (weather forecast provider)
+1. Register account  [openweathermap.org](https://openweathermap.org/)
+2. Get API_KEY (appid)
+
+```dotenv
+OPEN_WEATHER_API_URL=https://api.openweathermap.org/data/2.5
+OPEN_WEATHER_API_KEY=asdas...........
+```
+
+#### OpenWeatherGeo
+```dotenv
+OPEN_WEATHER_GEO_URL=http://api.openweathermap.org/geo/1.0/direct
+OPEN_WEATHER_GEO_KEY=asdas...........
 ```
 
 ---
@@ -116,11 +115,3 @@ npx playwright install --with-deps
 ```
 npm run test:ui
 ```
-
-## ci pipelines
-* github actions already has three jobs:
-    * `unit-tests` – jest unit tests
-    * `e2e-api-tests` – jest api tests
-    * `ui-tests` – playwright ui tests
-
-all jobs run automatically on every push and pull request.

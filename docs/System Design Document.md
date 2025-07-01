@@ -59,7 +59,7 @@ Bandwidth
 
 ## 3. High-Level Architecture
 
-![High-Level Architecture](https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-kvachikk/blob/hw-2-system-design/docs/High-level-architech.png?raw=true)
+![High-Level Architecture](high-level-architecture.svg)
 
 ## 4. Detailed Component Design
 
