@@ -16,6 +16,7 @@ import { ApiWeatherHandler } from './providers/api-weather.handler';
 import { OpenWeatherHandler } from './providers/open-weather.handler';
 import { SubscriptionRepository } from './repositories/subscription.repository';
 import { CacheService } from './services/cache.service';
+import { EmailTemplateService } from './services/email-template.service';
 import { EmailerService } from './services/emailer.service';
 import { SchedulerService } from './services/scheduler.service';
 import { SubscriptionService } from './services/subscription/subscription.service';
@@ -49,6 +50,7 @@ import { WeatherService } from './services/weather.service';
       },
       SubscriptionService,
       CacheService,
+      EmailTemplateService,
    ],
 })
 export class AppModule {}
