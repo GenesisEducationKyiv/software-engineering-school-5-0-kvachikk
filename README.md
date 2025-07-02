@@ -115,3 +115,49 @@ npx playwright install --with-deps
 ```
 npm run test:ui
 ```
+
+# List of all used tools
+- runtime - ```Node.js```
+- language - ```TypeScript```
+- framework - ```NestJS```
+- package management - ```npm```
+
+<br/>
+
+- linting - ```ESLint```
+- formatting - ```Prettier```
+- configurations - ```dotenv```
+- API documentation - ```Swagger (via @nestjs/swagger)```
+
+<br/>
+
+- CI/CD - ```GitHub Actions```
+- containerization - ```Docker, docker-compose```
+- monitoring - ```Prometheus```
+- visualization - ```Grafana```
+- logging - ```Winston, nest-winston```
+- caching - ```Redis (via cache-manager, cache-manager-redis-store, ioredis)```
+
+<br/>
+
+- ORM - ```Sequelize, sequelize-typescript```
+- database - ```PostgreSQL (main), SQLite (for tests)```
+- database migration - ```Umzug (via Sequelize CLI)```
+
+<br/>
+
+- network - ```Axios (via @nestjs/axios)```
+- cross-origin resource sharing - ```cors```
+- email sending - ```Resend (resend npm package)```
+
+<br/>
+
+- validation - ```Joi```
+- templating - ```Handlebars```
+- scheduling - ```@nestjs/schedule```
+- testing (unit & e2e) - ```Jest, @nestjs/testing, supertest```
+- UI e2e testing - ```Playwright (@playwright/test, playwright)```
+
+<br/>
+
+- static file serving -``` @nestjs/serve-static```
