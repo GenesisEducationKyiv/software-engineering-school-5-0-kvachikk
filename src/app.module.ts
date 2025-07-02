@@ -15,7 +15,7 @@ import { DatabaseLoader } from './loaders/database.loader';
 import { Logger, FileLogger } from './logger/logger.service';
 import { MetricsModule } from './metrics/metrics.module';
 import { ApiWeatherProvider } from './providers/api-weather-provider';
-import { CacheWeatherDecorator } from './providers/cache-weather.decorator';
+import { CacheWeatherProxy } from './providers/cache-weather.proxy';
 import { LoggingWeatherDecorator } from './providers/logging-weather.decorator';
 import { OpenWeatherProvider } from './providers/open-weather.provider';
 import { SubscriptionRepository } from './repositories/subscription.repository';
@@ -66,7 +66,7 @@ import { WeatherService } from './services/weather.service';
          provide: 'WeatherHandler',
          useFactory: (openWeather: OpenWeatherProvider, apiWeather: ApiWeatherProvider, cacheService: CacheService) => {
             openWeather.setNext(apiWeather);
-            return new CacheWeatherDecorator(openWeather, cacheService);
+            return new CacheWeatherProxy(openWeather, cacheService);
          },
          inject: [OpenWeatherProvider, ApiWeatherProvider, CacheService],
       },

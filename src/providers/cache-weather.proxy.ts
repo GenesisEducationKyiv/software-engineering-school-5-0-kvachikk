@@ -8,7 +8,7 @@ import { GetWeatherOptions } from '../types/weather.options';
 import { ChainableWeatherProvider } from './chainable-weather-provider';
 
 @Injectable()
-export class CacheWeatherDecorator extends ChainableWeatherProvider {
+export class CacheWeatherProxy extends ChainableWeatherProvider {
    constructor(
       private readonly decorate: ChainableWeatherProvider,
       private readonly cacheService: CacheService,
