@@ -7,11 +7,13 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { RedisConfig } from './config/redis.config';
+import { MetricsController } from './controllers/metrics.controller';
 import { SubscriptionController } from './controllers/subscription.controller';
 import { WeatherController } from './controllers/weather.controller';
 import { SubscriptionModel } from './database/models/subscription.model';
 import { DatabaseLoader } from './loaders/database.loader';
 import { Logger, FileLogger } from './logger/logger.service';
+import { MetricsModule } from './metrics/metrics.module';
 import { ApiWeatherProvider } from './providers/api-weather-provider';
 import { CacheWeatherDecorator } from './providers/cache-weather.decorator';
 import { LoggingWeatherDecorator } from './providers/logging-weather.decorator';
@@ -20,6 +22,7 @@ import { SubscriptionRepository } from './repositories/subscription.repository';
 import { CacheService } from './services/cache.service';
 import { EmailTemplateService } from './services/email-template.service';
 import { EmailerService } from './services/emailer.service';
+import { MonitoredCacheService } from './services/monitored-cache.service';
 import { SubscriptionService } from './services/subscription/subscription.service';
 import { EmailValidationService } from './services/validator.service';
 import { WeatherService } from './services/weather.service';
@@ -33,8 +36,9 @@ import { WeatherService } from './services/weather.service';
       ConfigModule.forRoot({ isGlobal: true }),
       CacheModule.registerAsync(RedisConfig),
       HttpModule,
+      MetricsModule,
    ],
-   controllers: [SubscriptionController, WeatherController],
+   controllers: [SubscriptionController, WeatherController, MetricsController],
    providers: [
       EmailerService,
       EmailValidationService,
@@ -71,7 +75,11 @@ import { WeatherService } from './services/weather.service';
          useFactory: () => new SubscriptionRepository(SubscriptionModel),
       },
       SubscriptionService,
-      CacheService,
+      {
+         provide: CacheService,
+         useClass: MonitoredCacheService,
+      },
+      MonitoredCacheService,
       EmailTemplateService,
    ],
 })
