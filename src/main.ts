@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-import { applicationConfig } from './config';
+import { applicationConfig } from './config/application.config';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 
 async function bootstrap() {
@@ -13,6 +13,7 @@ async function bootstrap() {
       SwaggerModule.setup('/', app, swaggerDoc);
    }
 
+   app.enableCors();
    app.useGlobalFilters(new AllExceptionsFilter());
    await app.listen(applicationConfig.port);
 }

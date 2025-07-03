@@ -1,14 +1,12 @@
-import fs from 'node:fs';
-import path from 'node:path';
-
 import { Injectable } from '@nestjs/common';
-import handlebars from 'handlebars';
 import { Resend } from 'resend';
 
-import { applicationConfig, mailConfig } from '../config';
+import { applicationConfig } from '../config/application.config';
+import { mailConfig } from '../config/mail.config';
 import { Subscription } from '../types/subscription';
 import { TemplateLetterParams } from '../types/template-letter-params';
 
+import { EmailTemplateService } from './email-template.service';
 import { EmailValidationService } from './validator.service';
 import { WeatherService } from './weather.service';
 
@@ -19,6 +17,7 @@ export class EmailerService {
    constructor(
       private readonly emailValidation: EmailValidationService,
       private readonly weatherService: WeatherService,
+      private readonly templateService: EmailTemplateService,
    ) {
       this.resend = new Resend(mailConfig.apiKey);
    }
@@ -30,31 +29,16 @@ export class EmailerService {
       templateVars = {},
       text = '',
    }: TemplateLetterParams): Promise<void> {
-      let fullPath = path.join(__dirname, '../../constants/templates', templatePath);
-
-      if (!fs.existsSync(fullPath)) {
-         fullPath = path.join(process.cwd(), 'src/constants/templates', templatePath);
-      }
-
-      const template = handlebars.compile(fs.readFileSync(fullPath, 'utf8'));
-      const html = template(templateVars);
-
+      const html = this.templateService.compile(templatePath, templateVars);
       const senderEmail = mailConfig.senderEmail;
-
-      const letter = {
-         from: senderEmail,
-         to,
-         subject,
-         html,
-         text,
-      };
+      const letter = { from: senderEmail, to, subject, html, text };
 
       if (this.emailValidation.isValidLetter(letter)) {
          await this.resend.emails.send({
             from: senderEmail,
-            to: to,
-            subject: subject,
-            html: html,
+            to,
+            subject,
+            html,
          });
       }
    }

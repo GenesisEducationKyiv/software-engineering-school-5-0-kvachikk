@@ -1,7 +1,7 @@
-import { ILogger } from './logger.interface';
+import { LoggerInterface } from './logger.interface';
 
-export abstract class LoggerDecorator implements ILogger {
-   protected constructor(protected readonly inner: ILogger) {}
+export abstract class LoggerDecorator implements LoggerInterface {
+   protected constructor(protected readonly inner: LoggerInterface) {}
 
    info(msg: string) {
       this.inner.info(msg);

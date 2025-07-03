@@ -1,25 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 
-import { ApiWeatherHandler } from '../providers/api-weather.handler';
-import { OpenWeatherHandler } from '../providers/open-weather.handler';
-import { WeatherHandler } from '../providers/weather.handler';
+import { WeatherDataProvider } from '../providers/abstract-chain';
 import { Weather } from '../types/weather';
 
 @Injectable()
 export class WeatherService {
-   private handler: WeatherHandler;
-
-   constructor(openWeatherHandler: OpenWeatherHandler, apiWeatherHandler: ApiWeatherHandler) {
-      openWeatherHandler.setNext(apiWeatherHandler);
-
-      this.handler = openWeatherHandler;
-   }
+   constructor(@Inject('WeatherHandler') private readonly provider: WeatherDataProvider) {}
 
    public async getWeatherForecast(city: string): Promise<Weather[]> {
-      return this.handler.handle(city);
+      return this.provider.handle({ city, date: new Date() });
    }
 
    public async getCurrentWeather(city: string): Promise<Weather> {
-      return (await this.handler.handle(city))[0];
+      return (await this.getWeatherForecast(city))[0];
    }
 }

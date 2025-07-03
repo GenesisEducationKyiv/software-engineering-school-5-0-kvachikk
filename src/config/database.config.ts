@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { DatabaseConfig } from './types';
+import { DatabaseConfig } from '../types/configurations/database-config';
 
 const createDatabaseConfig = (url: string): DatabaseConfig => ({
    url,

@@ -16,6 +16,21 @@ export class SchedulerService {
       private readonly logger: Logger,
    ) {}
 
+   @Cron(CronExpression.EVERY_HOUR)
+   private async hourlyJob(): Promise<void> {
+      await this.handleFrequency(SubscriptionModel.FREQUENCIES.HOURLY);
+   }
+
+   @Cron(CronExpression.EVERY_DAY_AT_1PM)
+   private async dailyJob(): Promise<void> {
+      await this.handleFrequency(SubscriptionModel.FREQUENCIES.DAILY);
+   }
+
+   private async handleFrequency(frequency: string): Promise<void> {
+      const subscriptions = await this.subscriptionService.getActiveSubscriptions(frequency);
+      await this.processSubscriptions(subscriptions);
+   }
+
    private async processSubscriptions(subscriptions: Subscription[]): Promise<void> {
       if (subscriptions.length === 0) {
          return;
@@ -30,20 +45,5 @@ export class SchedulerService {
             this.logger.error(`Failed to send forecast to ${failedSubscription.email}: ${result.reason}`);
          }
       });
-   }
-
-   private async handleFrequency(frequency: string): Promise<void> {
-      const subscriptions = await this.subscriptionService.getActiveSubscriptions(frequency);
-      await this.processSubscriptions(subscriptions);
-   }
-
-   @Cron(CronExpression.EVERY_HOUR)
-   private async hourlyJob(): Promise<void> {
-      await this.handleFrequency(SubscriptionModel.FREQUENCIES.HOURLY);
-   }
-
-   @Cron(CronExpression.EVERY_DAY_AT_1PM)
-   private async dailyJob(): Promise<void> {
-      await this.handleFrequency(SubscriptionModel.FREQUENCIES.DAILY);
    }
 }

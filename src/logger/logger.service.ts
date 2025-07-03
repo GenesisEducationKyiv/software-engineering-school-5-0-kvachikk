@@ -4,17 +4,14 @@ import * as path from 'node:path';
 import { Injectable } from '@nestjs/common';
 import * as winston from 'winston';
 
-import { applicationConfig } from '../config/application.config';
-
-import { ConsolePrettyLogger } from './console-pretty.logger';
-import { ILogger } from './logger.interface';
+import { LoggerInterface } from './logger.interface';
 
 @Injectable()
-export class FileLogger implements ILogger {
+export class FileLogger implements LoggerInterface {
    private readonly logger: winston.Logger;
 
    constructor() {
-      const logDir = path.join(__dirname, '../../logs');
+      const logDir = path.join(process.cwd(), 'logs');
 
       if (!fs.existsSync(logDir)) {
          fs.mkdirSync(logDir, { recursive: true });
@@ -42,14 +39,6 @@ export class FileLogger implements ILogger {
             }),
          ],
       });
-
-      if (applicationConfig.environment !== 'production') {
-         this.logger.add(
-            new winston.transports.Console({
-               format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
-            }),
-         );
-      }
    }
 
    info(log: string): void {
@@ -65,9 +54,10 @@ export class FileLogger implements ILogger {
    }
 
    response(log: string, source: string, data: unknown): void {
-      this.logger.info({
+      this.logger.log({
+         level: 'info',
+         message: log,
          type: 'response',
-         log,
          source,
          data,
       });
@@ -75,15 +65,11 @@ export class FileLogger implements ILogger {
 }
 
 @Injectable()
-export class Logger implements ILogger {
-   private readonly decorated: ILogger;
+export class Logger implements LoggerInterface {
+   private readonly decorated: LoggerInterface;
 
    constructor(private readonly base: FileLogger) {
-      let logger: ILogger = base;
-      if (applicationConfig.environment !== 'production') {
-         logger = new ConsolePrettyLogger(logger);
-      }
-      this.decorated = logger;
+      this.decorated = base;
    }
 
    info(msg: string): void {

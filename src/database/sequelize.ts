@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 
-import { databaseConfig } from '../config';
+import { databaseConfig } from '../config/database.config';
 
 const dbConfig = databaseConfig.current;
 
