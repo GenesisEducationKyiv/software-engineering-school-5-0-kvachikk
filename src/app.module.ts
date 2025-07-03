@@ -79,7 +79,6 @@ import { WeatherService } from './services/weather.service';
          provide: CacheService,
          useClass: MonitoredCacheService,
       },
-      MonitoredCacheService,
       EmailTemplateService,
    ],
 })

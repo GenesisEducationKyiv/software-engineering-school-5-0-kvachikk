@@ -13,10 +13,6 @@ export class CacheService {
    }
 
    async setData(key: string, value: unknown, ttl: number = CacheTTL.TEN_MINUTE) {
-      if (ttl) {
-         await this.cacheManager.set(key, value, ttl);
-      } else {
-         await this.cacheManager.set(key, value);
-      }
+      await this.cacheManager.set(key, value, ttl);
    }
 }
