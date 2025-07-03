@@ -6,9 +6,11 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "check": "npm run format && npm run lint && nest build && npm run test && npm run start",
+    "check": "npm run format && npm run lint && npm run build && npm run test && npm run start",
+
     "start": "nest start",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
+
     "dev": "nest start --watch",
     "debug": "nest start --debug --watch",
     "build": "nest build",

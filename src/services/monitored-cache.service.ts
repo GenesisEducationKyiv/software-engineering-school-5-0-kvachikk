@@ -34,11 +34,7 @@ export class MonitoredCacheService {
 
    async setData<T>(key: string, value: T, ttl: number = CacheTTL.TEN_MINUTE) {
       const start = process.hrtime();
-      if (ttl) {
-         await this.cacheManager.set(key, value, ttl);
-      } else {
-         await this.cacheManager.set(key, value);
-      }
+      await this.cacheManager.set(key, value, ttl);
       this.recordLatency(start);
       this.metrics.setCounter.inc();
    }
