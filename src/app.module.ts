@@ -14,6 +14,7 @@ import { SubscriptionModel } from './database/models/subscription.model';
 import { DatabaseLoader } from './loaders/database.loader';
 import { Logger, FileLogger } from './logger/logger.service';
 import { MetricsModule } from './metrics/metrics.module';
+import { SubscriptionRepositoryPort } from './ports/subscription-repository.port';
 import { ApiWeatherProvider } from './providers/api-weather-provider';
 import { CacheWeatherProxy } from './providers/cache-weather.proxy';
 import { LoggingWeatherDecorator } from './providers/logging-weather.decorator';
@@ -71,7 +72,7 @@ import { WeatherService } from './services/weather.service';
          inject: [OpenWeatherProvider, ApiWeatherProvider, CacheService],
       },
       {
-         provide: SubscriptionRepository,
+         provide: SubscriptionRepositoryPort,
          useFactory: () => new SubscriptionRepository(SubscriptionModel),
       },
       SubscriptionService,

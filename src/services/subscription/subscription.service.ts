@@ -5,8 +5,8 @@ import { Injectable } from '@nestjs/common';
 import { ConflictError } from '../../constants/errors/conflict.error';
 import { NotFoundError } from '../../constants/errors/not-found.error';
 import { subscriptionResponseMessages } from '../../constants/message/subscription-responses';
-import { SubscriptionModel } from '../../database/models/subscription.model';
-import { SubscriptionRepository } from '../../repositories/subscription.repository';
+import { SUBSCRIPTION_FREQUENCIES } from '../../constants/subscription-frequency';
+import { SubscriptionRepositoryPort } from '../../ports/subscription-repository.port';
 import { Subscription } from '../../types/subscription';
 import { EmailerService } from '../emailer.service';
 import { WeatherService } from '../weather.service';
@@ -14,7 +14,7 @@ import { WeatherService } from '../weather.service';
 @Injectable()
 export class SubscriptionService {
    constructor(
-      private readonly subscriptionRepository: SubscriptionRepository,
+      private readonly subscriptionRepository: SubscriptionRepositoryPort,
       private readonly emailer: EmailerService,
       private readonly weatherServices: WeatherService,
    ) {}
@@ -26,7 +26,7 @@ export class SubscriptionService {
    async subscribe(email: string, city: string, frequency: string): Promise<Subscription> {
       const freqUpper = frequency.toUpperCase();
 
-      const allowedFrequencies = Object.values(SubscriptionModel.FREQUENCIES) as string[];
+      const allowedFrequencies = Object.values(SUBSCRIPTION_FREQUENCIES) as string[];
       if (!allowedFrequencies.includes(freqUpper)) {
          throw new NotFoundError(`Frequency: "${frequency}" not supported`);
       }
@@ -40,7 +40,7 @@ export class SubscriptionService {
 
       const token = this.generateToken();
 
-      const newSubscription: Subscription = await this.subscriptionRepository.create({
+      const created = await this.subscriptionRepository.create({
          email: email.toUpperCase(),
          city: city.toUpperCase(),
          frequency: freqUpper,
@@ -50,7 +50,7 @@ export class SubscriptionService {
       });
 
       await this.emailer.sendWelcomeEmail(email, city, token);
-      return newSubscription;
+      return this.toDomain(created);
    }
 
    async confirmSubscription(token: string): Promise<void> {
@@ -83,6 +83,18 @@ export class SubscriptionService {
    }
 
    async getActiveSubscriptions(frequencyTitle: string): Promise<Subscription[]> {
-      return await this.subscriptionRepository.getActiveSubscriptionsByFrequency(frequencyTitle);
+      const items = await this.subscriptionRepository.getActiveSubscriptionsByFrequency(frequencyTitle);
+      return items.map((i) => this.toDomain(i));
+   }
+
+   private toDomain(model: {
+      email: string;
+      city: string;
+      verificationToken: string;
+      isVerified: boolean;
+      isActive: boolean;
+   }): Subscription {
+      const { email, city, verificationToken, isVerified, isActive } = model;
+      return { email, city, verificationToken, isVerified, isActive };
    }
 }

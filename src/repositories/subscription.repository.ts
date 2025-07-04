@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
 import { SubscriptionModel } from '../database/models/subscription.model';
+import { SubscriptionRepositoryPort } from '../ports/subscription-repository.port';
 
 @Injectable()
-export class SubscriptionRepository {
-   constructor(private readonly subscriptionModel: typeof SubscriptionModel) {}
+export class SubscriptionRepository extends SubscriptionRepositoryPort {
+   constructor(private readonly subscriptionModel: typeof SubscriptionModel) {
+      super();
+   }
 
    async create(payload: Partial<SubscriptionModel>): Promise<SubscriptionModel> {
       return this.subscriptionModel.create(payload);

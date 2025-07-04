@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { SubscriptionModel } from '../database/models/subscription.model';
+import { SUBSCRIPTION_FREQUENCIES } from '../constants/subscription-frequency';
 import { Logger } from '../logger/logger.service';
 import { Subscription } from '../types/subscription';
 
@@ -18,12 +18,12 @@ export class SchedulerService {
 
    @Cron(CronExpression.EVERY_HOUR)
    private async hourlyJob(): Promise<void> {
-      await this.handleFrequency(SubscriptionModel.FREQUENCIES.HOURLY);
+      await this.handleFrequency(SUBSCRIPTION_FREQUENCIES.HOURLY);
    }
 
    @Cron(CronExpression.EVERY_DAY_AT_1PM)
    private async dailyJob(): Promise<void> {
-      await this.handleFrequency(SubscriptionModel.FREQUENCIES.DAILY);
+      await this.handleFrequency(SUBSCRIPTION_FREQUENCIES.DAILY);
    }
 
    private async handleFrequency(frequency: string): Promise<void> {
