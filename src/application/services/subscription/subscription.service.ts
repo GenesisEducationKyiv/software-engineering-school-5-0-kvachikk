@@ -2,9 +2,9 @@ import { randomBytes } from 'node:crypto';
 
 import { Injectable } from '@nestjs/common';
 
-import { ConflictError } from '../../../domain/constants/errors/conflict.error';
-import { NotFoundError } from '../../../domain/constants/errors/not-found.error';
 import { SUBSCRIPTION_FREQUENCIES } from '../../../domain/constants/subscription-frequency';
+import { ConflictError } from '../../../domain/errors/conflict.error';
+import { NotFoundError } from '../../../domain/errors/not-found.error';
 import { Subscription } from '../../../domain/types/subscription';
 import { subscriptionResponseMessages } from '../../../shared/constants/message/subscription-responses';
 import { SubscriptionRepositoryPort } from '../../ports/subscription-repository.port';

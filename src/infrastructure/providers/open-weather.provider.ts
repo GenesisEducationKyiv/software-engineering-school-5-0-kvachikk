@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 
-import { NotFoundError } from '../../domain/constants/errors/not-found.error';
+import { NotFoundError } from '../../domain/errors/not-found.error';
 import { Coordinates } from '../../domain/types/coordinates';
 import { OpenWeatherApiResponse } from '../../domain/types/responses/open-weather-api-response';
 import { Weather } from '../../domain/types/weather';

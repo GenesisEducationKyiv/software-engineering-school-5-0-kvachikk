@@ -7,11 +7,10 @@ import handlebars from 'handlebars';
 @Injectable()
 export class EmailTemplateService {
    public compile(templatePath: string, templateVars: Record<string, unknown> = {}): string {
-      // Possible template locations relative to runtime and project root
       const candidatePaths: string[] = [
-         path.join(__dirname, '../../constants/templates', templatePath),
-         path.join(process.cwd(), 'src/constants/templates', templatePath),
-         path.join(process.cwd(), 'src/domain/constants/templates', templatePath),
+         path.join(__dirname, '../../templates', templatePath),
+         path.join(process.cwd(), 'src/templates', templatePath),
+         path.join(process.cwd(), 'src/domain/templates', templatePath),
       ];
 
       const fullPath = candidatePaths.find((p) => fs.existsSync(p));

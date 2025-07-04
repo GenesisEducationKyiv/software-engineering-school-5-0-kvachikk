@@ -1,5 +1,5 @@
-import { ConflictError } from '../../../domain/constants/errors/conflict.error';
-import { NotFoundError } from '../../../domain/constants/errors/not-found.error';
+import { ConflictError } from '../../../domain/errors/conflict.error';
+import { NotFoundError } from '../../../domain/errors/not-found.error';
 import { Subscription } from '../../../domain/types/subscription';
 import { SubscriptionRepository } from '../../../infrastructure/repositories/subscription.repository';
 import { EmailerService } from '../emailer.service';
