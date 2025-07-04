@@ -6,27 +6,27 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
-import { RedisConfig } from './config/redis.config';
-import { MetricsController } from './controllers/metrics.controller';
-import { SubscriptionController } from './controllers/subscription.controller';
-import { WeatherController } from './controllers/weather.controller';
-import { SubscriptionModel } from './database/models/subscription.model';
-import { DatabaseLoader } from './loaders/database.loader';
-import { Logger, FileLogger } from './logger/logger.service';
-import { MetricsModule } from './metrics/metrics.module';
-import { SubscriptionRepositoryPort } from './ports/subscription-repository.port';
-import { ApiWeatherProvider } from './providers/api-weather-provider';
-import { CacheWeatherProxy } from './providers/cache-weather.proxy';
-import { LoggingWeatherDecorator } from './providers/logging-weather.decorator';
-import { OpenWeatherProvider } from './providers/open-weather.provider';
-import { SubscriptionRepository } from './repositories/subscription.repository';
-import { CacheService } from './services/cache.service';
-import { EmailTemplateService } from './services/email-template.service';
-import { EmailerService } from './services/emailer.service';
-import { MonitoredCacheService } from './services/monitored-cache.service';
-import { SubscriptionService } from './services/subscription/subscription.service';
-import { EmailValidationService } from './services/validator.service';
-import { WeatherService } from './services/weather.service';
+import { MetricsModule } from './application/modules/metrics.module';
+import { SubscriptionRepositoryPort } from './application/ports/subscription-repository.port';
+import { CacheService } from './application/services/cache.service';
+import { EmailTemplateService } from './application/services/email-template.service';
+import { EmailerService } from './application/services/emailer.service';
+import { MonitoredCacheService } from './application/services/monitored-cache.service';
+import { SubscriptionService } from './application/services/subscription/subscription.service';
+import { EmailValidationService } from './application/services/validator.service';
+import { WeatherService } from './application/services/weather.service';
+import { RedisConfig } from './infrastructure/config/redis.config';
+import { SubscriptionModel } from './infrastructure/database/models/subscription.model';
+import { DatabaseLoader } from './infrastructure/loaders/database.loader';
+import { AppLogger, FileLogger } from './infrastructure/logger/logger.service';
+import { ApiWeatherProvider } from './infrastructure/providers/api-weather-provider';
+import { CacheWeatherProxy } from './infrastructure/providers/cache-weather.proxy';
+import { LoggingWeatherDecorator } from './infrastructure/providers/logging-weather.decorator';
+import { OpenWeatherProvider } from './infrastructure/providers/open-weather.provider';
+import { SubscriptionRepository } from './infrastructure/repositories/subscription.repository';
+import { MetricsController } from './presentation/controllers/metrics.controller';
+import { SubscriptionController } from './presentation/controllers/subscription.controller';
+import { WeatherController } from './presentation/controllers/weather.controller';
 
 @Module({
    imports: [
@@ -46,22 +46,22 @@ import { WeatherService } from './services/weather.service';
       WeatherService,
       DatabaseLoader,
       FileLogger,
-      Logger,
+      AppLogger,
       {
          provide: OpenWeatherProvider,
-         useFactory: (logger: Logger, httpService: HttpService) => {
+         useFactory: (logger: AppLogger, httpService: HttpService) => {
             const provider = new OpenWeatherProvider(httpService);
             return new LoggingWeatherDecorator(provider, logger, 'OpenWeather');
          },
-         inject: [Logger, HttpService],
+         inject: [AppLogger, HttpService],
       },
       {
          provide: ApiWeatherProvider,
-         useFactory: (logger: Logger, httpService: HttpService) => {
+         useFactory: (logger: AppLogger, httpService: HttpService) => {
             const provider = new ApiWeatherProvider(httpService);
             return new LoggingWeatherDecorator(provider, logger, 'WeatherAPI');
          },
-         inject: [Logger, HttpService],
+         inject: [AppLogger, HttpService],
       },
       {
          provide: 'WeatherHandler',
