@@ -6,7 +6,8 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "check": "npm audit && npm run format && npm run lint && npm run build && npm run test && npm run start",
+    "precommit": "npm audit && npm run format && npm run lint && npm run build",
+    "prepush": "npm run precommit && npm run test",
     "start": "nest start",
     "start:prod": "node dist/src/main",
     "dev": "nest start --watch",
@@ -20,7 +21,8 @@
     "test:ui": "playwright test",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "prepare": "husky"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
@@ -76,6 +78,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.1",
     "globals": "^16.0.0",
+    "husky": "^9.1.7",
     "jest": "^29.7.0",
     "playwright": "^1.53.0",
     "prettier": "^3.4.2",
