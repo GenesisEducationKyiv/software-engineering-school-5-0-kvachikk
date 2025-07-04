@@ -1,99 +1,84 @@
 ### **Status:** Selected
 
-### **Date:** 21.05.2025
+### **Date:** 27.06.2025
 
 ### **Author:** Pohorilets Vladyslav
 
 ## **Context**:
 
-We need to choose an architectural style that:
+We need to pick an architectural style that:
 
-- will ensure that the project achieves the desired business goals
-- defines the overall structure of the system and the relationships between its components;
-- establish a framework for making future technical decisions;
-- provide: maintainability, scalability, testability, and isolation of business logic;
-- provide flexibility in changing the infrastructure without changing the system core;
-- facilitate the long-term development of the project in the face of changing requirements.
+- helps us reach our business goals,
+- gives a clear structure to the system and shows how parts connect,
+- makes it easier to make technical decisions later,
+- keeps the code easy to maintain, test, and change,
+- lets us update infrastructure without breaking the main logic,
+- supports long-term development, even if requirements change.
 
 ## Reviewed options:
 
-1. Layered Architecture
-   Pros:
+1. **Layered Architecture**
+   - **Pros:**
+     - Very simple and easy to understand
+     - Well-known and supported by many tools and frameworks
+     - Clear separation between layers (like controllers, services, repositories)
+     - Easy to onboard new developers
+     - Good for most business applications
+   - **Cons:**
+     - Sometimes layers can become too dependent on each other
+     - If not careful, logic can "leak" between layers
+     - Not as flexible as some other patterns for very complex systems
 
-    - Simple structure
-    - Widely known and supported
-    - Clear separation of concerns (in theory)
+2. **Micro-kernel Architecture**
+   - **Pros:**
+     - Good for plugin-based systems
+     - Easy to add new features as plugins
+   - **Cons:**
+     - Too complex for our current needs
+     - Not a great fit for business logic-heavy apps
 
-    Cons:
+3. **Event-Driven Architecture**
+   - **Pros:**
+     - Scales well
+     - Components are decoupled
+   - **Cons:**
+     - Harder to trace what's happening
+     - More infrastructure needed
+     - Overkill for our use case
 
-    - Tends to violate dependency direction
-    - Difficult to isolate business logic
-    - Harder to test in isolation
-
-2. Micro-kernel Architecture
-   Pros:
-
-    - Supports modularity via plugins
-    - Easy to add features without changing core
-    - Suitable for extensible systems
-
-    Cons:
-
-    - Not ideal for business-centric logic
-    - Complexity in managing plugins
-    - Limited applicability for current scope
-
-3. Event-Driven Architecture
-   Pros:
-
-    - High scalability
-    - Asynchronous communication
-    - Decoupled components
-
-    Cons:
-
-    - Difficult to trace logic flow
-    - High infrastructure complexity
-    - Overhead for simple use cases
-
-4. Clean Architecture
-   Pros:
-
-    - Strict separation of concerns
-    - High testability
-    - Technology-agnostic core
-    - Long-term maintainability
-
-    Cons:
-
-    - Increased initial complexity
-    - Requires strong architectural discipline
-    - Higher onboarding cost for developers
+4. **Clean Architecture**
+   - **Pros:**
+     - Very strict separation of concerns
+     - High testability
+     - Technology-agnostic core
+   - **Cons:**
+     - More complex to set up
+     - Slower onboarding for new devs
+     - Can be too much for smaller projects
 
 ## Decision taken:
 
-Chosen to implement Clean Architecture as defined by Robert C. Martin (Uncle Bob)
+We decided to use **Layered Architecture** for this project.
 
 ## Arguments
 
-- The project is planned as a multi-component system with a mobile application, API, analytics, notifications, and integration with other services
-- Long-term support and constant scaling of the logic are expected
-- So the most suitable for these requirements is Clean Architecture
+- Our project is a typical business application with clear layers: controllers (API), services (business logic), and repositories (data access).
+- Layered Architecture is simple, easy to understand, and matches the way most teams work.
+- It's easy to test each layer separately.
+- New developers can quickly understand the structure and start working.
+- We don't need the extra complexity of Clean Architecture or Event-Driven patterns right now.
+- If the project grows, we can still refactor or add more advanced patterns later.
 
 ## Consequences:
 
-Positive
+**Positive**
+- The codebase is easy to read and maintain.
+- Onboarding new team members is fast.
+- Each layer has a clear responsibility, so bugs are easier to find and fix.
+- We can swap out infrastructure (like the database) with minimal changes to business logic.
+- Testing is straightforward, since we can mock layers.
 
-- Core business logic remains independent of frameworks, UI, and infrastructure
-- Facilitates unit testing and test automation
-- Enables parallel development of infrastructure and business logic
-- Improves maintainability over time
-- Eases integration with new external systems or services
-- Provides a clear and consistent architectural model for long-term evolution
-
-Negative
-
-- Higher initial complexity and setup cost
-- Slower onboarding for new developers unfamiliar with the pattern
-- Requires strict adherence to architectural boundaries
-- Potential over-engineering if project complexity remains low
+**Negative**
+- If we're not careful, logic might leak between layers.
+- For very large or complex systems, we might need to rethink the architecture later.
+- Some flexibility is lost compared to more advanced patterns.

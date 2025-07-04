@@ -6,7 +6,7 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "check": "npm run format && npm run lint && npm run build && npm run test && npm run start",
+    "check": "npm audit && npm run format && npm run lint && npm run build && npm run test && npm run start",
 
     "start": "nest start",
     "start:prod": "node dist/src/main",
