@@ -4,9 +4,9 @@ import { Injectable } from '@nestjs/common';
 
 import { ConflictError } from '../../../domain/constants/errors/conflict.error';
 import { NotFoundError } from '../../../domain/constants/errors/not-found.error';
-import { subscriptionResponseMessages } from '../../../domain/constants/message/subscription-responses';
 import { SUBSCRIPTION_FREQUENCIES } from '../../../domain/constants/subscription-frequency';
 import { Subscription } from '../../../domain/types/subscription';
+import { subscriptionResponseMessages } from '../../../shared/constants/message/subscription-responses';
 import { SubscriptionRepositoryPort } from '../../ports/subscription-repository.port';
 import { EmailerService } from '../emailer.service';
 import { WeatherService } from '../weather.service';

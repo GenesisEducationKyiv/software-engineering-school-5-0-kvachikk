@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { validationMessages } from '../../domain/constants/message/validation';
 import { Letter } from '../../domain/types/letter';
+import { validationMessages } from '../../shared/constants/message/validation';
 
 @Injectable()
 export class EmailValidationService {

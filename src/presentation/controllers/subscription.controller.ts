@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query, UsePipes } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { SubscriptionService } from '../../application/services/subscription/subscription.service';
-import { subscriptionResponseMessages as messages } from '../../domain/constants/message/subscription-responses';
+import { subscriptionResponseMessages as messages } from '../../shared/constants/message/subscription-responses';
 import { CreateSubscriptionDto } from '../dtos/create-subscription.dto';
 import { TokenQueryDto } from '../dtos/token-query.dto';
 import { JoiValidationPipe } from '../validation';

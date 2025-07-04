@@ -15,6 +15,8 @@ import { MonitoredCacheService } from './application/services/monitored-cache.se
 import { SubscriptionService } from './application/services/subscription/subscription.service';
 import { EmailValidationService } from './application/services/validator.service';
 import { WeatherService } from './application/services/weather.service';
+import { ApplicationConfigProvider } from './infrastructure/config/application.config';
+import { MailConfigProvider } from './infrastructure/config/mail.config';
 import { RedisConfig } from './infrastructure/config/redis.config';
 import { SubscriptionModel } from './infrastructure/database/models/subscription.model';
 import { DatabaseLoader } from './infrastructure/loaders/database.loader';
@@ -81,6 +83,8 @@ import { WeatherController } from './presentation/controllers/weather.controller
          useClass: MonitoredCacheService,
       },
       EmailTemplateService,
+      ApplicationConfigProvider,
+      MailConfigProvider,
    ],
 })
 export class AppModule {}

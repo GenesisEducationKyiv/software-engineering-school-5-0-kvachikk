@@ -9,9 +9,9 @@ import { WeatherService } from '../src/application/services/weather.service';
 import { BadRequestError } from '../src/domain/constants/errors/bad-request.error';
 import { ConflictError } from '../src/domain/constants/errors/conflict.error';
 import { NotFoundError } from '../src/domain/constants/errors/not-found.error';
-import { subscriptionResponseMessages as subMsgs } from '../src/domain/constants/message/subscription-responses';
 import { DatabaseLoader } from '../src/infrastructure/loaders/database.loader';
 import { AllExceptionsFilter } from '../src/presentation/filters/all-exceptions.filter';
+import { subscriptionResponseMessages as subMsgs } from '../src/shared/constants/message/subscription-responses';
 
 const getCurrentWeatherMock = jest.fn().mockResolvedValue({
    temperature: 12,

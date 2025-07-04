@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-import { validationMessages } from '../../domain/constants/message/validation';
+import { validationMessages } from '../../shared/constants/message/validation';
 
 export const subscriptionSchema = Joi.object({
    email: Joi.string().email().required().trim().messages({

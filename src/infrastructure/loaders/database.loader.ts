@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
-import { databaseMessages as dbMessages } from '../../domain/constants/message/database';
+import { databaseMessages as dbMessages } from '../../shared/constants/message/database';
 import { testConnection } from '../database/utils/database-connect';
 import { runMigrations } from '../database/utils/migration-runner';
 

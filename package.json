@@ -6,23 +6,28 @@
   "private": false,
   "license": "MIT",
   "scripts": {
+    "check": "npm run precommit && npm run prepush && npm run start",
+
+    "prepare": "husky",
     "precommit": "npm audit && npm run format && npm run lint && npm run build",
-    "prepush": "npm run precommit && npm run test",
+    "prepush": "npm run test",
+
     "start": "nest start",
     "start:prod": "node dist/src/main",
     "dev": "nest start --watch",
     "debug": "nest start --debug --watch",
     "build": "nest build",
+
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "test": "npm run test:unit && npm run test:e2e && npm run test:ui",
+    "test": "npm run test:unit && npm run test:e2e && npm run test:ui && npm run test:arch",
+    "test:arch": "depcruise --config dependency-cruiser.js src",
     "test:unit": "jest",
     "test:e2e": "cross-env RUN_ENVIROMENT=test TEST_DB_URL=sqlite::memory: jest --config ./test/jest-e2e.json",
     "test:ui": "playwright test",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "prepare": "husky"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
@@ -72,6 +77,7 @@
     "@typescript-eslint/eslint-plugin": "^8.35.1",
     "@typescript-eslint/parser": "^8.35.1",
     "cross-env": "^7.0.3",
+    "dependency-cruiser": "^16.10.4",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-import-resolver-typescript": "^4.4.3",
