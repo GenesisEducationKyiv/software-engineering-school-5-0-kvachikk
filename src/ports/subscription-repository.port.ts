@@ -3,7 +3,6 @@ import { CreateSubscriptionPayload } from '../types/payloads/create-subscription
 
 export abstract class SubscriptionRepositoryPort {
    abstract create(payload: Partial<CreateSubscriptionPayload>): Promise<SubscriptionModel>;
-   abstract update(instance: SubscriptionModel): Promise<SubscriptionModel>;
    abstract save(instance: SubscriptionModel): Promise<SubscriptionModel>;
    abstract delete(instance: SubscriptionModel): Promise<void>;
 

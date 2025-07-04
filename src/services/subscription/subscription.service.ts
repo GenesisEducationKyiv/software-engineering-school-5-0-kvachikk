@@ -19,10 +19,6 @@ export class SubscriptionService {
       private readonly weatherServices: WeatherService,
    ) {}
 
-   private generateToken(): string {
-      return randomBytes(32).toString('hex');
-   }
-
    async subscribe(email: string, city: string, frequency: string): Promise<Subscription> {
       const freqUpper = frequency.toUpperCase();
 
@@ -38,7 +34,7 @@ export class SubscriptionService {
          throw new ConflictError(subscriptionResponseMessages.SUBSCRIPTION_ALREADY_EXISTS);
       }
 
-      const token = this.generateToken();
+      const token = randomBytes(32).toString('hex');
 
       const created = await this.subscriptionRepository.create({
          email: email.toUpperCase(),
@@ -88,13 +84,14 @@ export class SubscriptionService {
    }
 
    private toDomain(model: {
+      id?: number;
       email: string;
       city: string;
       verificationToken: string;
       isVerified: boolean;
       isActive: boolean;
    }): Subscription {
-      const { email, city, verificationToken, isVerified, isActive } = model;
-      return { email, city, verificationToken, isVerified, isActive };
+      const { id, email, city, verificationToken, isVerified, isActive } = model;
+      return { id, email, city, verificationToken, isVerified, isActive };
    }
 }

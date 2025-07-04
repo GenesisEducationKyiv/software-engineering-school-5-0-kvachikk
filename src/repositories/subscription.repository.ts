@@ -13,10 +13,6 @@ export class SubscriptionRepository extends SubscriptionRepositoryPort {
       return this.subscriptionModel.create(payload);
    }
 
-   async update(instance: SubscriptionModel): Promise<SubscriptionModel> {
-      return await instance.save();
-   }
-
    async save(instance: SubscriptionModel): Promise<SubscriptionModel> {
       return instance.save();
    }
