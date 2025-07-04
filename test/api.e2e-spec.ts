@@ -3,15 +3,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AppModule } from '../src/app.module';
-import { BadRequestError } from '../src/constants/errors/bad-request.error';
-import { ConflictError } from '../src/constants/errors/conflict.error';
-import { NotFoundError } from '../src/constants/errors/not-found.error';
-import { subscriptionResponseMessages as subMsgs } from '../src/constants/message/subscription-responses';
-import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
-import { DatabaseLoader } from '../src/loaders/database.loader';
-import { EmailerService } from '../src/services/emailer.service';
-import { SubscriptionService } from '../src/services/subscription/subscription.service';
-import { WeatherService } from '../src/services/weather.service';
+import { EmailerService } from '../src/application/services/emailer.service';
+import { SubscriptionService } from '../src/application/services/subscription/subscription.service';
+import { WeatherService } from '../src/application/services/weather.service';
+import { BadRequestError } from '../src/domain/errors/bad-request.error';
+import { ConflictError } from '../src/domain/errors/conflict.error';
+import { NotFoundError } from '../src/domain/errors/not-found.error';
+import { DatabaseLoader } from '../src/infrastructure/loaders/database.loader';
+import { AllExceptionsFilter } from '../src/presentation/filters/all-exceptions.filter';
+import { subscriptionResponseMessages as subMsgs } from '../src/shared/constants/message/subscription-responses';
 
 const getCurrentWeatherMock = jest.fn().mockResolvedValue({
    temperature: 12,

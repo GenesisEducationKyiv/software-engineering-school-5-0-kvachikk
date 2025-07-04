@@ -1,0 +1,2 @@
+export const APPLICATION_CONFIG = 'APPLICATION_CONFIG';
+export const MAIL_CONFIG = 'MAIL_CONFIG';

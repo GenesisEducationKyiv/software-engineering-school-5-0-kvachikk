@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Weather Forecast</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                color: #333;
+                text-align: center;
+            }
+
+            h2 {
+                margin-bottom: 30px;
+                color: #555;
+            }
+
+            .forecast-container {
+                white-space: nowrap;
+                overflow-x: auto;
+                padding-bottom: 20px;
+            }
+
+            .weather-card {
+                display: inline-block;
+                vertical-align: top;
+                width: 160px;
+                max-width: 90vw;
+                margin: 0 10px 20px;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+                text-align: center;
+                transition:
+                    background 0.3s ease,
+                    color 0.3s ease;
+                color: #333;
+            }
+
+            .weather-card__date {
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 6px;
+            }
+
+            .weather-card__temp {
+                font-size: 28px;
+                font-weight: bold;
+                margin: 8px 0;
+            }
+
+            .weather-card__description {
+                margin: 6px 0 12px;
+                font-size: 14px;
+                text-transform: capitalize;
+                min-height: 30px;
+            }
+
+            .weather-card__icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .unsubscribe-link {
+                margin-top: 30px;
+                color: #777;
+                text-decoration: none;
+                font-size: 14px;
+            }
+
+            .unsubscribe-link:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Weather forecast for {{city}}</h2>
+        <div class="forecast-container">
+            {{#each forecast}}
+            <div class="weather-card">
+                <div class="weather-card__date">
+                    {{#if @first}}Today{{else}}Day {{@index}}{{/if}}
+                </div>
+                <div class="weather-card__temp">{{this.temperature}}°C</div>
+                <div class="weather-card__description">
+                    {{this.description}}
+                </div>
+                {{#if this.icon}}
+                <img
+                    src="https://openweathermap.org/img/wn/{{this.icon}}@2x.png"
+                    alt="icon"
+                    class="weather-card__icon"
+                />
+                {{/if}}
+            </div>
+            {{/each}}
+        </div>
+
+        <div style="margin-top: 30px">
+            <a href="{{unsubscribeUrl}}" class="unsubscribe-link"
+                >Unsubscribe</a
+            >
+        </div>
+    </body>
+</html>
