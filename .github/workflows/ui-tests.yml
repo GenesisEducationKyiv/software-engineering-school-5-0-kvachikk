@@ -8,12 +8,14 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'playwright/**'
+      - 'public/**'
   pull_request:
     paths:
       - 'src/**'
       - 'package.json'
       - 'package-lock.json'
       - 'playwright/**'
+      - 'public/**'
 
 jobs:
   ui-tests:
