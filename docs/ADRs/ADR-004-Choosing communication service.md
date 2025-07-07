@@ -1,6 +1,6 @@
 ### **Status:** Selected
 
-### **Date:** 06.07.2025
+### **Date:** 07.07.2025
 
 ### **Author:** Pohorilets Vladyslav 
 
@@ -71,26 +71,25 @@ We plan to split the current app into small microservices (weather, subscription
     - Still synchronous, caller must wait (unless we add queues)
 
 ## Decision taken:
-
-Pick **RabbitMQ** as the message broker between microservices
+Pick **gRPC** for service-to-service communication
 
 ## Arguments
 
-- Fits our present load and can grow with us
-- Simple concepts help the team move fast
-- Rich plugins give us retries and dead-letter queues with little work
-- Many NestJS examples exist, so integration have to be smooth
-- Lighter than Kafka, safer than plain Redis pub/sub
+- One clear way for services to call each other. No extra broker to run.
+- gRPC is very fast. Small binary messages mean less network cost.
+- We get strong contracts with protobuf, so the compiler catches many bugs.
+- Built-in streaming works great for live data like weather updates and metrics.
+- Runs fine in Docker and Kubernetes. Scaling is just adding more pods.
 
 ## Consequences:
 
 Positive
-
-- Services stay decoupled; one down service does not block others
-- We can add new consumers without touching existing code
-- Clear monitoring UI helps us debug queue problems
+- Less infrastructure
+- Lower latency. Calls feel almost real-time
+- Auto-generated client code
+- Streaming lets us push data instead of polling
 
 Negative
-
-- We must run and maintain a RabbitMQ cluster
-- Need to plan for HA setup when traffic rises 
+- Calls are synchronous. If a service is down we must retry or handle errors fast
+- Not as easy to debug by hand as plain HTTP or a queue UI
+- Team needs to learn protobuf and the tooling
