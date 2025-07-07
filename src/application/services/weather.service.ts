@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 
 import { Weather } from '../../domain/types/weather';
-import { WeatherDataProvider } from '../../infrastructure/providers/abstract-chain';
+import { WeatherDataProvider } from '../ports/weather-data-provider.port';
 
 @Injectable()
 export class WeatherService {

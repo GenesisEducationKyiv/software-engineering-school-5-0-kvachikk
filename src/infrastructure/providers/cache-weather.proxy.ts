@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
+import { WeatherDataProvider } from '../../application/ports/weather-data-provider.port';
 import { CacheService } from '../../application/services/cache.service';
 import { Weather } from '../../domain/types/weather';
-import { GetWeatherOptions } from '../../domain/types/weather.options';
 import { TimeUnits } from '../../shared/constants/time-units';
-
-import { WeatherDataProvider } from './abstract-chain';
 
 @Injectable()
 export class CacheWeatherProxy implements WeatherDataProvider {
@@ -14,11 +12,7 @@ export class CacheWeatherProxy implements WeatherDataProvider {
       private readonly cacheService: CacheService,
    ) {}
 
-   setNext(handler: WeatherDataProvider): WeatherDataProvider {
-      return this.decorate.setNext(handler);
-   }
-
-   async handle(options: GetWeatherOptions): Promise<Weather[]> {
+   async handle(options: { city: string; date: Date }): Promise<Weather[]> {
       const cacheKey = options.city.trim().toUpperCase();
       const cachedData = await this.cacheService.getData<Weather[]>(cacheKey);
 

@@ -1,20 +1,17 @@
+import { WeatherDataProvider } from '../../application/ports/weather-data-provider.port';
 import { Weather } from '../../domain/types/weather';
-import { GetWeatherOptions } from '../../domain/types/weather.options';
 
-export interface WeatherDataProvider {
-   setNext(handler: WeatherDataProvider): WeatherDataProvider;
-
-   handle(options: GetWeatherOptions): Promise<Weather[]>;
+export abstract class AbstractWeatherDataProvider implements WeatherDataProvider {
+   abstract handle(params: { city: string; date: Date }): Promise<Weather[]>;
 }
 
-export abstract class Chainable<Request, Response> {
-   protected nextHandler?: Chainable<Request, Response>;
-   protected onError?: (error: Error) => boolean;
+export abstract class Chainable<TRequest, TResponse> {
+   protected nextHandler?: Chainable<TRequest, TResponse>;
 
-   setNext(handler: Chainable<Request, Response>): Chainable<Request, Response> {
+   setNext(handler: Chainable<TRequest, TResponse>): Chainable<TRequest, TResponse> {
       this.nextHandler = handler;
       return handler;
    }
 
-   abstract handle(request: Request): Promise<Response>;
+   abstract handle(params: TRequest): Promise<TResponse>;
 }
