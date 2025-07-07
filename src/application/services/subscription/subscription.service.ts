@@ -36,7 +36,9 @@ export class SubscriptionService {
 
       const token = randomBytes(32).toString('hex');
 
-      const created = await this.subscriptionRepository.create({
+      await this.emailer.sendWelcomeEmail(email, city, token);
+
+      return await this.subscriptionRepository.create({
          email: email.toUpperCase(),
          city: city.toUpperCase(),
          frequency: freqUpper,
@@ -44,9 +46,6 @@ export class SubscriptionService {
          isVerified: false,
          isActive: false,
       });
-
-      await this.emailer.sendWelcomeEmail(email, city, token);
-      return this.toDomain(created);
    }
 
    async confirmSubscription(token: string): Promise<void> {
@@ -79,19 +78,6 @@ export class SubscriptionService {
    }
 
    async getActiveSubscriptions(frequencyTitle: string): Promise<Subscription[]> {
-      const items = await this.subscriptionRepository.getActiveSubscriptionsByFrequency(frequencyTitle);
-      return items.map((i) => this.toDomain(i));
-   }
-
-   private toDomain(model: {
-      id?: number;
-      email: string;
-      city: string;
-      verificationToken: string;
-      isVerified: boolean;
-      isActive: boolean;
-   }): Subscription {
-      const { id, email, city, verificationToken, isVerified, isActive } = model;
-      return { id, email, city, verificationToken, isVerified, isActive };
+      return this.subscriptionRepository.getActiveSubscriptionsByFrequency(frequencyTitle);
    }
 }
