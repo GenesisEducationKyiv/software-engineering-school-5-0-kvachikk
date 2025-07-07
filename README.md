@@ -95,17 +95,17 @@ green check marks will be shown at each stage, if you do not see them, then the 
 
 ## run tests separately:
 
-### unit tests
+### UNIT tests
 ```
 npm run test:unit
 ```
 
-### api e2e tests
+### API e2e tests
 ```
 npm run test:e2e
 ```
 
-### ui e2e tests (playwright)
+### UI e2e tests (playwright)
 ```
 npm install
 ```
@@ -114,6 +114,11 @@ npx playwright install --with-deps
 ``` 
 ```
 npm run test:ui
+```
+
+### architecture tests (dependency rules, import structure):
+```
+npm run test:arch
 ```
 
 # List of all used tools
@@ -155,8 +160,9 @@ npm run test:ui
 - validation - ```Joi```
 - templating - ```Handlebars```
 - scheduling - ```@nestjs/schedule```
-- testing (unit & e2e) - ```Jest, @nestjs/testing, supertest```
+- Unit & e2e testing  - ```Jest, @nestjs/testing, supertest```
 - UI e2e testing - ```Playwright (@playwright/test, playwright)```
+- architecture testing - ```Dependency Cruiser (dependency-cruiser)```
 
 <br/>
 
