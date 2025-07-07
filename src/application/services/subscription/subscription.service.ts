@@ -2,11 +2,11 @@ import { randomBytes } from 'node:crypto';
 
 import { Injectable } from '@nestjs/common';
 
-import { SUBSCRIPTION_FREQUENCIES } from '../../../domain/constants/subscription-frequency';
 import { ConflictError } from '../../../domain/errors/conflict.error';
 import { NotFoundError } from '../../../domain/errors/not-found.error';
 import { Subscription } from '../../../domain/types/subscription';
 import { subscriptionResponseMessages } from '../../../shared/constants/message/subscription-responses';
+import { SUBSCRIPTION_FREQUENCIES } from '../../../shared/constants/subscription-frequency';
 import { SubscriptionRepositoryPort } from '../../ports/subscription-repository.port';
 import { EmailerService } from '../emailer.service';
 import { WeatherService } from '../weather.service';

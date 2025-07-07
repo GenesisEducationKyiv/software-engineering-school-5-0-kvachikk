@@ -2,7 +2,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
-import { CacheTTL } from '../../domain/constants/cache-ttl';
+import { TimeUnits } from '../../shared/constants/time-units';
 
 @Injectable()
 export class CacheService {
@@ -12,7 +12,7 @@ export class CacheService {
       return await this.cacheManager.get<T>(key);
    }
 
-   async setData(key: string, value: unknown, ttl: number = CacheTTL.TEN_MINUTE) {
+   async setData(key: string, value: unknown, ttl: number = TimeUnits.MINUTE * 10) {
       await this.cacheManager.set(key, value, ttl);
    }
 }
