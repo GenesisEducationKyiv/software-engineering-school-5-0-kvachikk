@@ -1,12 +1,18 @@
-export type DatabaseConfig = {
+export interface DatabaseConfig {
    url: string;
    dialect: 'postgres' | 'sqlite';
    logging: boolean;
-   pool: {
+   pool?: {
       max: number;
       min: number;
       acquire: number;
       idle: number;
    };
-   dialectOptions?: Record<string, unknown>;
-};
+   storage?: string;
+   dialectOptions?: {
+      ssl: {
+         require: boolean;
+         rejectUnauthorized: boolean;
+      };
+   };
+}

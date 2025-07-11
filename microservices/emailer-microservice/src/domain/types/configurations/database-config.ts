@@ -1,14 +1,15 @@
 export interface DatabaseConfig {
    url: string;
-   dialect: 'postgres';
+   dialect: 'postgres' | 'sqlite';
    logging: boolean;
-   pool: {
+   pool?: {
       max: number;
       min: number;
       acquire: number;
       idle: number;
    };
-   dialectOptions: {
+   storage?: string;
+   dialectOptions?: {
       ssl: {
          require: boolean;
          rejectUnauthorized: boolean;

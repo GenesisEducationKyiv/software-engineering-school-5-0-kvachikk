@@ -4,28 +4,29 @@ import { Provider } from '@nestjs/common';
 import { DatabaseConfig } from '../../domain/types/configurations/database-config';
 import { DATABASE_CONFIG } from '../../shared/tokens/config-tokens';
 
-const createDatabaseConfig = (url: string): DatabaseConfig => ({
+const createDatabaseConfig = (url: string, dialect: 'postgres' | 'sqlite'): DatabaseConfig => ({
    url,
-   dialect: 'postgres',
+   dialect,
    logging: false,
-   pool: {
+   pool: dialect === 'postgres' ? {
       max: 5,
       min: 0,
       acquire: 30000,
       idle: 10000,
-   },
-   dialectOptions: {
+   } : undefined,
+   storage: dialect === 'sqlite' ? ':memory:' : undefined,
+   dialectOptions: dialect === 'postgres' ? {
       ssl: {
          require: true,
          rejectUnauthorized: false,
       },
-   },
+   } : undefined,
 });
 
 const configs = {
-   test: createDatabaseConfig(process.env.TEST_DB_URL || ''),
-   development: createDatabaseConfig(process.env.DEVELOPMENT_DB_URL || ''),
-   production: createDatabaseConfig(process.env.PRODUCTION_DB_URL || ''),
+   test: createDatabaseConfig(process.env.TEST_DB_URL || 'sqlite::memory:', 'sqlite'),
+   development: createDatabaseConfig(process.env.DEVELOPMENT_DB_URL || '', 'postgres'),
+   production: createDatabaseConfig(process.env.PRODUCTION_DB_URL || '', 'postgres'),
 };
 
 const getCurrentConfig = (): DatabaseConfig => {
