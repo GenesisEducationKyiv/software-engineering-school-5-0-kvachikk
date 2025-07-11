@@ -23,7 +23,7 @@
       "test:watch": "jest --watch",
       "test:cov": "jest --coverage",
       "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-      "test:e2e": "cross-env RUN_ENVIROMENT=test TEST_DB_URL=sqlite::memory: jest --config ./test/jest-e2e.json"
+      "test:e2e": "cross-env RUN_ENVIROMENT=test TEST_DB_URL=sqlite::memory: MAIL_PROVIDER_API_KEY=re_test MAIL_PROVIDER_SENDER_EMAIL=test@example.com jest --config ./test/jest-e2e.json"
    },
    "dependencies": {
       "@nestjs/common": "^11.0.1",

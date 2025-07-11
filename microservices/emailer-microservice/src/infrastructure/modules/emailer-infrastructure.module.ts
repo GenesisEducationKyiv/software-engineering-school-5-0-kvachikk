@@ -12,7 +12,8 @@ import { SubscriptionRepository } from '../repositories/subscription.repository'
 @Module({
    imports: [
       SequelizeModule.forRoot({
-         dialect: 'postgres',
+         dialect: databaseConfig.current.dialect as any,
+         storage: databaseConfig.current.storage,
          autoLoadModels: true,
          synchronize: false,
          logging: databaseConfig.current.logging,

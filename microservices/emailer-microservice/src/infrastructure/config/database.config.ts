@@ -8,19 +8,25 @@ const createDatabaseConfig = (url: string, dialect: 'postgres' | 'sqlite'): Data
    url,
    dialect,
    logging: false,
-   pool: dialect === 'postgres' ? {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000,
-   } : undefined,
+   pool:
+      dialect === 'postgres'
+         ? {
+              max: 5,
+              min: 0,
+              acquire: 30000,
+              idle: 10000,
+           }
+         : undefined,
    storage: dialect === 'sqlite' ? ':memory:' : undefined,
-   dialectOptions: dialect === 'postgres' ? {
-      ssl: {
-         require: true,
-         rejectUnauthorized: false,
-      },
-   } : undefined,
+   dialectOptions:
+      dialect === 'postgres'
+         ? {
+              ssl: {
+                 require: true,
+                 rejectUnauthorized: false,
+              },
+           }
+         : undefined,
 });
 
 const configs = {
