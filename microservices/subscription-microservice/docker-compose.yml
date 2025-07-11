@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+   subscription-service:
+      build: .
+      container_name: subscription-service
+      environment:
+         PORT: 3000
+         RUN_ENVIRONMENT: production
+         DEVELOPMENT_DB_URL: ${DEVELOPMENT_DB_URL}
+         PRODUCTION_DB_URL: ${PRODUCTION_DB_URL}
+         WEATHER_SERVICE_URL: ${WEATHER_SERVICE_URL}
+      env_file:
+         - .env
+      ports:
+         - '3000:3000'
+      depends_on:
+         - weather-service
+
+   weather-service:
+      #image:
+      container_name: weather-service
+      environment:
+         PORT: 3001
+      ports:
+         - '3001:3001'

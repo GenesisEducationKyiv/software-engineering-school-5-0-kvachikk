@@ -1,0 +1,33 @@
+version: '3.9'
+
+x-test-runner: &test-runner
+   build:
+      context: .
+      dockerfile: Dockerfile.test
+   env_file:
+      - .env.test
+   working_dir: /home/node/app
+   volumes:
+      - ./:/home/node/app
+   networks:
+      - test-net
+
+networks:
+   test-net:
+      driver: bridge
+
+services:
+   unit-tests:
+      <<: *test-runner
+      container_name: emailer-unit-tests
+      command: npm run test:unit
+
+   arch-tests:
+      <<: *test-runner
+      container_name: emailer-arch-tests
+      command: npm run test:arch
+
+   api-tests:
+      <<: *test-runner
+      container_name: emailer-api-tests
+      command: npm run test:e2e

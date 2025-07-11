@@ -1,0 +1,11 @@
+<html>
+   <body>
+      <h1>Weather forecast for {{city}}</h1>
+      <ul>
+         {{#each forecast}}
+         <li>{{description}} - {{temperature}}°C, humidity {{humidity}}%</li>
+         {{/each}}
+      </ul>
+      <p>If you wish to unsubscribe, click <a href="{{unsubscribeUrl}}">here</a>.</p>
+   </body>
+</html>

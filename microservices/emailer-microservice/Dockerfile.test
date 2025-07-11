@@ -1,0 +1,11 @@
+FROM node:24-alpine
+WORKDIR /home/node/app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+ENV RUN_ENVIRONMENT test
+
+CMD npm run test 
