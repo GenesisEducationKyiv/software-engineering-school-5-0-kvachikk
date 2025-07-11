@@ -1,5 +1,5 @@
 import { Logger } from './logger.interface';
-import { AppLogger } from './logger.service';
+import { AppLogger, FileLogger } from './logger.service';
 
 describe('AppLogger', () => {
    const mockBase: Logger = {
@@ -10,7 +10,7 @@ describe('AppLogger', () => {
       response: jest.fn(),
    };
 
-   const logger = new AppLogger(mockBase as unknown);
+   const logger = new AppLogger(mockBase as unknown as FileLogger);
 
    it('should delegate info', () => {
       logger.info('info');

@@ -4,6 +4,9 @@
    "description": "",
    "author": "",
    "private": false,
+   "workspaces": [
+      "microservices/*"
+   ],
    "license": "MIT",
    "scripts": {
       "check": "npm run precommit && npm run prepush && npm run start",
@@ -14,14 +17,14 @@
       "start:prod": "node dist/src/main",
       "dev": "nest start --watch",
       "debug": "nest start --debug --watch",
-      "build": "nest build",
+      "build": "npm --workspaces --if-present run build",
       "lint": "eslint \"**/*.ts\" --fix",
       "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,html,css}\"",
-      "test": "npm run test:unit && npm run test:e2e && npm run test:ui && npm run test:arch",
-      "test:arch": "depcruise --config dependency-cruiser.js src",
-      "test:unit": "jest",
-      "test:e2e": "cross-env RUN_ENVIROMENT=test TEST_DB_URL=sqlite::memory: jest --config ./test/jest-e2e.json",
-      "test:ui": "playwright test",
+      "test": "npm --workspaces --if-present run test",
+      "test:arch": "npm --workspaces --if-present run test:arch",
+      "test:unit": "npm --workspaces --if-present run test:unit",
+      "test:e2e": "npm --workspaces --if-present run test:e2e",
+      "test:ui": "npm --workspaces --if-present run test:ui",
       "test:watch": "jest --watch",
       "test:cov": "jest --coverage",
       "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
@@ -92,22 +95,5 @@
       "tsconfig-paths": "^4.2.0",
       "typescript": "^5.7.3",
       "typescript-eslint": "^8.20.0"
-   },
-   "jest": {
-      "moduleFileExtensions": [
-         "js",
-         "json",
-         "ts"
-      ],
-      "rootDir": "src",
-      "testRegex": ".*\\.spec\\.ts$",
-      "transform": {
-         "^.+\\.(t|j)s$": "ts-jest"
-      },
-      "collectCoverageFrom": [
-         "**/*.(t|j)s"
-      ],
-      "coverageDirectory": "../coverage",
-      "testEnvironment": "node"
    }
 }

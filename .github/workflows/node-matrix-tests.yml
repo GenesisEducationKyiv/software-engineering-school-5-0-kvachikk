@@ -4,12 +4,14 @@ on:
    push:
       branches: [main]
       paths:
+         - 'microservices/**'
          - 'src/**'
          - 'package.json'
          - 'package-lock.json'
          - 'test/**'
    pull_request:
       paths:
+         - 'microservices/**'
          - 'src/**'
          - 'package.json'
          - 'package-lock.json'
