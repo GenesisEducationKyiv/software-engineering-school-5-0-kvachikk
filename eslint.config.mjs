@@ -1,30 +1,42 @@
 // @ts-check
-import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import importPlugin from 'eslint-plugin-import';
+import js from '@eslint/js';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
 import globals from 'globals';
-import tslint from 'typescript-eslint';
+import importPlugin from 'eslint-plugin-import';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
-export default tslint.config(
+export default [
+   js.configs.recommended,
    {
       ignores: ['dist', 'node_modules', 'src/database/migrations', 'logs', 'eslint.config.mjs'],
    },
-   eslint.configs.recommended,
    {
       files: ['**/*.ts', '**/*.tsx'],
-      extends: [...tslint.configs.recommendedTypeChecked],
       languageOptions: {
+         parser: tsParser,
          parserOptions: {
-            project: true,
+            project: './tsconfig.json',
             tsconfigRootDir: import.meta.dirname,
+         },
+         globals: {
+            ...globals.node,
+            ...globals.jest,
          },
       },
       plugins: {
+         '@typescript-eslint': tseslint,
          import: importPlugin,
       },
       rules: {
          '@typescript-eslint/no-floating-promises': 'error',
          '@typescript-eslint/no-unsafe-argument': 'error',
+         '@typescript-eslint/no-explicit-any': 'warn',
+         '@typescript-eslint/no-misused-promises': 'warn',
+         '@typescript-eslint/no-unsafe-assignment': 'warn',
+         '@typescript-eslint/no-deprecated': 'error',
+         '@typescript-eslint/no-unused-vars': ['off', { argsIgnorePattern: '^_' }],
+
          'import/order': [
             'error',
             {
@@ -39,6 +51,8 @@ export default tslint.config(
          'import/no-unresolved': 'error',
          'import/no-unused-modules': 'warn',
          'import/no-duplicates': 'error',
+         'max-len': ['off'],
+         'no-unused-vars': ['off', { argsIgnorePattern: '^_' }],
       },
       settings: {
          'import/resolver': {
@@ -48,25 +62,6 @@ export default tslint.config(
             },
          },
       },
-
    },
-
-   {
-      languageOptions: {
-         globals: {
-            ...globals.node,
-            ...globals.jest,
-         },
-      },
-      rules: {
-         'max-len': ['off'],
-         '@typescript-eslint/no-explicit-any': 'warn',
-         '@typescript-eslint/no-misused-promises': 'warn',
-         '@typescript-eslint/no-unsafe-assignment': 'warn',
-         '@typescript-eslint/no-deprecated': 'error',
-         '@typescript-eslint/no-unused-vars': 'warn',
-      },
-   },
-
    eslintPluginPrettierRecommended,
-);
+];
