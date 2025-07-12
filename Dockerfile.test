@@ -6,6 +6,9 @@ COPY package*.json ./
 
 RUN npm ci
 RUN npx playwright install --with-deps
+RUN npm install
+
+COPY proto ./proto
 
 COPY . .
 
