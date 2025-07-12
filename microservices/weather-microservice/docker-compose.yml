@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+   weather-service:
+      build: .
+      container_name: weather-service
+      environment:
+         PORT: 3000
+         REDIS_HOST: redis
+         REDIS_PORT: 6379
+         OPEN_WEATHER_API_URL: ${OPEN_WEATHER_API_URL:-https://api.openweathermap.org/data/2.5}
+         OPEN_WEATHER_API_KEY: ${OPEN_WEATHER_API_KEY:-changeme}
+         OPEN_WEATHER_GEO_URL: ${OPEN_WEATHER_GEO_URL:-http://api.openweathermap.org/geo/1.0/direct}
+         OPEN_WEATHER_GEO_KEY: ${OPEN_WEATHER_GEO_KEY:-changeme}
+      env_file:
+         - .env
+      ports:
+         - '3000:3000'
+         - '50051:50051'
+      depends_on:
+         - redis
+
+   redis:
+      image: redis:7.2-alpine
+      container_name: redis
+      restart: unless-stopped
+      ports:
+         - '6379:6379'

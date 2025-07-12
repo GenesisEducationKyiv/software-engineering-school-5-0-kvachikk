@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+   subscription-service:
+      build: .
+      container_name: subscription-service
+      environment:
+         PORT: 3000
+         RUN_ENVIRONMENT: production
+         DEVELOPMENT_DB_URL: ${DEVELOPMENT_DB_URL}
+         PRODUCTION_DB_URL: ${PRODUCTION_DB_URL}
+         WEATHER_GRPC_URL: ${WEATHER_GRPC_URL:-weather-service:50051}
+         EMAILER_GRPC_URL: ${EMAILER_GRPC_URL:-emailer-service:50052}
+      env_file:
+         - .env
+      ports:
+         - '3002:3000'
+# Note: this compose expects weather-service and emailer-service to be started separately or via docker compose with proper network.

@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+   weather-service:
+      build:
+         context: ./microservices/weather-microservice
+      container_name: weather-service
+      ports:
+         - '3000:3000'
+         - '50051:50051'
+      env_file:
+         - microservices/weather-microservice/.env
+
+   emailer-service:
+      build:
+         context: ./microservices/emailer-microservice
+      container_name: emailer-service
+      depends_on:
+         - weather-service
+      ports:
+         - '3003:3000'
+         - '50052:50052'
+      environment:
+         WEATHER_GRPC_URL: weather-service:50051
+      env_file:
+         - microservices/emailer-microservice/.env
+
+   subscription-service:
+      build:
+         context: ./microservices/subscription-microservice
+      container_name: subscription-service
+      depends_on:
+         - weather-service
+         - emailer-service
+      ports:
+         - '3002:3000'
+      environment:
+         WEATHER_GRPC_URL: weather-service:50051
+         EMAILER_GRPC_URL: emailer-service:50052
+      env_file:
+         - microservices/subscription-microservice/.env
+
+   gateway:
+      build:
+         context: ./getaway
+      container_name: api-gateway
+      depends_on:
+         - weather-service
+         - subscription-service
+      ports:
+         - '8080:3000'
+      environment:
+         WEATHER_GRPC_URL: weather-service:50051
+         SUBSCRIPTION_GRPC_URL: subscription-service:50053

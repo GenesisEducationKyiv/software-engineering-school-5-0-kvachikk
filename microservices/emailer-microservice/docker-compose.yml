@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+   emailer-service:
+      build: .
+      container_name: emailer-service
+      environment:
+         PORT: 3000
+         RUN_ENVIRONMENT: production
+         DEVELOPMENT_DB_URL: ${DEVELOPMENT_DB_URL}
+         PRODUCTION_DB_URL: ${PRODUCTION_DB_URL}
+         MAIL_PROVIDER_API_KEY: ${MAIL_PROVIDER_API_KEY}
+         MAIL_PROVIDER_SENDER_EMAIL: ${MAIL_PROVIDER_SENDER_EMAIL}
+      env_file:
+         - .env
+      ports:
+         - '3003:3000'
+         - '50052:50052'

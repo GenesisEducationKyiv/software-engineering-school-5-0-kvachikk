@@ -1,35 +1,37 @@
 name: Architecture Tests (Dependency cruiser)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'src/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'dependency-cruiser.js'
-  pull_request:
-    paths:
-      - 'src/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'dependency-cruiser.js'
+   push:
+      branches: [main]
+      paths:
+         - 'microservices/**'
+         - 'src/**'
+         - 'package.json'
+         - 'package-lock.json'
+         - 'dependency-cruiser.js'
+   pull_request:
+      paths:
+         - 'microservices/**'
+         - 'src/**'
+         - 'package.json'
+         - 'package-lock.json'
+         - 'dependency-cruiser.js'
 
 jobs:
-  architecture-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-      - name: Cache node modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-      - name: Install dependencies
-        run: npm ci
-      - name: Run architecture tests
-        run: npm run test:arch 
+   architecture-tests:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v4
+         - uses: actions/setup-node@v4
+           with:
+              node-version: '24'
+              cache: 'npm'
+         - name: Cache node modules
+           uses: actions/cache@v4
+           with:
+              path: ~/.npm
+              key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+         - name: Install dependencies
+           run: npm install --legacy-peer-deps
+         - name: Run architecture tests
+           run: npm run test:arch

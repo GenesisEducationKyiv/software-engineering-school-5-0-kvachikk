@@ -1,0 +1,171 @@
+import { ConflictError } from '../../domain/errors/conflict.error';
+import { NotFoundError } from '../../domain/errors/not-found.error';
+import { Subscription } from '../../domain/types/subscription';
+import { EmailSenderPort } from '../ports/email-sender.port';
+import { SubscriptionRepositoryPort } from '../ports/subscription-repository.port';
+
+import { CityValidatorService } from './city-validator.service';
+import { SubscriptionService } from './subscription.service';
+
+interface RepositoryMocks {
+   repo: SubscriptionRepositoryPort;
+   findByEmail: jest.Mock;
+   create: jest.Mock;
+   findByToken: jest.Mock;
+   save: jest.Mock;
+   getActiveSubscriptionsByFrequency: jest.Mock;
+}
+
+const buildRepositoryMock = (): RepositoryMocks => {
+   const findByEmail = jest.fn();
+   const create = jest.fn();
+   const findByToken = jest.fn();
+   const save = jest.fn();
+   const getActiveSubscriptionsByFrequency = jest.fn();
+
+   return {
+      repo: {
+         findByEmail,
+         create,
+         findByToken,
+         save,
+         getActiveSubscriptionsByFrequency,
+      } as unknown as SubscriptionRepositoryPort,
+      findByEmail,
+      create,
+      findByToken,
+      save,
+      getActiveSubscriptionsByFrequency,
+   };
+};
+
+const buildEmailSenderMock = () => {
+   const sendWelcomeEmail = jest.fn().mockResolvedValue(undefined);
+   const sendConfirmEmail = jest.fn().mockResolvedValue(undefined);
+   const sendUnsubscribeEmail = jest.fn().mockResolvedValue(undefined);
+
+   return {
+      emailSender: {
+         sendWelcomeEmail,
+         sendConfirmEmail,
+         sendUnsubscribeEmail,
+      } as unknown as EmailSenderPort,
+      sendWelcomeEmail,
+      sendConfirmEmail,
+      sendUnsubscribeEmail,
+   };
+};
+
+const buildCityValidatorMock = () => {
+   const validate = jest.fn().mockResolvedValue(undefined);
+   return { validator: { validate } as unknown as CityValidatorService, validate };
+};
+
+describe('SubscriptionService', () => {
+   const email = 'test@example.com';
+   const city = 'Kyiv';
+   const frequency = 'hourly';
+
+   const createService = () => {
+      const repositoryMocks = buildRepositoryMock();
+      const cityMocks = buildCityValidatorMock();
+      const emailMocks = buildEmailSenderMock();
+      const service = new SubscriptionService(repositoryMocks.repo, cityMocks.validator, emailMocks.emailSender);
+
+      return { service, repositoryMocks, cityMocks, emailMocks };
+   };
+
+   describe('subscribe()', () => {
+      it('creates new subscription and validates city', async () => {
+         const { service, repositoryMocks, cityMocks, emailMocks } = createService();
+
+         repositoryMocks.findByEmail.mockResolvedValue(null);
+         const created: Subscription = {
+            id: 1,
+            email,
+            city,
+            verificationToken: 'token',
+            isActive: false,
+            isVerified: false,
+         };
+         repositoryMocks.create.mockResolvedValue(created);
+         process.env.WEATHER_SERVICE_URL = 'http://weather-service:3001';
+
+         const result = await service.subscribe(email, city, frequency);
+
+         expect(cityMocks.validate).toHaveBeenCalledWith(city);
+         expect(repositoryMocks.create).toHaveBeenCalled();
+         expect(emailMocks.sendWelcomeEmail).toHaveBeenCalled();
+         expect(result).toEqual(created);
+      });
+
+      it('throws ConflictError when email already exists', async () => {
+         const { service, repositoryMocks, emailMocks } = createService();
+         repositoryMocks.findByEmail.mockResolvedValue({ email } as Subscription);
+         process.env.WEATHER_SERVICE_URL = 'http://weather-service:3001';
+
+         await expect(service.subscribe(email, city, frequency)).rejects.toBeInstanceOf(ConflictError);
+         expect(emailMocks.sendWelcomeEmail).not.toHaveBeenCalled();
+      });
+   });
+
+   describe('confirmSubscription()', () => {
+      const token = 'token-123';
+      it('activates subscription', async () => {
+         const { service, repositoryMocks, emailMocks } = createService();
+         const subscription: Subscription = {
+            id: 1,
+            email,
+            city,
+            verificationToken: token,
+            isActive: false,
+            isVerified: false,
+         };
+         repositoryMocks.findByToken.mockResolvedValue(subscription);
+
+         await service.confirmSubscription(token);
+
+         expect(subscription.isActive).toBe(true);
+         expect(subscription.isVerified).toBe(true);
+         expect(repositoryMocks.save).toHaveBeenCalledWith(subscription);
+         expect(emailMocks.sendConfirmEmail).toHaveBeenCalled();
+      });
+
+      it('throws NotFoundError when token not found', async () => {
+         const { service, repositoryMocks, emailMocks } = createService();
+         repositoryMocks.findByToken.mockResolvedValue(null);
+         await expect(service.confirmSubscription(token)).rejects.toBeInstanceOf(NotFoundError);
+         expect(emailMocks.sendConfirmEmail).not.toHaveBeenCalled();
+      });
+   });
+
+   describe('unsubscribe()', () => {
+      const token = 'token-456';
+      it('deactivates subscription', async () => {
+         const { service, repositoryMocks, emailMocks } = createService();
+         const subscription: Subscription = {
+            id: 1,
+            email,
+            city,
+            verificationToken: token,
+            isActive: true,
+            isVerified: true,
+         };
+         repositoryMocks.findByToken.mockResolvedValue(subscription);
+
+         await service.unsubscribe(token);
+
+         expect(subscription.isActive).toBe(false);
+         expect(repositoryMocks.save).toHaveBeenCalledWith(subscription);
+         expect(emailMocks.sendUnsubscribeEmail).toHaveBeenCalled();
+      });
+
+      it('throws NotFoundError when token not found', async () => {
+         const { service, repositoryMocks, emailMocks } = createService();
+         repositoryMocks.findByToken.mockResolvedValue(null);
+
+         await expect(service.unsubscribe(token)).rejects.toBeInstanceOf(NotFoundError);
+         expect(emailMocks.sendUnsubscribeEmail).not.toHaveBeenCalled();
+      });
+   });
+});

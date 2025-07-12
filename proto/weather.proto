@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package weather;
+
+service WeatherService {
+  // Returns 4-day weather forecast for the given city.
+  rpc GetWeatherForecast (WeatherRequest) returns (WeatherForecastResponse);
+  // Returns the current weather for the given city.
+  rpc GetCurrentWeather (WeatherRequest) returns (CurrentWeatherResponse);
+}
+
+// Request containing the city for which to fetch weather data.
+message WeatherRequest {
+  string city = 1;
+}
+
+// Four-day forecast response.
+message WeatherForecastResponse {
+  repeated ForecastEntry forecast = 1;
+}
+
+// One forecast entry per day.
+message ForecastEntry {
+  string date = 1;           // ISO date string (YYYY-MM-DD)
+  double temperature = 2;    // Average temperature in Celsius
+  string description = 3;    // e.g., "Cloudy", "Sunny"
+}
+
+// Current weather response.
+message CurrentWeatherResponse {
+  string city = 1;
+  double temperature = 2;
+  string description = 3;
+} 

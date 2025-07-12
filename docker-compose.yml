@@ -1,74 +1,74 @@
 version: '3.9'
 
 services:
-  pg:
-    image: postgres:17.4
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: example
-      POSTGRES_DB: app
-    ports:
-      - "5432:5432"
-    volumes:
-      - pg-data:/var/lib/postgresql/data
-      - ./scripts/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql:ro
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U app" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+   pg:
+      image: postgres:17.4
+      restart: unless-stopped
+      environment:
+         POSTGRES_USER: app
+         POSTGRES_PASSWORD: example
+         POSTGRES_DB: app
+      ports:
+         - '5432:5432'
+      volumes:
+         - pg-data:/var/lib/postgresql/data
+         - ./scripts/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql:ro
+      healthcheck:
+         test: ['CMD-SHELL', 'pg_isready -U app']
+         interval: 10s
+         timeout: 5s
+         retries: 5
 
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+   api:
+      build:
+         context: .
+         dockerfile: Dockerfile
 
-    environment:
-      POSTGRES_URL: postgresql://app:example@pg:5432/app
-      PORT: 3000
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-    env_file:
-      - .env
-    ports:
-      - "3000:3000"
-    depends_on:
-      pg:
-        condition: service_healthy
-      redis:
-        condition: service_started
+      environment:
+         POSTGRES_URL: postgresql://app:example@pg:5432/app
+         PORT: 3000
+         REDIS_HOST: redis
+         REDIS_PORT: 6379
+      env_file:
+         - .env
+      ports:
+         - '3000:3000'
+      depends_on:
+         pg:
+            condition: service_healthy
+         redis:
+            condition: service_started
 
-  redis:
-    image: redis:7.2-alpine
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
+   redis:
+      image: redis:7.2-alpine
+      restart: unless-stopped
+      ports:
+         - '6379:6379'
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - "9090:9090"
-    depends_on:
-      - api
+   prometheus:
+      image: prom/prometheus:latest
+      container_name: prometheus
+      volumes:
+         - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+         - prometheus-data:/prometheus
+      command:
+         - '--config.file=/etc/prometheus/prometheus.yml'
+      ports:
+         - '9090:9090'
+      depends_on:
+         - api
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    depends_on:
-      - prometheus
-    ports:
-      - "3001:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
+   grafana:
+      image: grafana/grafana:latest
+      container_name: grafana
+      depends_on:
+         - prometheus
+      ports:
+         - '3001:3000'
+      volumes:
+         - grafana-data:/var/lib/grafana
 
 volumes:
-  pg-data:
-  prometheus-data:
-  grafana-data:
+   pg-data:
+   prometheus-data:
+   grafana-data:
