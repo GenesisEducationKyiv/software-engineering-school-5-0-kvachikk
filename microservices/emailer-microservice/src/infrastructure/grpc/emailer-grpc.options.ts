@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+
 import { GrpcOptions, Transport } from '@nestjs/microservices';
 
 export const emailerGrpcOptions: GrpcOptions = {
@@ -8,4 +9,4 @@ export const emailerGrpcOptions: GrpcOptions = {
       package: 'emailer',
       protoPath: join(__dirname, '../../../../../../proto/emailer.proto'),
    },
-}; 
+};

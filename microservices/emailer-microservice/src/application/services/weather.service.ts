@@ -1,11 +1,14 @@
+import { join } from 'node:path';
+
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Client, ClientGrpc, Transport } from '@nestjs/microservices';
-import { join } from 'node:path';
 
 export type WeatherForecast = { temperature: number; humidity: number; description: string };
 
 interface WeatherGrpcService {
-   GetWeatherForecast(request: { city: string }): Promise<{ forecast: Array<{ date: string; temperature: number; description: string }> }>;
+   GetWeatherForecast(request: {
+      city: string;
+   }): Promise<{ forecast: Array<{ date: string; temperature: number; description: string }> }>;
 }
 
 @Injectable()

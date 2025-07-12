@@ -1,11 +1,11 @@
 import { ConflictError } from '../../domain/errors/conflict.error';
 import { NotFoundError } from '../../domain/errors/not-found.error';
 import { Subscription } from '../../domain/types/subscription';
+import { EmailSenderPort } from '../ports/email-sender.port';
 import { SubscriptionRepositoryPort } from '../ports/subscription-repository.port';
 
 import { CityValidatorService } from './city-validator.service';
 import { SubscriptionService } from './subscription.service';
-import { EmailSenderPort } from '../ports/email-sender.port';
 
 interface RepositoryMocks {
    repo: SubscriptionRepositoryPort;
@@ -70,11 +70,7 @@ describe('SubscriptionService', () => {
       const repositoryMocks = buildRepositoryMock();
       const cityMocks = buildCityValidatorMock();
       const emailMocks = buildEmailSenderMock();
-      const service = new SubscriptionService(
-         repositoryMocks.repo,
-         cityMocks.validator,
-         emailMocks.emailSender,
-      );
+      const service = new SubscriptionService(repositoryMocks.repo, cityMocks.validator, emailMocks.emailSender);
 
       return { service, repositoryMocks, cityMocks, emailMocks };
    };

@@ -1,8 +1,7 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ClientGrpc, Client } from '@nestjs/microservices';
 import { join } from 'node:path';
 
-import { Transport } from '@nestjs/microservices';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { ClientGrpc, Client, Transport } from '@nestjs/microservices';
 
 import { WeatherDataProviderPort } from '../../application/ports/weather-data-provider.port';
 import { NotFoundError } from '../../domain/errors/not-found.error';
@@ -40,4 +39,4 @@ export class GrpcWeatherProvider implements WeatherDataProviderPort, OnModuleIni
          throw error;
       }
    }
-} 
+}

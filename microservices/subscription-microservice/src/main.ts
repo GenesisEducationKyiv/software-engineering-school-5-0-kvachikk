@@ -4,8 +4,8 @@ import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { applicationConfig } from './infrastructure/config/application.config';
-import { AllExceptionsFilter } from './presentation/filters/all-exceptions.filter';
 import { subscriptionGrpcOptions } from './infrastructure/grpc/subscription-grpc.options';
+import { AllExceptionsFilter } from './presentation/filters/all-exceptions.filter';
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule);

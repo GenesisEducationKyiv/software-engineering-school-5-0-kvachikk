@@ -1,13 +1,13 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module, Global } from '@nestjs/common';
 
+import { EmailSenderPort } from '../../application/ports/email-sender.port';
 import { SubscriptionRepositoryPort } from '../../application/ports/subscription-repository.port';
 import { WeatherDataProviderPort } from '../../application/ports/weather-data-provider.port';
-import { EmailSenderPort } from '../../application/ports/email-sender.port';
 import { SubscriptionModel } from '../database/models/subscription.model';
 import { DatabaseLoader } from '../loaders/database.loader';
-import { GrpcWeatherProvider } from '../providers/grpc-weather-provider';
 import { GrpcEmailerSender } from '../providers/grpc-emailer-sender';
+import { GrpcWeatherProvider } from '../providers/grpc-weather-provider';
 import { SubscriptionRepository } from '../repositories/subscription.repository';
 
 @Global()

@@ -15,5 +15,4 @@ services:
          - .env
       ports:
          - '3002:3000'
-
 # Note: this compose expects weather-service and emailer-service to be started separately or via docker compose with proper network.

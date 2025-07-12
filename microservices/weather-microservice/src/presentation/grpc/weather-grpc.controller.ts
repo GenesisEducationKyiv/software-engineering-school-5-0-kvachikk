@@ -32,4 +32,4 @@ export class WeatherGrpcController {
          description: weather.description,
       };
    }
-} 
+}

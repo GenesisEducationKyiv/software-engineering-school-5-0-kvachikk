@@ -1,6 +1,7 @@
+import { join } from 'node:path';
+
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Client, ClientGrpc, Transport } from '@nestjs/microservices';
-import { join } from 'node:path';
 
 import { EmailSenderPort } from '../../application/ports/email-sender.port';
 
@@ -39,4 +40,4 @@ export class GrpcEmailerSender implements EmailSenderPort, OnModuleInit {
    async sendUnsubscribeEmail(email: string, city: string): Promise<void> {
       await this.emailerService.SendUnsubscribeEmail({ email, city, token: '' });
    }
-} 
+}

@@ -15,4 +15,4 @@ export class WeatherGatewayController {
   async forecast(@Query('city') city: string) {
     return this.weatherClient.getForecast(city);
   }
-} 
+}

@@ -1,9 +1,14 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Client, ClientGrpc, Transport } from '@nestjs/microservices';
 import { join } from 'node:path';
 
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Client, ClientGrpc, Transport } from '@nestjs/microservices';
+
 interface SubscriptionGrpc {
-  Subscribe(data: { email: string; city: string; frequency: string }): Promise<{ success: boolean; token: string }>;
+  Subscribe(data: {
+    email: string;
+    city: string;
+    frequency: string;
+  }): Promise<{ success: boolean; token: string }>;
   Confirm(data: { token: string }): Promise<{ success: boolean }>;
   Unsubscribe(data: { token: string }): Promise<{ success: boolean }>;
 }
@@ -23,7 +28,9 @@ export class SubscriptionClient implements OnModuleInit {
   private service!: SubscriptionGrpc;
 
   onModuleInit() {
-    this.service = this.client.getService<SubscriptionGrpc>('SubscriptionService');
+    this.service = this.client.getService<SubscriptionGrpc>(
+      'SubscriptionService',
+    );
   }
 
   subscribe(email: string, city: string, frequency: string) {
@@ -37,4 +44,4 @@ export class SubscriptionClient implements OnModuleInit {
   unsubscribe(token: string) {
     return this.service.Unsubscribe({ token });
   }
-} 
+}

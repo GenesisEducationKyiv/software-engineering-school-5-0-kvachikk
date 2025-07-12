@@ -30,4 +30,4 @@ export class EmailerGrpcController {
       await this.emailerService.sendUnsubscribeEmail(data.email, data.city);
       return { success: true };
    }
-} 
+}

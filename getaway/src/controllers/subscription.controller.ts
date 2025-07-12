@@ -7,7 +7,9 @@ export class SubscriptionGatewayController {
   constructor(private readonly subClient: SubscriptionClient) {}
 
   @Post('subscribe')
-  async subscribe(@Body() body: { email: string; city: string; frequency: string }) {
+  async subscribe(
+    @Body() body: { email: string; city: string; frequency: string },
+  ) {
     return this.subClient.subscribe(body.email, body.city, body.frequency);
   }
 
@@ -20,4 +22,4 @@ export class SubscriptionGatewayController {
   async unsubscribe(@Query('token') token: string) {
     return this.subClient.unsubscribe(token);
   }
-} 
+}

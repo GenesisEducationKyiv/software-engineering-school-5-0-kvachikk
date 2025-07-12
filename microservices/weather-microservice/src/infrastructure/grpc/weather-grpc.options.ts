@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+
 import { GrpcOptions, Transport } from '@nestjs/microservices';
 
 export const weatherGrpcOptions: GrpcOptions = {
@@ -8,4 +9,4 @@ export const weatherGrpcOptions: GrpcOptions = {
       package: 'weather',
       protoPath: join(__dirname, '../../../../../../proto/weather.proto'),
    },
-}; 
+};

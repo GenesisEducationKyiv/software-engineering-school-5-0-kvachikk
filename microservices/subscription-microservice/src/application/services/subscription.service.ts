@@ -7,10 +7,10 @@ import { NotFoundError } from '../../domain/errors/not-found.error';
 import { Subscription } from '../../domain/types/subscription';
 import { SUBSCRIPTION_FREQUENCIES } from '../../shared/constants/subscription-frequency';
 import { subscriptionResponseMessages } from '../../shared/constants/subscription-responses';
+import { EmailSenderPort } from '../ports/email-sender.port';
 import { SubscriptionRepositoryPort } from '../ports/subscription-repository.port';
 
 import { CityValidatorService } from './city-validator.service';
-import { EmailSenderPort } from '../ports/email-sender.port';
 
 @Injectable()
 export class SubscriptionService {

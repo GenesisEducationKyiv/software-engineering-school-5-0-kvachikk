@@ -1,10 +1,15 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Client, ClientGrpc, Transport } from '@nestjs/microservices';
 import { join } from 'node:path';
 
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Client, ClientGrpc, Transport } from '@nestjs/microservices';
+
 interface WeatherGrpc {
-  GetWeatherForecast(data: { city: string }): Promise<{ forecast: Array<{ date: string; temperature: number; description: string }> }>;
-  GetCurrentWeather(data: { city: string }): Promise<{ city: string; temperature: number; description: string }>;
+  GetWeatherForecast(data: { city: string }): Promise<{
+    forecast: Array<{ date: string; temperature: number; description: string }>;
+  }>;
+  GetCurrentWeather(data: {
+    city: string;
+  }): Promise<{ city: string; temperature: number; description: string }>;
 }
 
 @Injectable()
@@ -32,4 +37,4 @@ export class WeatherClient implements OnModuleInit {
   getCurrent(city: string) {
     return this.service.GetCurrentWeather({ city });
   }
-} 
+}

@@ -2,8 +2,8 @@ import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 import { applicationConfig } from './infrastructure/config/application.config';
-import { AllExceptionsFilter } from './shared/filters/all-exceptions.filter';
 import { emailerGrpcOptions } from './infrastructure/grpc/emailer-grpc.options';
+import { AllExceptionsFilter } from './shared/filters/all-exceptions.filter';
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule);
