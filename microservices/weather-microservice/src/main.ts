@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { weatherGrpcOptions } from './infrastructure/grpc/weather-grpc.options';
 
 import { AppModule } from './app.module';
 import { applicationConfig } from './infrastructure/config/application.config';
@@ -7,6 +8,10 @@ import { AllExceptionsFilter } from './shared/filters/all-exceptions.filter';
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule);
+
+   // Start gRPC microservice for internal communication
+   app.connectMicroservice(weatherGrpcOptions);
+   await app.startAllMicroservices();
 
    if (applicationConfig.environment !== 'production') {
       const swaggerDoc = SwaggerModule.createDocument(

@@ -66,4 +66,38 @@ export class EmailerService {
          },
       });
    }
+
+   public async sendWelcomeEmail(email: string, city: string, token: string): Promise<void> {
+      await this.sendTemplateLetter({
+         to: email,
+         subject: 'Welcome to Weather Subscription',
+         templatePath: 'welcome.html',
+         templateVars: {
+            city,
+            confirmUrl: `${this.applicationConfig.baseUrl}/confirm?token=${token}`,
+         },
+      });
+   }
+
+   public async sendConfirmEmail(email: string, city: string): Promise<void> {
+      await this.sendTemplateLetter({
+         to: email,
+         subject: 'Subscription confirmed',
+         templatePath: 'confirm.html',
+         templateVars: {
+            city,
+         },
+      });
+   }
+
+   public async sendUnsubscribeEmail(email: string, city: string): Promise<void> {
+      await this.sendTemplateLetter({
+         to: email,
+         subject: 'You have been unsubscribed',
+         templatePath: 'unsubscribe.html',
+         templateVars: {
+            city,
+         },
+      });
+   }
 }

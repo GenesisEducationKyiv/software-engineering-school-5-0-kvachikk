@@ -3,9 +3,11 @@ import { Module, Global } from '@nestjs/common';
 
 import { SubscriptionRepositoryPort } from '../../application/ports/subscription-repository.port';
 import { WeatherDataProviderPort } from '../../application/ports/weather-data-provider.port';
+import { EmailSenderPort } from '../../application/ports/email-sender.port';
 import { SubscriptionModel } from '../database/models/subscription.model';
 import { DatabaseLoader } from '../loaders/database.loader';
-import { ApiWeatherProvider } from '../providers/api-weather-provider';
+import { GrpcWeatherProvider } from '../providers/grpc-weather-provider';
+import { GrpcEmailerSender } from '../providers/grpc-emailer-sender';
 import { SubscriptionRepository } from '../repositories/subscription.repository';
 
 @Global()
@@ -19,9 +21,13 @@ import { SubscriptionRepository } from '../repositories/subscription.repository'
       },
       {
          provide: WeatherDataProviderPort,
-         useClass: ApiWeatherProvider,
+         useClass: GrpcWeatherProvider,
+      },
+      {
+         provide: EmailSenderPort,
+         useClass: GrpcEmailerSender,
       },
    ],
-   exports: [SubscriptionRepositoryPort, WeatherDataProviderPort],
+   exports: [SubscriptionRepositoryPort, WeatherDataProviderPort, EmailSenderPort],
 })
 export class SubscriptionInfrastructureModule {}

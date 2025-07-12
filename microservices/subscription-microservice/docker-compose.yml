@@ -9,18 +9,11 @@ services:
          RUN_ENVIRONMENT: production
          DEVELOPMENT_DB_URL: ${DEVELOPMENT_DB_URL}
          PRODUCTION_DB_URL: ${PRODUCTION_DB_URL}
-         WEATHER_SERVICE_URL: ${WEATHER_SERVICE_URL}
+         WEATHER_GRPC_URL: ${WEATHER_GRPC_URL:-weather-service:50051}
+         EMAILER_GRPC_URL: ${EMAILER_GRPC_URL:-emailer-service:50052}
       env_file:
          - .env
       ports:
-         - '3000:3000'
-      depends_on:
-         - weather-service
+         - '3002:3000'
 
-   weather-service:
-      #image:
-      container_name: weather-service
-      environment:
-         PORT: 3001
-      ports:
-         - '3001:3001'
+# Note: this compose expects weather-service and emailer-service to be started separately or via docker compose with proper network.

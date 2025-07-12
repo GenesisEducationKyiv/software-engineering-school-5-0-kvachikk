@@ -1,13 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Client, ClientGrpc, Transport } from '@nestjs/microservices';
+import { join } from 'node:path';
 
 export type WeatherForecast = { temperature: number; humidity: number; description: string };
 
+interface WeatherGrpcService {
+   GetWeatherForecast(request: { city: string }): Promise<{ forecast: Array<{ date: string; temperature: number; description: string }> }>;
+}
+
 @Injectable()
-export class WeatherService {
-   async getWeatherForecast(_city: string): Promise<WeatherForecast[]> {
-      return [
-         { temperature: 20, humidity: 60, description: 'Clear sky' },
-         { temperature: 22, humidity: 55, description: 'Few clouds' },
-      ];
+export class WeatherService implements OnModuleInit {
+   @Client({
+      transport: Transport.GRPC,
+      options: {
+         url: process.env.WEATHER_GRPC_URL ?? 'localhost:50051',
+         package: 'weather',
+         protoPath: join(__dirname, '../../../../../../proto/weather.proto'),
+      },
+   })
+   private readonly client!: ClientGrpc;
+
+   private weatherGrpcService!: WeatherGrpcService;
+
+   onModuleInit() {
+      this.weatherGrpcService = this.client.getService<WeatherGrpcService>('WeatherService');
+   }
+
+   async getWeatherForecast(city: string): Promise<WeatherForecast[]> {
+      const { forecast } = await this.weatherGrpcService.GetWeatherForecast({ city });
+      // Map gRPC response to internal DTO structure
+      return forecast.map((entry) => ({
+         temperature: entry.temperature,
+         humidity: 0, // humidity not present in gRPC response; set 0 or adjust
+         description: entry.description,
+      }));
    }
 }

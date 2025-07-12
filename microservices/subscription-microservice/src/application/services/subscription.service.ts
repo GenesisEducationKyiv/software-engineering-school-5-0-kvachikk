@@ -10,12 +10,14 @@ import { subscriptionResponseMessages } from '../../shared/constants/subscriptio
 import { SubscriptionRepositoryPort } from '../ports/subscription-repository.port';
 
 import { CityValidatorService } from './city-validator.service';
+import { EmailSenderPort } from '../ports/email-sender.port';
 
 @Injectable()
 export class SubscriptionService {
    constructor(
       private readonly subscriptionRepository: SubscriptionRepositoryPort,
       private readonly cityValidator: CityValidatorService,
+      private readonly emailSender: EmailSenderPort,
    ) {}
 
    private async validateCity(city: string): Promise<void> {
@@ -39,7 +41,7 @@ export class SubscriptionService {
 
       const token = randomBytes(32).toString('hex');
 
-      // TODO: send welcome email via emailer microservice (not implemented yet)
+      await this.emailSender.sendWelcomeEmail(email, city, token);
 
       return this.subscriptionRepository.create({
          email: email.toUpperCase(),
@@ -61,7 +63,7 @@ export class SubscriptionService {
       subscription.isVerified = true;
 
       await this.subscriptionRepository.save(subscription);
-      // TODO: send confirmation email
+      await this.emailSender.sendConfirmEmail(subscription.email, subscription.city);
    }
 
    async unsubscribe(token: string): Promise<void> {
@@ -72,7 +74,7 @@ export class SubscriptionService {
 
       subscription.isActive = false;
       await this.subscriptionRepository.save(subscription);
-      // TODO: send unsubscribe email
+      await this.emailSender.sendUnsubscribeEmail(subscription.email, subscription.city);
    }
 
    async getActiveSubscriptions(frequencyTitle: string): Promise<Subscription[]> {

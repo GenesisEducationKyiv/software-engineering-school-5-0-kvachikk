@@ -1,0 +1,40 @@
+PORT=3000
+# gRPC endpoints of internal services (inside Docker compose network)
+WEATHER_GRPC_URL=weather-service:50051
+SUBSCRIPTION_GRPC_URL=subscription-service:50053
+
+# ------------------------------
+# WEATHER SERVICE
+PORT=3000
+REDIS_HOST=redis
+REDIS_PORT=6379
+# External APIs
+OPEN_WEATHER_API_URL=https://api.openweathermap.org/data/2.5
+OPEN_WEATHER_API_KEY=<REPLACE_WITH_OPENWEATHER_KEY>
+OPEN_WEATHER_GEO_URL=http://api.openweathermap.org/geo/1.0/direct
+OPEN_WEATHER_GEO_KEY=<REPLACE_WITH_OPENWEATHER_KEY>
+
+# ------------------------------
+# EMAILER SERVICE
+PORT=3000
+# Database connection strings (examples)
+DEVELOPMENT_DB_URL=sqlite::memory:
+PRODUCTION_DB_URL=postgresql://app:example@pg:5432/app
+# Mail provider
+MAIL_PROVIDER_API_KEY=<REPLACE_WITH_RESEND_KEY>
+MAIL_PROVIDER_SENDER_EMAIL=weather@example.com
+# gRPC endpoint of Weather service
+WEATHER_GRPC_URL=weather-service:50051
+
+# ------------------------------
+# SUBSCRIPTION SERVICE
+PORT=3000
+DEVELOPMENT_DB_URL=sqlite::memory:
+PRODUCTION_DB_URL=postgresql://app:example@pg:5432/app
+# gRPC endpoints
+WEATHER_GRPC_URL=weather-service:50051
+EMAILER_GRPC_URL=emailer-service:50052
+
+# ------------------------------
+# SHARED / OTHER SERVICES
+RUN_ENVIRONMENT=production

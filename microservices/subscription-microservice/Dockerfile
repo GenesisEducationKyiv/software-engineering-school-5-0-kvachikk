@@ -2,7 +2,7 @@ FROM node:24
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 ENV RUN_ENVIROMENT production

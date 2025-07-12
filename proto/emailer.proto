@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package emailer;
+
+service EmailerService {
+  rpc SendWelcomeEmail (SubscriptionEmail) returns (EmailerResponse);
+  rpc SendConfirmEmail (SubscriptionEmail) returns (EmailerResponse);
+  rpc SendUnsubscribeEmail (SubscriptionEmail) returns (EmailerResponse);
+}
+
+message SubscriptionEmail {
+  string email = 1;
+  string city = 2;
+  string token = 3;
+}
+
+message EmailerResponse {
+  bool success = 1;
+} 
