@@ -2,7 +2,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
-import { CacheTTL } from '../../domain/constants/cache-ttl';
+import { TimeUnits } from '../../shared/constants/time-units';
 import { CACHE_METRICS, CacheMetrics } from '../modules/metrics.module';
 
 @Injectable()
@@ -32,7 +32,7 @@ export class MonitoredCacheService {
       return data ?? undefined;
    }
 
-   async setData<T>(key: string, value: T, ttl: number = CacheTTL.TEN_MINUTE) {
+   async setData<T>(key: string, value: T, ttl: number = TimeUnits.MINUTE * 10) {
       const start = process.hrtime();
       await this.cacheManager.set(key, value, ttl);
       this.recordLatency(start);

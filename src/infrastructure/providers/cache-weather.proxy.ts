@@ -1,26 +1,18 @@
 import { Injectable } from '@nestjs/common';
 
+import { WeatherDataProvider } from '../../application/ports/weather-data-provider.port';
 import { CacheService } from '../../application/services/cache.service';
-import { CacheTTL } from '../../domain/constants/cache-ttl';
 import { Weather } from '../../domain/types/weather';
-import { GetWeatherOptions } from '../../domain/types/weather.options';
-
-import { ChainableWeatherProvider } from './chainable-weather-provider';
+import { TimeUnits } from '../../shared/constants/time-units';
 
 @Injectable()
-export class CacheWeatherProxy extends ChainableWeatherProvider {
+export class CacheWeatherProxy implements WeatherDataProvider {
    constructor(
-      private readonly decorate: ChainableWeatherProvider,
+      private readonly decorate: WeatherDataProvider,
       private readonly cacheService: CacheService,
-   ) {
-      super();
-   }
+   ) {}
 
-   setNext(handler: ChainableWeatherProvider): ChainableWeatherProvider {
-      return this.decorate.setNext(handler);
-   }
-
-   async getWeather(options: GetWeatherOptions): Promise<Weather[]> {
+   async handle(options: { city: string; date: Date }): Promise<Weather[]> {
       const cacheKey = options.city.trim().toUpperCase();
       const cachedData = await this.cacheService.getData<Weather[]>(cacheKey);
 
@@ -29,7 +21,7 @@ export class CacheWeatherProxy extends ChainableWeatherProvider {
       }
 
       const data = await this.decorate.handle(options);
-      await this.cacheService.setData(cacheKey, data, CacheTTL.TEN_MINUTE);
+      await this.cacheService.setData(cacheKey, data, TimeUnits.MINUTE * 10);
       return data;
    }
 }

@@ -19,7 +19,7 @@ export abstract class ChainableWeatherProvider
       try {
          return await this.getWeather(options);
       } catch (error) {
-         if (this.nextHandler && this.onError?.(error as Error)) {
+         if (this.nextHandler) {
             return this.nextHandler.handle(options);
          }
 

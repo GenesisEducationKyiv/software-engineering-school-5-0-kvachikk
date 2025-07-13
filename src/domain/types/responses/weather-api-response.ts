@@ -11,22 +11,23 @@ export type WeatherApiResponse = {
    };
    current: {
       temp_c: number;
-      condition: {
-         text: string;
-      };
+      condition: { text: string };
       humidity: number;
    };
-   forecast: {
-      forecastday: {
-         date: string;
-         date_epoch: number;
-         day: {
-            maxtemp_c: number;
-            avghumidity: number;
-            condition: {
-               text: string;
-            };
+   forecast?: {
+      forecastday?: {
+         date?: string;
+         date_epoch?: number;
+         day?: {
+            maxtemp_c?: number;
+            avghumidity?: number;
+            condition?: { text?: string };
          };
+         hour?: {
+            temp_c?: number;
+            humidity?: number;
+            condition?: { text?: string };
+         }[];
       }[];
    };
 };

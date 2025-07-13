@@ -2,11 +2,11 @@ import { randomBytes } from 'node:crypto';
 
 import { Injectable } from '@nestjs/common';
 
-import { SUBSCRIPTION_FREQUENCIES } from '../../../domain/constants/subscription-frequency';
 import { ConflictError } from '../../../domain/errors/conflict.error';
 import { NotFoundError } from '../../../domain/errors/not-found.error';
 import { Subscription } from '../../../domain/types/subscription';
 import { subscriptionResponseMessages } from '../../../shared/constants/message/subscription-responses';
+import { SUBSCRIPTION_FREQUENCIES } from '../../../shared/constants/subscription-frequency';
 import { SubscriptionRepositoryPort } from '../../ports/subscription-repository.port';
 import { EmailerService } from '../emailer.service';
 import { WeatherService } from '../weather.service';
@@ -36,7 +36,9 @@ export class SubscriptionService {
 
       const token = randomBytes(32).toString('hex');
 
-      const created = await this.subscriptionRepository.create({
+      await this.emailer.sendWelcomeEmail(email, city, token);
+
+      return await this.subscriptionRepository.create({
          email: email.toUpperCase(),
          city: city.toUpperCase(),
          frequency: freqUpper,
@@ -44,9 +46,6 @@ export class SubscriptionService {
          isVerified: false,
          isActive: false,
       });
-
-      await this.emailer.sendWelcomeEmail(email, city, token);
-      return this.toDomain(created);
    }
 
    async confirmSubscription(token: string): Promise<void> {
@@ -79,19 +78,6 @@ export class SubscriptionService {
    }
 
    async getActiveSubscriptions(frequencyTitle: string): Promise<Subscription[]> {
-      const items = await this.subscriptionRepository.getActiveSubscriptionsByFrequency(frequencyTitle);
-      return items.map((i) => this.toDomain(i));
-   }
-
-   private toDomain(model: {
-      id?: number;
-      email: string;
-      city: string;
-      verificationToken: string;
-      isVerified: boolean;
-      isActive: boolean;
-   }): Subscription {
-      const { id, email, city, verificationToken, isVerified, isActive } = model;
-      return { id, email, city, verificationToken, isVerified, isActive };
+      return this.subscriptionRepository.getActiveSubscriptionsByFrequency(frequencyTitle);
    }
 }

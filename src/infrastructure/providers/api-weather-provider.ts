@@ -41,10 +41,47 @@ export class ApiWeatherProvider extends ChainableWeatherProvider {
    }
 
    private formatWeatherData(data: WeatherApiResponse): Weather[] {
-      return data.forecast.forecastday.map((day) => ({
-         temperature: day.day.maxtemp_c,
-         humidity: day.day.avghumidity,
-         description: day.day.condition.text,
-      }));
+      const forecastDays = data.forecast?.forecastday ?? [];
+      const result: Weather[] = [];
+
+      for (const day of forecastDays) {
+         const daily = day.day;
+
+         if (daily && typeof daily.maxtemp_c === 'number' && daily.condition?.text) {
+            result.push({
+               temperature: daily.maxtemp_c,
+               humidity: daily.avghumidity ?? data.current?.humidity ?? 0,
+               description: daily.condition.text,
+            });
+            continue;
+         }
+
+         const hours = day.hour ?? [];
+         const fallbackHour = hours[12] ?? hours[Math.floor(hours.length / 2)] ?? hours[0];
+
+         if (fallbackHour && typeof fallbackHour.temp_c === 'number' && fallbackHour.condition?.text) {
+            result.push({
+               temperature: fallbackHour.temp_c,
+               humidity: fallbackHour.humidity ?? data.current?.humidity ?? 0,
+               description: fallbackHour.condition.text,
+            });
+         }
+      }
+
+      if (result.length) {
+         return result;
+      }
+
+      if (data.current?.condition?.text) {
+         return [
+            {
+               temperature: data.current.temp_c,
+               humidity: data.current.humidity,
+               description: data.current.condition.text,
+            },
+         ];
+      }
+
+      throw new Error('No valid weather data in WeatherAPI response');
    }
 }

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { SUBSCRIPTION_FREQUENCIES } from '../../domain/constants/subscription-frequency';
 import { Subscription } from '../../domain/types/subscription';
-import { AppLogger } from '../../infrastructure/logger/logger.service';
+import { Logger } from '../../infrastructure/logger/logger.interface';
+import { SUBSCRIPTION_FREQUENCIES } from '../../shared/constants/subscription-frequency';
 
 import { EmailerService } from './emailer.service';
 import { SubscriptionService } from './subscription/subscription.service';
@@ -13,7 +13,7 @@ export class SchedulerService {
    constructor(
       private readonly emailer: EmailerService,
       private readonly subscriptionService: SubscriptionService,
-      private readonly logger: AppLogger,
+      private readonly logger: Logger,
    ) {}
 
    @Cron(CronExpression.EVERY_HOUR)
