@@ -14,8 +14,8 @@ export class SubscriptionRepository extends SubscriptionRepositoryPort {
    }
 
    private toDomain(model: SubscriptionModel): Subscription {
-      const { id, email, city, verificationToken, isVerified, isActive } = model;
-      return { id, email, city, verificationToken, isVerified, isActive };
+      const { id, email, city, verificationToken, isVerified, isActive, frequency } = model;
+      return { id, email, city, verificationToken, isVerified, isActive, frequency };
    }
 
    private async getModelById(id: number | undefined): Promise<SubscriptionModel | null> {

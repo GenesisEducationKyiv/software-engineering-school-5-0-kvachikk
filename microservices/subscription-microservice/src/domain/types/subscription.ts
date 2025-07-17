@@ -5,4 +5,5 @@ export type Subscription = {
    verificationToken: string;
    isVerified: boolean;
    isActive: boolean;
+   frequency: string;
 };

@@ -27,9 +27,7 @@
       "test:ui": "npm --workspaces --if-present run test:ui",
       "test:watch": "jest --watch",
       "test:cov": "jest --coverage",
-      "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-      "micro:up": "docker compose -f docker-compose.micro.yml up --build -d",
-      "micro:down": "docker compose -f docker-compose.micro.yml down"
+      "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
    },
    "dependencies": {
       "@grpc/grpc-js": "^1.13.4",

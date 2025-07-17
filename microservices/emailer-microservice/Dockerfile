@@ -1,15 +1,17 @@
-FROM node:24
+FROM node:20-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 
-COPY ../../proto ./proto
-
 COPY . .
-ENV RUN_ENVIROMENT production
 RUN npm run build
 
-EXPOSE 3000 50052
-
-CMD npm run start 
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY --from=build /app/dist ./dist
+EXPOSE 3000
+EXPOSE 50052
+CMD ["node", "dist/main.js"]
