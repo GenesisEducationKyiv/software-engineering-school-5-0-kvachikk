@@ -48,7 +48,8 @@ PORT=3000
 RUN_ENVIROMENT=development   # or test / production
 URL=http://localhost:3000    # base URL (used in e-mail templates)
 
-# PostgreSQL (Sequelize)
+KAFKA_URL=localhost:29092
+
 DEVELOPMENT_DB_URL=postgres//...............
 TEST_DB_URL=postgres://.....................
 PRODUCTION_DB_URL=postgres://...............

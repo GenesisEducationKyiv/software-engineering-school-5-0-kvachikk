@@ -1,9 +1,15 @@
 version: '3.9'
 
+networks:
+   app-net:
+      driver: bridge
+
 services:
    pg:
       image: postgres:17.4
       restart: unless-stopped
+      networks:
+         - app-net
       environment:
          POSTGRES_USER: app
          POSTGRES_PASSWORD: example
@@ -19,35 +25,96 @@ services:
          timeout: 5s
          retries: 5
 
-   api:
-      build:
-         context: .
-         dockerfile: Dockerfile
-
-      environment:
-         POSTGRES_URL: postgresql://app:example@pg:5432/app
-         PORT: 3000
-         REDIS_HOST: redis
-         REDIS_PORT: 6379
-      env_file:
-         - .env
-      ports:
-         - '3000:3000'
-      depends_on:
-         pg:
-            condition: service_healthy
-         redis:
-            condition: service_started
-
    redis:
       image: redis:7.2-alpine
       restart: unless-stopped
+      networks:
+         - app-net
       ports:
          - '6379:6379'
+
+   zookeeper:
+      image: confluentinc/cp-zookeeper:7.0.1
+      container_name: zookeeper
+      networks:
+         - app-net
+      environment:
+         ZOOKEEPER_CLIENT_PORT: 2181
+         ZOOKEEPER_TICK_TIME: 2000
+
+   kafka:
+      image: confluentinc/cp-kafka:7.0.1
+      container_name: kafka
+      networks:
+         - app-net
+      depends_on:
+         - zookeeper
+      ports:
+         - '9092:9092'
+      environment:
+         KAFKA_BROKER_ID: 1
+         KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+         KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+         KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+         KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+         KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+   subscription-service:
+      build:
+         context: ./subscription-microservice
+         dockerfile: Dockerfile
+      container_name: subscription-service
+      networks:
+         - app-net
+      depends_on:
+         pg:
+            condition: service_healthy
+         kafka:
+            condition: service_started
+         redis:
+            condition: service_started
+      environment:
+         RUN_ENVIRONMENT: ${RUN_ENVIRONMENT:-production}
+         PORT: ${SUB_PORT:-3002}
+
+         POSTGRES_URL: postgresql://app:example@pg:5432/app
+         KAFKA_URL: kafka:29092
+         REDIS_HOST: redis
+         REDIS_PORT: 6379
+
+         WEATHER_GRPC_URL: ${WEATHER_GRPC_URL:-weather-service:50051}
+
+      ports:
+         - '3002:3002'
+
+   emailer-service:
+      build:
+         context: ./emailer-microservice
+         dockerfile: Dockerfile
+      container_name: emailer-service
+      networks:
+         - app-net
+      depends_on:
+         - kafka
+      environment:
+         RUN_ENVIRONMENT: ${RUN_ENVIRONMENT:-production}
+         PORT: ${EMAILER_PORT:-3000}
+         GRPC_PORT: ${EMAILER_GRPC_PORT:-50052}
+
+         KAFKA_URL: kafka:29092
+
+         MAIL_PROVIDER_API_KEY: ${MAIL_PROVIDER_API_KEY}
+         MAIL_PROVIDER_SENDER_EMAIL: ${MAIL_PROVIDER_SENDER_EMAIL}
+
+      ports:
+         - '3003:3000'
+         - '50052:50052'
 
    prometheus:
       image: prom/prometheus:latest
       container_name: prometheus
+      networks:
+         - app-net
       volumes:
          - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
          - prometheus-data:/prometheus
@@ -55,12 +122,12 @@ services:
          - '--config.file=/etc/prometheus/prometheus.yml'
       ports:
          - '9090:9090'
-      depends_on:
-         - api
 
    grafana:
       image: grafana/grafana:latest
       container_name: grafana
+      networks:
+         - app-net
       depends_on:
          - prometheus
       ports:

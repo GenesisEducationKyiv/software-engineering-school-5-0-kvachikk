@@ -1,18 +1,51 @@
 version: '3.9'
 
+networks:
+   app-net:
+      driver: bridge
+
 services:
+   zookeeper:
+      image: confluentinc/cp-zookeeper:7.0.1
+      container_name: zookeeper
+      networks:
+         - app-net
+      environment:
+         ZOOKEEPER_CLIENT_PORT: 2181
+         ZOOKEEPER_TICK_TIME: 2000
+
+   kafka:
+      image: confluentinc/cp-kafka:7.0.1
+      container_name: kafka
+      networks:
+         - app-net
+      depends_on:
+         - zookeeper
+      ports:
+         - '9092:9092'
+      environment:
+         KAFKA_BROKER_ID: 1
+         KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+         KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+         KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+         KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+         KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
    subscription-service:
       build: .
       container_name: subscription-service
+      networks:
+         - app-net
+      depends_on:
+         - kafka
       environment:
          PORT: 3000
          RUN_ENVIRONMENT: production
          DEVELOPMENT_DB_URL: ${DEVELOPMENT_DB_URL}
          PRODUCTION_DB_URL: ${PRODUCTION_DB_URL}
          WEATHER_GRPC_URL: ${WEATHER_GRPC_URL:-weather-service:50051}
-         EMAILER_GRPC_URL: ${EMAILER_GRPC_URL:-emailer-service:50052}
+         KAFKA_URL: kafka:29092
       env_file:
          - .env
       ports:
          - '3002:3000'
-# Note: this compose expects weather-service and emailer-service to be started separately or via docker compose with proper network.
