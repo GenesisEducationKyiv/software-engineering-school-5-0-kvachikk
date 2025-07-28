@@ -3,6 +3,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 
 import { SubscriptionRepositoryPort } from '../../application/ports/subscription-repository.port';
 import { FileLogger, AppLogger } from '../../shared/logger/logger.service';
+import { LOGGER } from '../../shared/tokens/logger.token';
 import { ApplicationConfigProvider } from '../config/application.config';
 import { databaseConfig, DatabaseConfigProvider } from '../config/database.config';
 import { MailConfigProvider } from '../config/mail.config';
@@ -27,7 +28,10 @@ import { MetricsModule } from './metrics.module';
    ],
    providers: [
       FileLogger,
-      AppLogger,
+      {
+         provide: LOGGER,
+         useClass: AppLogger,
+      },
       DatabaseConfigProvider,
       ApplicationConfigProvider,
       MailConfigProvider,
@@ -36,13 +40,6 @@ import { MetricsModule } from './metrics.module';
          useFactory: () => new SubscriptionRepository(SubscriptionModel),
       },
    ],
-   exports: [
-      SubscriptionRepositoryPort,
-      DatabaseConfigProvider,
-      ApplicationConfigProvider,
-      MailConfigProvider,
-      FileLogger,
-      AppLogger,
-   ],
+   exports: [SubscriptionRepositoryPort, DatabaseConfigProvider, ApplicationConfigProvider, MailConfigProvider, LOGGER],
 })
 export class EmailerInfrastructureModule {}

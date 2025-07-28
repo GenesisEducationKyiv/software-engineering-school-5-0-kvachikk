@@ -70,29 +70,27 @@ export class FileLogger implements Logger {
 
 @Injectable()
 export class AppLogger implements Logger {
-   private readonly decorated: Logger;
+   constructor(private readonly base: FileLogger) {}
 
-   constructor(private readonly base: FileLogger) {
-      this.decorated = base;
+   private readonly sampleRate = Math.min(Math.max(parseFloat(process.env.LOG_SAMPLE_RATE ?? '1'), 0), 1);
+
+   private shouldLog(): boolean {
+      return Math.random() < this.sampleRate;
    }
 
    info(msg: string): void {
-      this.decorated.info(msg);
+      if (this.shouldLog()) this.base.info(msg);
    }
-
    warn(msg: string): void {
-      this.decorated.warn(msg);
+      if (this.shouldLog()) this.base.warn(msg);
    }
-
    error(msg: string): void {
-      this.decorated.error(msg);
+      if (this.shouldLog()) this.base.error(msg);
    }
-
    debug(msg: string, source?: string, data?: unknown): void {
-      this.decorated.debug(msg, source, data);
+      if (this.shouldLog()) this.base.debug(msg, source, data);
    }
-
    response(msg: string, source: string, data: unknown): void {
-      this.decorated.response(msg, source, data);
+      if (this.shouldLog()) this.base.response(msg, source, data);
    }
 }
