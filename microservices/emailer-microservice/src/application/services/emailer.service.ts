@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Optional, Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
 
 import { ApplicationConfig } from '../../domain/types/configurations/application-config';
 import { MailConfig } from '../../domain/types/configurations/mail-config';
 import { Subscription } from '../../domain/types/subscription';
 import { TemplateLetterParams } from '../../domain/types/template-letter-params';
+import { EMAIL_METRICS, EmailMetrics } from '../../infrastructure/modules/metrics.module';
 import { AppLogger } from '../../shared/logger/logger.service';
 import { APPLICATION_CONFIG, MAIL_CONFIG } from '../../shared/tokens/config-tokens';
 
@@ -23,6 +24,7 @@ export class EmailerService {
       @Inject(MAIL_CONFIG) private readonly mailConfig: MailConfig,
       @Inject(APPLICATION_CONFIG) private readonly applicationConfig: ApplicationConfig,
       private readonly logger: AppLogger,
+      @Optional() @Inject(EMAIL_METRICS) private readonly metrics?: EmailMetrics,
    ) {
       this.resend = new Resend(this.mailConfig.apiKey);
    }
@@ -41,12 +43,19 @@ export class EmailerService {
       const letter = { from: senderEmail, to, subject, html, text };
       if (this.emailValidation.isValidLetter(letter)) {
          this.logger.debug('Sending email', 'EmailerService', letter);
-         await this.resend.emails.send({
-            from: senderEmail,
-            to,
-            subject,
-            html,
-         });
+         try {
+            await this.resend.emails.send({
+               from: senderEmail,
+               to,
+               subject,
+               html,
+            });
+            this.metrics?.sentCounter.inc();
+         } catch (err) {
+            this.logger.error(`Error sending email: ${err}`);
+            this.metrics?.errorCounter.inc();
+            throw err;
+         }
          this.logger.info(`Email sent: ${subject} to ${to}`);
       } else {
          this.logger.warn(`Invalid email data: ${JSON.stringify(letter)}`);

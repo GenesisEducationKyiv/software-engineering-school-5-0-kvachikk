@@ -2,6 +2,7 @@ import { HttpModule, HttpService } from '@nestjs/axios';
 import { Global, Module } from '@nestjs/common';
 
 import { FileLogger, AppLogger } from '../../shared/logger/logger.service';
+import { LOGGER } from '../../shared/tokens/logger.token';
 import { CACHE_SERVICE } from '../../shared/tokens/service-tokens';
 import { ApiWeatherProvider } from '../providers/api-weather-provider';
 import { CacheWeatherProxy } from '../providers/cache-weather.proxy';
@@ -17,14 +18,17 @@ import { MetricsModule } from './metrics.module';
    imports: [HttpModule, MetricsModule],
    providers: [
       FileLogger,
-      AppLogger,
+      {
+         provide: LOGGER,
+         useClass: AppLogger,
+      },
       {
          provide: OpenWeatherProvider,
          useFactory: (logger: AppLogger, httpService: HttpService) => {
             const provider = new OpenWeatherProvider(httpService);
             return new LoggingWeatherDecorator(provider, logger, 'OpenWeather');
          },
-         inject: [AppLogger, HttpService],
+         inject: [LOGGER, HttpService],
       },
       {
          provide: ApiWeatherProvider,
@@ -32,7 +36,7 @@ import { MetricsModule } from './metrics.module';
             const provider = new ApiWeatherProvider(httpService);
             return new LoggingWeatherDecorator(provider, logger, 'WeatherAPI');
          },
-         inject: [AppLogger, HttpService],
+         inject: [LOGGER, HttpService],
       },
       CacheService,
       {
@@ -48,6 +52,6 @@ import { MetricsModule } from './metrics.module';
          inject: [OpenWeatherProvider, ApiWeatherProvider, CACHE_SERVICE],
       },
    ],
-   exports: ['WeatherHandler'],
+   exports: ['WeatherHandler', LOGGER],
 })
 export class WeatherInfrastructureModule {}

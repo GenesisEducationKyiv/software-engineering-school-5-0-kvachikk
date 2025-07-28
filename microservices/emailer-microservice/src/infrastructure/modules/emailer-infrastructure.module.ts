@@ -3,11 +3,14 @@ import { SequelizeModule } from '@nestjs/sequelize';
 
 import { SubscriptionRepositoryPort } from '../../application/ports/subscription-repository.port';
 import { FileLogger, AppLogger } from '../../shared/logger/logger.service';
+import { LOGGER } from '../../shared/tokens/logger.token';
 import { ApplicationConfigProvider } from '../config/application.config';
 import { databaseConfig, DatabaseConfigProvider } from '../config/database.config';
 import { MailConfigProvider } from '../config/mail.config';
 import { SubscriptionModel } from '../database/models/subscription.model';
 import { SubscriptionRepository } from '../repositories/subscription.repository';
+
+import { MetricsModule } from './metrics.module';
 
 @Module({
    imports: [
@@ -21,10 +24,14 @@ import { SubscriptionRepository } from '../repositories/subscription.repository'
          pool: databaseConfig.current.pool,
       }),
       SequelizeModule.forFeature([SubscriptionModel]),
+      MetricsModule,
    ],
    providers: [
       FileLogger,
-      AppLogger,
+      {
+         provide: LOGGER,
+         useClass: AppLogger,
+      },
       DatabaseConfigProvider,
       ApplicationConfigProvider,
       MailConfigProvider,
@@ -33,13 +40,6 @@ import { SubscriptionRepository } from '../repositories/subscription.repository'
          useFactory: () => new SubscriptionRepository(SubscriptionModel),
       },
    ],
-   exports: [
-      SubscriptionRepositoryPort,
-      DatabaseConfigProvider,
-      ApplicationConfigProvider,
-      MailConfigProvider,
-      FileLogger,
-      AppLogger,
-   ],
+   exports: [SubscriptionRepositoryPort, DatabaseConfigProvider, ApplicationConfigProvider, MailConfigProvider, LOGGER],
 })
 export class EmailerInfrastructureModule {}
