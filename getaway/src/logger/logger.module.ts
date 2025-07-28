@@ -4,7 +4,7 @@ import { AppLogger, FileLogger } from './logger.service';
 
 @Global()
 @Module({
-   providers: [FileLogger, AppLogger],
-   exports: [AppLogger],
+  providers: [FileLogger, AppLogger],
+  exports: [AppLogger],
 })
-export class LoggerModule {} 
+export class LoggerModule {}

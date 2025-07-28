@@ -1,11 +1,12 @@
 import { randomBytes } from 'node:crypto';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Optional, Injectable } from '@nestjs/common';
 
 import { ConflictError } from '../../domain/errors/conflict.error';
 import { NotFoundError } from '../../domain/errors/not-found.error';
 import { Subscription } from '../../domain/types/subscription';
 import { ProducerService } from '../../infrastructure/kafka/producer.service';
+import { SUBSCRIPTION_METRICS, SubscriptionMetrics } from '../../infrastructure/modules/metrics.module';
 import { SUBSCRIPTION_FREQUENCIES } from '../../shared/constants/subscription-frequency';
 import { subscriptionResponseMessages } from '../../shared/constants/subscription-responses';
 import { SubscriptionRepositoryPort } from '../ports/subscription-repository.port';
@@ -18,6 +19,7 @@ export class SubscriptionService {
       private readonly subscriptionRepository: SubscriptionRepositoryPort,
       private readonly cityValidator: CityValidatorService,
       private readonly producerService: ProducerService,
+      @Optional() @Inject(SUBSCRIPTION_METRICS) private readonly metrics?: SubscriptionMetrics,
    ) {}
 
    private async validateCity(city: string): Promise<void> {
@@ -50,6 +52,8 @@ export class SubscriptionService {
          ],
       });
 
+      this.metrics?.createdCounter.inc();
+
       return this.subscriptionRepository.create({
          email: email.toUpperCase(),
          city: city.toUpperCase(),
@@ -79,6 +83,8 @@ export class SubscriptionService {
             },
          ],
       });
+
+      this.metrics?.confirmedCounter.inc();
    }
 
    async unsubscribe(token: string): Promise<void> {
@@ -98,5 +104,7 @@ export class SubscriptionService {
             },
          ],
       });
+
+      this.metrics?.unsubscribedCounter.inc();
    }
 }

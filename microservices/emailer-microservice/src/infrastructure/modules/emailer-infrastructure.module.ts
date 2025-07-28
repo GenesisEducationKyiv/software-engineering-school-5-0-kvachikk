@@ -9,6 +9,8 @@ import { MailConfigProvider } from '../config/mail.config';
 import { SubscriptionModel } from '../database/models/subscription.model';
 import { SubscriptionRepository } from '../repositories/subscription.repository';
 
+import { MetricsModule } from './metrics.module';
+
 @Module({
    imports: [
       SequelizeModule.forRoot({
@@ -21,6 +23,7 @@ import { SubscriptionRepository } from '../repositories/subscription.repository'
          pool: databaseConfig.current.pool,
       }),
       SequelizeModule.forFeature([SubscriptionModel]),
+      MetricsModule,
    ],
    providers: [
       FileLogger,

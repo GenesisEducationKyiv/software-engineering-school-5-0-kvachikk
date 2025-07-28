@@ -10,9 +10,11 @@ import { GrpcEmailerSender } from '../providers/grpc-emailer-sender';
 import { GrpcWeatherProvider } from '../providers/grpc-weather-provider';
 import { SubscriptionRepository } from '../repositories/subscription.repository';
 
+import { MetricsModule } from './metrics.module';
+
 @Global()
 @Module({
-   imports: [HttpModule],
+   imports: [HttpModule, MetricsModule],
    providers: [
       DatabaseLoader,
       {
