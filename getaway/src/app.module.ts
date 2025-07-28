@@ -6,9 +6,10 @@ import { SubscriptionClient } from './clients/subscription.client';
 import { WeatherClient } from './clients/weather.client';
 import { SubscriptionGatewayController } from './controllers/subscription.controller';
 import { WeatherGatewayController } from './controllers/weather.controller';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
-  imports: [],
+  imports: [LoggerModule],
   controllers: [
     AppController,
     WeatherGatewayController,
